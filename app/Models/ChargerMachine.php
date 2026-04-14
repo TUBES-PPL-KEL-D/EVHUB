@@ -19,7 +19,7 @@ class ChargerMachine extends Model
         'status',
     ];
 
-    // Relasi: Setiap mesin dimiliki oleh satu vendor (User)
+    // Relasi: Setiap mesin dimiliki oleh satu vendor (User) testerrrrr
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
