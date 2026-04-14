@@ -2,14 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\VehicleController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 // Area Pengendara
-Route::prefix('rider')->group(function () {
-    //
+Route::prefix('rider')->middleware('auth')->group(function () {
+    Route::resource('vehicles', VehicleController::class);
 });
 
 // Area Vendor
