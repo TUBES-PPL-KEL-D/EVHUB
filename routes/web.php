@@ -17,6 +17,7 @@ Route::prefix('rider')->group(function () {
 Route::prefix('vendor')->name('vendor.')->middleware('auth')->group(function () {
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show']);
+    Route::get('status', [VendorController::class, 'status'])->name('status');
 });
 
 // Area Admin (Langgeng Yongi S.)

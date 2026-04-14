@@ -56,8 +56,23 @@ class VendorController extends Controller
         );
 
         return redirect()
-            ->route('vendor.documents.show', $vendor)
+            ->route('vendor.status')
             ->with('success', 'Dokumen legalitas berhasil diunggah.');
+    }
+
+    public function status(Request $request)
+    {
+        $vendor = $request->user()->vendor;
+
+        if (! $vendor) {
+            return redirect()
+                ->route('vendor.documents.create')
+                ->with('error', 'Silakan unggah dokumen legalitas terlebih dahulu.');
+        }
+
+        return view('vendor_documents.status', [
+            'vendor' => $vendor,
+        ]);
     }
 
     public function show(Request $request, Vendor $document)

@@ -37,7 +37,10 @@
 
             <div class="flex flex-col gap-3 border-t border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-sm text-slate-500">Vendor dapat melanjutkan ke proses review berikutnya.</p>
-                <a href="{{ route('vendor.documents.create') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Upload Ulang</a>
+                <div class="flex gap-3">
+                    <a href="{{ route('vendor.documents.create') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Upload Ulang</a>
+                    <a href="{{ route('vendor.status') }}" class="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700">Lihat Status</a>
+                </div>
             </div>
         </div>
     </div>
