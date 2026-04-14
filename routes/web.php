@@ -16,7 +16,7 @@ Route::prefix('rider')->group(function () {
 // Area Vendor (Fakhri & Riehand)
 Route::prefix('vendor')->name('vendor.')->middleware('auth')->group(function () {
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
-    Route::resource('documents', VendorController::class)->only(['create', 'store', 'show']);
+    Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
 });
 

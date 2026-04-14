@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
 {
+    protected function ensureOwner(Request $request, Vendor $vendor): void
+    {
+        if ($vendor->user_id !== $request->user()->id) {
+            abort(403);
+        }
+    }
+
     public function create(Request $request)
     {
         $vendorProfile = $request->user()->vendorProfile;
@@ -75,11 +82,51 @@ class VendorController extends Controller
         ]);
     }
 
+    public function edit(Request $request, Vendor $document)
+    {
+        $this->ensureOwner($request, $document);
+
+        if ($document->status !== 'Rejected') {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Dokumen hanya bisa diperbaiki saat status ditolak.');
+        }
+
+        return view('vendor_documents.edit', [
+            'vendor' => $document,
+        ]);
+    }
+
+    public function update(Request $request, Vendor $document)
+    {
+        $this->ensureOwner($request, $document);
+
+        if ($document->status !== 'Rejected') {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Dokumen hanya bisa diperbaiki saat status ditolak.');
+        }
+
+        $validated = $request->validate([
+            'legality_document' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        ]);
+
+        if ($document->legality_document_path) {
+            Storage::disk('public')->delete($document->legality_document_path);
+        }
+
+        $document->legality_document_path = $validated['legality_document']->store('vendor/legalities', 'public');
+        $document->status = 'Pending';
+        $document->save();
+
+        return redirect()
+            ->route('vendor.status')
+            ->with('success', 'Dokumen perbaikan berhasil diunggah. Status kembali menjadi Pending.');
+    }
+
     public function show(Request $request, Vendor $document)
     {
-        if ($document->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        $this->ensureOwner($request, $document);
 
         return view('vendor_documents.show', [
             'vendor' => $document,

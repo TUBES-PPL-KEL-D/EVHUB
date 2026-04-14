@@ -12,6 +12,7 @@
         ];
         $statusClass = $statusStyles[$vendor->status] ?? 'bg-slate-100 text-slate-700';
         $isApproved = $vendor->status === 'Approved';
+        $isRejected = $vendor->status === 'Rejected';
     @endphp
 
     <div class="mx-auto max-w-4xl">
@@ -49,6 +50,9 @@
                     @if ($isApproved)
                         <p class="text-base font-semibold text-emerald-700">Pendaftaran Anda sudah disetujui.</p>
                         <p class="mt-2 text-sm text-slate-600">Vendor dapat melanjutkan ke proses operasional berikutnya di EV-HUB.</p>
+                    @elseif ($isRejected)
+                        <p class="text-base font-semibold text-red-700">Dokumen legalitas Anda ditolak.</p>
+                        <p class="mt-2 text-sm text-slate-600">Silakan perbaiki dokumen dan unggah ulang melalui tombol perbaikan.</p>
                     @else
                         <p class="text-base font-semibold text-amber-700">Pendaftaran Anda masih dalam proses review.</p>
                         <p class="mt-2 text-sm text-slate-600">Status akan berubah menjadi Approved setelah verifikasi admin selesai.</p>
@@ -59,6 +63,9 @@
             <div class="flex flex-col gap-3 border-t border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-sm text-slate-500">Terakhir diperbarui: {{ $vendor->updated_at->format('d M Y H:i') }}</p>
                 <div class="flex gap-3">
+                    @if ($isRejected)
+                        <a href="{{ route('vendor.documents.edit', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Perbaiki & Upload Ulang</a>
+                    @endif
                     <a href="{{ route('vendor.documents.show', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Detail Dokumen</a>
                     <a href="{{ url('/') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Kembali ke Beranda</a>
                 </div>

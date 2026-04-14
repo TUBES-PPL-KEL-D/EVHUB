@@ -3,6 +3,10 @@
 @section('title', 'Status Legalitas Vendor')
 
 @section('content')
+    @php
+        $isRejected = $vendor->status === 'Rejected';
+    @endphp
+
     <div class="mx-auto max-w-4xl">
         @if (session('success'))
             <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -38,7 +42,9 @@
             <div class="flex flex-col gap-3 border-t border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-sm text-slate-500">Vendor dapat melanjutkan ke proses review berikutnya.</p>
                 <div class="flex gap-3">
-                    <a href="{{ route('vendor.documents.create') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Upload Ulang</a>
+                    @if ($isRejected)
+                        <a href="{{ route('vendor.documents.edit', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Perbaiki Dokumen</a>
+                    @endif
                     <a href="{{ route('vendor.status') }}" class="inline-flex items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700">Lihat Status</a>
                 </div>
             </div>
