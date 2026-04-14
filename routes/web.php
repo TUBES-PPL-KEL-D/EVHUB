@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\SpkluController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -11,6 +12,7 @@ Route::get('/', function () {
 // Area Pengendara
 Route::prefix('rider')->middleware('auth')->group(function () {
     Route::resource('vehicles', VehicleController::class);
+    Route::get('/peta', [SpkluController::class, 'index'])->name('welcome');
 });
 
 // Area Vendor
