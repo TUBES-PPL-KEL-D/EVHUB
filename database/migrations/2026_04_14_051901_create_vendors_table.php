@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendor_profiles', function (Blueprint $table) {
+        Schema::create('vendors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->unique();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('company_name');
-            $table->string('company_email')->nullable();
-            $table->string('company_phone')->nullable();
-            $table->text('company_address');
-            $table->text('company_description')->nullable();
+            $table->string('legality_document_path')->nullable();
+            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Suspended'])->default('Pending');
             $table->timestamps();
-        });
+        }); 
     }
 
     /**
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_profiles');
+        Schema::dropIfExists('vendors');
     }
 };
