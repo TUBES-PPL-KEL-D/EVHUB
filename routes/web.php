@@ -1,22 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 Route::get('/', function () {
-    return view('welcome'); // Base map SPKLU akan dirender di sini
+    return view('welcome');
 });
 
-// Area Pengendara (Byan & Wisnu)
+// Area Pengendara
 Route::prefix('rider')->group(function () {
-    // Rute Garasi Digital & Profil masuk di sini
+    //
 });
 
-// Area Vendor (Fakhri & Riehand)
+// Area Vendor
 Route::prefix('vendor')->group(function () {
-    // Rute Pendaftaran Vendor & Manajemen Mesin Charger masuk di sini
+    //
 });
 
-// Area Admin (Langgeng Yongi S.)
+// Area Admin
 Route::prefix('admin')->group(function () {
-    // Rute Verifikasi Vendor & Panel Manajemen Pengguna masuk di sini
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });
