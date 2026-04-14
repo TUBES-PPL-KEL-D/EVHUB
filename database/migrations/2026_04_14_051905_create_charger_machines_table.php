@@ -10,14 +10,15 @@ return new class extends Migration
     {
         Schema::create('charger_machines', function (Blueprint $table) {
             $table->id();
-            // Asumsi vendor_id merujuk ke tabel users
             $table->foreignId('vendor_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('spklu_id')->constrained('spklus')->onDelete('cascade');
             $table->string('name');
-            $table->string('location');
             $table->string('connector_type');
             $table->decimal('capacity_kw', 8, 2);
-            $table->string('photo_path'); // Menyimpan path file foto
-            $table->enum('status', ['active', 'inactive', 'maintenance'])->default('inactive');
+            $table->decimal('price_per_kwh', 10, 2);
+            $table->string('operational_hours');
+            $table->string('photo_path'); 
+            $table->enum('status', ['available', 'unavailable', 'maintenance'])->default('available');
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ChargerMachineController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,7 +16,7 @@ Route::prefix('rider')->middleware('auth')->group(function () {
 
 // Area Vendor
 Route::prefix('vendor')->group(function () {
-    //
+    Route::resource('chargers', ChargerMachineController::class);
 });
 
 // Area Admin

@@ -3,47 +3,101 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChargerMachine;
+use App\Models\Spklu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChargerMachineController extends Controller
 {
-    // Menampilkan halaman form create
-    public function create()
+    // Read: Menampilkan daftar mesin charger milik vendor
+    public function index()
     {
-        return view('vendor.chargers.create');
+        $chargers = ChargerMachine::with('spklu')
+            ->where('vendor_id', Auth::id() ?? 1) // Gunakan Auth sesungguhnya nanti
+            ->get();
+        return view('vendor.chargers.index', compact('chargers'));
     }
 
-    // Memproses data yang di-submit
+    // Create: Menampilkan form tambah
+    public function create()
+    {
+        $spklus = Spklu::all(); // Mengambil data SPKLU untuk opsi dropdown
+        return view('vendor.chargers.create', compact('spklus'));
+    }
+
+    // Store: Memproses data simpan
     public function store(Request $request)
     {
-        // 1. Validasi input
         $validatedData = $request->validate([
+            'spklu_id' => 'required|exists:spklus,id',
             'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
             'connector_type' => 'required|string|max:100',
             'capacity_kw' => 'required|numeric|min:1',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
+            'price_per_kwh' => 'required|numeric|min:0',
+            'operational_hours' => 'required|string|max:255',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 2. Proses unggah file
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('chargers', 'public');
-            $validatedData['photo_path'] = $path;
-        }
+        $path = $request->file('photo')->store('chargers', 'public');
 
-        // 3. Simpan data ke database
-        // Asumsi autentikasi vendor menggunakan sistem default auth
         ChargerMachine::create([
-            'vendor_id' => Auth::id() ?? 1, // Fallback ID 1 jika belum implementasi Auth
+            'vendor_id' => Auth::id() ?? 1,
+            'spklu_id' => $validatedData['spklu_id'],
             'name' => $validatedData['name'],
-            'location' => $validatedData['location'],
             'connector_type' => $validatedData['connector_type'],
             'capacity_kw' => $validatedData['capacity_kw'],
-            'photo_path' => $validatedData['photo_path'],
+            'price_per_kwh' => $validatedData['price_per_kwh'],
+            'operational_hours' => $validatedData['operational_hours'],
+            'photo_path' => $path,
+            'status' => 'available', // Default saat create
         ]);
 
-        // 4. Redirect dengan pesan sukses
-        return redirect()->route('vendor.chargers.create')->with('success', 'Infrastruktur mesin charger berhasil ditambahkan!');
+        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil ditambahkan!');
+    }
+
+    // Edit: Menampilkan form edit
+    public function edit(ChargerMachine $charger)
+    {
+        $spklus = Spklu::all();
+        return view('vendor.chargers.edit', compact('charger', 'spklus'));
+    }
+
+    // Update: Memproses pembaruan data
+    public function update(Request $request, ChargerMachine $charger)
+    {
+        $validatedData = $request->validate([
+            'spklu_id' => 'required|exists:spklus,id',
+            'name' => 'required|string|max:255',
+            'connector_type' => 'required|string|max:100',
+            'capacity_kw' => 'required|numeric|min:1',
+            'price_per_kwh' => 'required|numeric|min:0',
+            'operational_hours' => 'required|string|max:255',
+            'status' => 'required|in:available,unavailable,maintenance',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama
+            if (Storage::disk('public')->exists($charger->photo_path)) {
+                Storage::disk('public')->delete($charger->photo_path);
+            }
+            $validatedData['photo_path'] = $request->file('photo')->store('chargers', 'public');
+        }
+
+        $charger->update($validatedData);
+
+        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil diperbarui!');
+    }
+
+    // Delete: Memproses penghapusan data
+    public function destroy(ChargerMachine $charger)
+    {
+        if (Storage::disk('public')->exists($charger->photo_path)) {
+            Storage::disk('public')->delete($charger->photo_path);
+        }
+        $charger->delete();
+
+        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil dihapus!');
     }
 }
