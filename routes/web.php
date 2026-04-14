@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\VendorProfileController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,6 +16,7 @@ Route::prefix('rider')->group(function () {
 // Area Vendor (Fakhri & Riehand)
 Route::prefix('vendor')->name('vendor.')->middleware('auth')->group(function () {
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
+    Route::resource('documents', VendorController::class)->only(['create', 'store', 'show']);
 });
 
 // Area Admin (Langgeng Yongi S.)
