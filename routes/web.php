@@ -24,3 +24,10 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });
+
+
+
+
+
+
+
