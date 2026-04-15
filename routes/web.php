@@ -10,7 +10,7 @@ Route::get('/', function () {
 });
 
 // Area Pengendara
-Route::prefix('rider')->middleware('auth')->group(function () {
+Route::prefix('rider')->group(function () {
     Route::resource('vehicles', VehicleController::class);
 });
 
@@ -23,3 +23,4 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });
+

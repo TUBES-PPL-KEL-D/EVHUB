@@ -28,7 +28,7 @@ class VehicleController extends Controller
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
         ]);
 
-        $validated['user_id'] = Auth::id();
+        $validated['user_id'] = 1;
 
         Vehicle::create($validated);
 
