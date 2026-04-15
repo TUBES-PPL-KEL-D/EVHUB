@@ -3,16 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class VendorProfileController extends Controller
 {
-    public function create()
+    protected function resolveUser(Request $request): User
     {
-        if (request()->user()->vendorProfile()->exists()) {
+        if ($request->user()) {
+            return $request->user();
+        }
+
+        if (! app()->environment('local')) {
+            abort(401);
+        }
+
+        return User::firstOrCreate(
+            ['email' => 'vendor.local@test.dev'],
+            [
+                'name' => 'Vendor Local',
+                'password' => Hash::make('password123'),
+                'role' => 'vendor',
+                'phone' => '081234567890',
+            ]
+        );
+    }
+
+    public function create(Request $request)
+    {
+        $user = $this->resolveUser($request);
+
+        if ($user->vendorProfile()->exists()) {
             return redirect()
-                ->route('vendor.profile.show', request()->user()->vendorProfile)
+                ->route('vendor.profile.show', $user->vendorProfile)
                 ->with('success', 'Profil vendor Anda sudah tersimpan.');
         }
 
@@ -21,9 +46,11 @@ class VendorProfileController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->user()->vendorProfile()->exists()) {
+        $user = $this->resolveUser($request);
+
+        if ($user->vendorProfile()->exists()) {
             return redirect()
-                ->route('vendor.profile.show', $request->user()->vendorProfile)
+                ->route('vendor.profile.show', $user->vendorProfile)
                 ->with('success', 'Profil vendor Anda sudah tersimpan.');
         }
 
@@ -36,7 +63,7 @@ class VendorProfileController extends Controller
         ]);
 
         $vendorProfile = new VendorProfile($validated);
-        $vendorProfile->user_id = $request->user()->id;
+    $vendorProfile->user_id = $user->id;
         $vendorProfile->save();
 
         return redirect()
@@ -44,9 +71,11 @@ class VendorProfileController extends Controller
             ->with('success', 'Profil vendor berhasil disimpan.');
     }
 
-    public function show(VendorProfile $vendorProfile)
+    public function show(Request $request, VendorProfile $vendorProfile)
     {
-        if ($vendorProfile->user_id !== request()->user()->id) {
+        $user = $this->resolveUser($request);
+
+        if ($vendorProfile->user_id !== $user->id) {
             abort(403);
         }
 
