@@ -4,14 +4,16 @@ use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ChargerMachineController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 // Area Pengendara
-Route::prefix('rider')->group(function () {
-    //
+Route::prefix('rider')->middleware('auth')->group(function () {
+    Route::resource('vehicles', VehicleController::class);
 });
 
 // Area Vendor (Fakhri & Riehand)

@@ -11,17 +11,23 @@ class ChargerMachine extends Model
 
     protected $fillable = [
         'vendor_id',
+        'spklu_id',
         'name',
-        'location',
         'connector_type',
         'capacity_kw',
+        'price_per_kwh',
+        'operational_hours',
         'photo_path',
         'status',
     ];
 
-    // Relasi: Setiap mesin dimiliki oleh satu vendor (User) testerrrrr
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    public function spklu()
+    {
+        return $this->belongsTo(Spklu::class, 'spklu_id');
     }
 }
