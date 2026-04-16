@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('role')->default('rider'); // rider, vendor, admin
             $table->string('phone')->nullable();
+            $table->string('status')->default('aktif');
             $table->rememberToken();
             $table->timestamps();
         });
