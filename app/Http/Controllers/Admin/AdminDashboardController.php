@@ -10,9 +10,38 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Mengambil vendor dengan status Pending dan memuat relasi user (untuk mengambil email)
+        // Mengambil data berdasarkan masing-masing status
         $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
+        $approvedVendors = Vendor::with('user')->where('status', 'Approved')->get();
+        $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
         
-        return view('admin.dashboard', compact('pendingVendors'));
+        // Mengirim ketiga kelompok data tersebut ke View
+        return view('admin.dashboard', compact('pendingVendors', 'approvedVendors', 'rejectedVendors'));
+    }
+
+    public function approve($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $vendor->update(['status' => 'Approved']);
+        
+        return redirect()->route('admin.dashboard')
+            ->with('success', "Pendaftaran vendor {$vendor->company_name} berhasil disetujui.");
+    }
+
+    public function reject($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $vendor->update(['status' => 'Rejected']);
+        
+        return redirect()->route('admin.dashboard')
+            ->with('success', "Pendaftaran vendor {$vendor->company_name} telah ditolak.");
+    }
+
+    public function stations()
+    {
+        $approvedVendors = Vendor::with('user')->where('status', 'Approved')->get();
+        $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
+        
+        return view('admin.stations', compact('approvedVendors', 'rejectedVendors'));
     }
 }
