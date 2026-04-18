@@ -64,3 +64,7 @@ Route::prefix('admin')->group(function () {
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
 });
+    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations'); // Rute baru
+    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
+    Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
+});
