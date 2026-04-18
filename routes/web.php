@@ -5,10 +5,10 @@ use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\SpkluController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SpkluController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
 Route::prefix('rider')->middleware('auth')->group(function () {
     Route::resource('vehicles', VehicleController::class);
     Route::get('/peta', [SpkluController::class, 'index'])->name('welcome');
+
 });
 
 // Area Vendor (Fakhri & Riehand)
@@ -44,6 +45,8 @@ Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(f
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+
+});
 // Area Vendor (Riehand)
 Route::prefix('vendor')->group(function () {
     Route::resource('chargers', ChargerMachineController::class);
@@ -52,18 +55,6 @@ Route::prefix('vendor')->group(function () {
 // Area Admin (Langgeng - PBI 9 & PBI 10)
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-});
-
-
-
-
-
-
-
-    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations'); // Rute baru
-    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
-    Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
-});
     Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations'); // Rute baru
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
