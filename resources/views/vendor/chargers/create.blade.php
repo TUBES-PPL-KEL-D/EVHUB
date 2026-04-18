@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form action="{{ route('chargers.store') }}" method="POST" enctype="multipart/form-data" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <form action="{{ route('vendor.chargers.store') }}" method="POST" enctype="multipart/form-data" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         @csrf
 
         <div style="margin-bottom: 15px;">
@@ -60,7 +60,7 @@
         </div>
 
         <div style="text-align: right;">
-            <a href="{{ route('chargers.index') }}" style="text-decoration: none; color: #6c757d; margin-right: 20px; font-weight: bold;">Batal</a>
+            <a href="{{ route('vendor.chargers.index') }}" style="text-decoration: none; color: #6c757d; margin-right: 20px; font-weight: bold;">Batal</a>
             <button type="submit" style="background-color: #28a745; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px;">Simpan Infrastruktur</button>
         </div>
     </form>

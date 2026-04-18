@@ -12,7 +12,7 @@ Route::get('/', function () {
 });
 
 // Area Pengendara
-Route::prefix('rider')->middleware('auth')->group(function () {
+Route::prefix('rider')->group(function () {
     Route::resource('vehicles', VehicleController::class);
 });
 
@@ -23,9 +23,11 @@ Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(f
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+    Route::resource('chargers', ChargerMachineController::class);
 });
 
 // Area Admin
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });
+
