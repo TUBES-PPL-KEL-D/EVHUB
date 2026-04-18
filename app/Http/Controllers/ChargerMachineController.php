@@ -53,7 +53,7 @@ class ChargerMachineController extends Controller
             'status' => 'available', // Default saat create
         ]);
 
-        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil ditambahkan!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil ditambahkan!');
     }
 
     // Edit: Menampilkan form edit
@@ -87,7 +87,7 @@ class ChargerMachineController extends Controller
 
         $charger->update($validatedData);
 
-        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil diperbarui!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil diperbarui!');
     }
 
     // Delete: Memproses penghapusan data
@@ -98,6 +98,6 @@ class ChargerMachineController extends Controller
         }
         $charger->delete();
 
-        return redirect()->route('chargers.index')->with('success', 'Mesin charger berhasil dihapus!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil dihapus!');
     }
 }

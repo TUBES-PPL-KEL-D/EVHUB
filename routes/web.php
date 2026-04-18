@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\VendorProfileController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\VehicleController;
@@ -33,6 +35,13 @@ Route::prefix('rider')->middleware('auth')->group(function () {
     Route::resource('vehicles', VehicleController::class);
 });
 
+// Area Vendor (Fakhri & Riehand)
+$vendorMiddleware = app()->environment('local') ? [] : ['auth'];
+
+Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(function () {
+    Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
+    Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
+    Route::get('status', [VendorController::class, 'status'])->name('status');
 // Area Vendor (Riehand)
 Route::prefix('vendor')->group(function () {
     Route::resource('chargers', ChargerMachineController::class);

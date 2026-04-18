@@ -22,6 +22,7 @@ class Vendor extends Model
     {
         return $this->belongsTo(User::class);
     }
+}
     
     // Opsional: Relasi ke tabel Chargers (Merging PBI Rehan)
     public function chargers()
