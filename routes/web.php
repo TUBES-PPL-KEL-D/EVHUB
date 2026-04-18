@@ -8,6 +8,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SpkluController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -33,6 +34,8 @@ Route::middleware('auth')->group(function () {
 // Area Pengendara (Byan)
 Route::prefix('rider')->middleware('auth')->group(function () {
     Route::resource('vehicles', VehicleController::class);
+    Route::get('/peta', [SpkluController::class, 'index'])->name('welcome');
+
 });
 
 // Area Vendor (Fakhri & Riehand)
@@ -42,6 +45,8 @@ Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(f
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+
+});
 // Area Vendor (Riehand)
 Route::prefix('vendor')->group(function () {
     Route::resource('chargers', ChargerMachineController::class);
