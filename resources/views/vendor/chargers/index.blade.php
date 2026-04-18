@@ -4,7 +4,7 @@
 <div class="container" style="padding: 20px; font-family: sans-serif;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="margin: 0;">Daftar Mesin Charger</h2>
-        <a href="{{ route('vendor.chargers.create') }}" style="background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">+ Tambah Mesin Baru</a>
+        <a href="{{ route('chargers.create') }}" style="background-color: #007bff; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">+ Tambah Mesin Baru</a>
     </div>
 
     @if(session('success'))
