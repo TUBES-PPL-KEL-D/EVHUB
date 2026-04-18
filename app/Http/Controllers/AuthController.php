@@ -9,53 +9,79 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // REGISTER
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
     public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6'
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|max:15',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password), // Password akan otomatis di-hash karena cast di model
+            'role' => 'rider', 
+            'status' => 'aktif'
         ]);
 
-        return response()->json([
-            'message' => 'User berhasil dibuat',
-            'user' => $user
-        ], 201);
+        Auth::login($user);
+
+        return redirect()->intended('/rider/vehicles')->with('success', 'Akun berhasil dibuat dan Anda telah login.');
     }
 
-    // LOGIN
+    public function showLogin()
+    {
+        return view('auth.login');
+    }
+
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Email atau password salah'
-            ], 401);
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || $user->status !== 'aktif') {
+            return back()->withErrors([
+                'email' => 'Akun tidak ditemukan atau sudah tidak aktif.',
+            ])->onlyInput('email');
         }
 
-        $user = Auth::user();
+        if (Hash::check($request->password, $user->password)) {
+            // Jika benar, lakukan login manual
+            Auth::login($user, $request->remember);
+            $request->session()->regenerate();
 
-        return response()->json([
-            'message' => 'Login berhasil',
-            'user' => $user
-        ]);
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'vendor') {
+                return redirect('/vendor/chargers');
+            } elseif ($user->role === 'rider') {
+                return redirect('/rider/vehicles');
+            }
+
+        }
+
+        return back()->withErrors([
+            'email' => 'Password yang Anda masukkan salah.',
+        ])->onlyInput('email');
     }
 
-    // LOGOUT
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-
-        return response()->json([
-            'message' => 'Logout berhasil'
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
     }
 }

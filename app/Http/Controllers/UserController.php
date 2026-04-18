@@ -4,37 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+
+    public function profile()
     {
-        return User::all();
+        $user = Auth::user();
+        return view('auth.profile', compact('user'));
     }
 
-    public function show($id)
+
+    public function update(Request $request)
     {
-        return User::findOrFail($id);
-    }
+        $user = Auth::user();
 
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-
-        $user->update($request->all());
-
-        return response()->json([
-            'message' => 'User berhasil diupdate',
-            'user' => $user
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:15',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        User::destroy($id);
+        $user = Auth::user();
 
-        return response()->json([
-            'message' => 'User berhasil dihapus'
-        ]);
+        $user->status = 'tidak aktif';
+        $user->save();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login')->with('success', 'Akun Anda telah dinonaktifkan.');
     }
 }
