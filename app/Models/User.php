@@ -21,7 +21,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'role',
         'password',
+        'status'
     ];
 
     /**
@@ -45,5 +48,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function vendorProfile()
+    {
+        return $this->hasOne(VendorProfile::class);
+    }
+
+    public function vendor()
+    {
+        return $this->hasOne(Vendor::class);
     }
 }
