@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Area Pengendara (Byan)
-Route::prefix('rider')->group(function () {
+Route::prefix('rider')->middleware('auth')->group(function () {
     Route::resource('vehicles', VehicleController::class);
 });
 
