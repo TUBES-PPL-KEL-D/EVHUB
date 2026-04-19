@@ -5,7 +5,6 @@
 @section('content')
     <div class="mx-auto max-w-4xl">
         <div class="mb-6">
-            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600">PBI 2</p>
             <h1 class="mt-2 text-3xl font-bold text-slate-900">Upload Dokumen Legalitas Vendor</h1>
             <p class="mt-2 text-slate-600">Unggah dokumen legalitas untuk melanjutkan proses pendaftaran vendor.</p>
         </div>
@@ -55,7 +54,6 @@
                 <div class="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
                     <p class="text-sm text-slate-500">Dokumen ini akan dipakai untuk verifikasi vendor.</p>
                     <div class="flex gap-3">
-                        <a href="{{ route('vendor.profile.show', $vendorProfile) }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Kembali</a>
                         <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">Upload Dokumen</button>
                     </div>
                 </div>

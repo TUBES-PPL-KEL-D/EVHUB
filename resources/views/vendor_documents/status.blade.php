@@ -30,7 +30,6 @@
 
         <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
             <div class="border-b border-slate-200 bg-gradient-to-r from-cyan-700 to-sky-600 px-6 py-6 text-white">
-                <p class="text-sm font-medium uppercase tracking-[0.3em] text-sky-100">PBI 3</p>
                 <h1 class="mt-2 text-3xl font-bold">Status Pendaftaran Vendor</h1>
                 <p class="mt-2 text-sky-50">Pantau status pendaftaran perusahaan Anda secara real-time.</p>
             </div>
@@ -67,7 +66,7 @@
                         <a href="{{ route('vendor.documents.edit', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Perbaiki & Upload Ulang</a>
                     @endif
                     <a href="{{ route('vendor.documents.show', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Detail Dokumen</a>
-                    <a href="{{ url('/') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Kembali ke Beranda</a>
+                    <a href="{{ route('admin.stations') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Kembali ke Beranda</a>
                 </div>
             </div>
         </div>

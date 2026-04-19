@@ -16,7 +16,6 @@
 
         <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
             <div class="border-b border-slate-200 bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-6 text-white">
-                <p class="text-sm font-medium uppercase tracking-[0.3em] text-emerald-100">Status PBI 2</p>
                 <h1 class="mt-2 text-3xl font-bold">Dokumen Legalitas Vendor</h1>
                 <p class="mt-2 text-emerald-50">Dokumen berhasil tersimpan dan sedang menunggu proses berikutnya.</p>
             </div>
