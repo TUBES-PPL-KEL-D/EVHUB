@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StationController;
 
 Route::get('/', function () {
     return view('welcome'); // Base map SPKLU akan dirender di sini
@@ -20,3 +21,6 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('admin')->group(function () {
     // Rute Verifikasi Vendor & Panel Manajemen Pengguna masuk di sini
 });
+
+// Rute untuk Modal Detail SPKLU
+Route::get('/spklu/{id}/detail', [StationController::class, 'getDetail']);
