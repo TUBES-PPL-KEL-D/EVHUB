@@ -5,7 +5,6 @@
 @section('content')
     <div class="mx-auto max-w-4xl">
         <div class="mb-6">
-            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-red-600">PBI 4</p>
             <h1 class="mt-2 text-3xl font-bold text-slate-900">Perbaiki & Unggah Ulang Dokumen</h1>
             <p class="mt-2 text-slate-600">Status dokumen Anda ditolak. Silakan unggah dokumen legalitas yang sudah diperbaiki.</p>
         </div>

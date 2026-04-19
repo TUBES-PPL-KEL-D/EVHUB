@@ -29,6 +29,7 @@ class Vendor extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Opsional: Relasi ke tabel Chargers (Merging PBI Rehan)
     /**
      * Relasi ke profil detail vendor (Pekerjaan Fakhri - PBI 5).
      * Memungkinkan admin melihat detail profil tambahan perusahaan.

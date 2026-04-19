@@ -45,10 +45,9 @@ Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(f
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
-
 });
 // Area Vendor (Riehand)
-Route::prefix('vendor')->group(function () {
+Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(function () {
     Route::resource('chargers', ChargerMachineController::class);
 });
 

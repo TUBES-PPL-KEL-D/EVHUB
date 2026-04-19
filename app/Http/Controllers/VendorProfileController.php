@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class VendorProfileController extends Controller
 {
@@ -20,39 +21,41 @@ class VendorProfileController extends Controller
             abort(401);
         }
 
-        return User::firstOrCreate(
-            ['email' => 'vendor.local@test.dev'],
-            [
-                'name' => 'Vendor Local',
-                'password' => Hash::make('password123'),
-                'role' => 'vendor',
-                'phone' => '081234567890',
-            ]
-        );
+        $localUserId = $request->session()->get('local_vendor_user_id');
+
+        if ($localUserId) {
+            $existingLocalUser = User::find($localUserId);
+            if ($existingLocalUser) {
+                return $existingLocalUser;
+            }
+        }
+
+        $user = User::create([
+            'name' => 'Vendor Local '.now()->format('His'),
+            'email' => 'vendor.local+'.Str::lower((string) Str::uuid()).'@test.dev',
+            'password' => Hash::make('password123'),
+            'role' => 'vendor',
+            'phone' => '081234567890',
+        ]);
+
+        $request->session()->put('local_vendor_user_id', $user->id);
+
+        return $user;
     }
 
     public function create(Request $request)
     {
         $user = $this->resolveUser($request);
 
-        if ($user->vendorProfile()->exists()) {
-            return redirect()
-                ->route('vendor.profile.show', $user->vendorProfile)
-                ->with('success', 'Profil vendor Anda sudah tersimpan.');
-        }
-
-        return view('vendor_profiles.create');
+        return view('vendor_profiles.create', [
+            'vendorProfile' => $user->vendorProfile,
+        ]);
     }
 
     public function store(Request $request)
     {
         $user = $this->resolveUser($request);
-
-        if ($user->vendorProfile()->exists()) {
-            return redirect()
-                ->route('vendor.profile.show', $user->vendorProfile)
-                ->with('success', 'Profil vendor Anda sudah tersimpan.');
-        }
+        $hadProfile = $user->vendorProfile()->exists();
 
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
@@ -62,21 +65,42 @@ class VendorProfileController extends Controller
             'company_description' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $vendorProfile = new VendorProfile($validated);
-    $vendorProfile->user_id = $user->id;
-        $vendorProfile->save();
+        $vendorProfile = VendorProfile::updateOrCreate(
+            ['user_id' => $user->id],
+            $validated
+        );
+
+        if ($user->vendor) {
+            $user->vendor->update([
+                'company_name' => $vendorProfile->company_name,
+            ]);
+        }
+
+        if ($hadProfile) {
+            return redirect()
+                ->route('vendor.profile.show', $vendorProfile)
+                ->with('success', 'Profil vendor berhasil diperbarui.');
+        }
 
         return redirect()
-            ->route('vendor.profile.show', $vendorProfile)
-            ->with('success', 'Profil vendor berhasil disimpan.');
+            ->route('vendor.documents.create')
+            ->with('success', 'Profil vendor berhasil disimpan. Lanjut upload dokumen legalitas.');
     }
 
     public function show(Request $request, VendorProfile $vendorProfile)
     {
         $user = $this->resolveUser($request);
+        $currentUserProfile = $user->vendorProfile;
 
-        if (! app()->environment('local') && $vendorProfile->user_id !== $user->id) {
-            abort(403);
+        if (! $currentUserProfile) {
+            return redirect()
+                ->route('vendor.profile.create')
+                ->with('error', 'Silakan isi profil vendor terlebih dahulu.');
+        }
+
+        if ($vendorProfile->user_id !== $user->id) {
+            // Avoid redirect loops by always rendering the active user's own profile.
+            $vendorProfile = $currentUserProfile;
         }
 
         return view('vendor_profiles.show', compact('vendorProfile'));
