@@ -38,6 +38,7 @@
             @auth
                 <div class="flex items-center space-x-8 text-sm font-bold text-slate-500">
                     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Verifikasi</a>
+                    <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Garasi Kendaraan</a>
                     <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
                     
                     <a href="{{ route('profile') }}" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">A</a>
