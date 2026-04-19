@@ -35,15 +35,14 @@
                 </div>
                 <span class="text-2xl font-extrabold tracking-tighter text-slate-900 drop-shadow-sm">EV-HUB</span>
             </div>
-            
-            <div class="flex items-center space-x-8 text-sm font-bold text-slate-500">
-                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Verifikasi</a>
-                <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
-                
-                <div class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">
-                    A
+            @auth
+                <div class="flex items-center space-x-8 text-sm font-bold text-slate-500">
+                    <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Verifikasi</a>
+                    <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
+                    
+                    <a href="{{ route('profile') }}" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">A</a>
                 </div>
-            </div>
+            @endauth
         </nav>
 
         <main class="w-full lg:w-[65%] lg:ml-auto px-6 lg:px-12 py-8 flex-grow">
