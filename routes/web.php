@@ -64,3 +64,6 @@ Route::prefix('admin')->group(function () {
     Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('admin.vendors.suspend');
     Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('admin.vendors.activate');
 });
+
+// Route untuk mengambil data JSON relasi SPKLU dan Charger
+Route::get('/api/spklus', [SpkluController::class, 'getSpkluData']);
