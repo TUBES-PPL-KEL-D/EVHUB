@@ -9,7 +9,10 @@ class Vendor extends Model
 {
     use HasFactory;
 
-    // Mengizinkan kolom-kolom ini diisi data secara massal (mass assignment)
+    /**
+     * Kolom yang dapat diisi secara massal.
+     * Status yang didukung: 'Pending', 'Approved', 'Rejected', 'Suspended'.
+     */
     protected $fillable = [
         'user_id',
         'company_name',
@@ -17,14 +20,28 @@ class Vendor extends Model
         'status',
     ];
 
-    // Mendaftarkan relasi: Setiap Vendor "dimiliki" (belongsTo) oleh satu User
+    /**
+     * Relasi ke User (Pemilik akun vendor).
+     * Setiap vendor terhubung ke satu akun user.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    
-    // Opsional: Relasi ke tabel Chargers (Merging PBI Rehan)
+    /**
+     * Relasi ke profil detail vendor (Pekerjaan Fakhri - PBI 5).
+     * Memungkinkan admin melihat detail profil tambahan perusahaan.
+     */
+    public function profile()
+    {
+        return $this->hasOne(VendorProfile::class);
+    }
+
+    /**
+     * Relasi ke mesin charger (Pekerjaan Riehand - PBI 15).
+     * Memungkinkan sistem melacak mesin mana saja yang dimiliki vendor ini.
+     */
     public function chargers()
     {
         return $this->hasMany(ChargerMachine::class);

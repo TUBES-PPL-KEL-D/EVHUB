@@ -10,38 +10,45 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Mengambil data berdasarkan masing-masing status
         $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
-        $approvedVendors = Vendor::with('user')->where('status', 'Approved')->get();
-        $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
-        
-        // Mengirim ketiga kelompok data tersebut ke View
-        return view('admin.dashboard', compact('pendingVendors', 'approvedVendors', 'rejectedVendors'));
+        return view('admin.dashboard', compact('pendingVendors'));
     }
 
     public function approve($id)
     {
         $vendor = Vendor::findOrFail($id);
         $vendor->update(['status' => 'Approved']);
-        
-        return redirect()->route('admin.dashboard')
-            ->with('success', "Pendaftaran vendor {$vendor->company_name} berhasil disetujui.");
+        return redirect()->route('admin.dashboard')->with('success', "Vendor {$vendor->company_name} telah diaktifkan.");
     }
 
     public function reject($id)
     {
         $vendor = Vendor::findOrFail($id);
         $vendor->update(['status' => 'Rejected']);
-        
-        return redirect()->route('admin.dashboard')
-            ->with('success', "Pendaftaran vendor {$vendor->company_name} telah ditolak.");
+        return redirect()->route('admin.dashboard')->with('success', "Pendaftaran {$vendor->company_name} telah ditolak.");
     }
 
+    // Fungsi untuk PBI 11
     public function stations()
     {
         $approvedVendors = Vendor::with('user')->where('status', 'Approved')->get();
+        $suspendedVendors = Vendor::with('user')->where('status', 'Suspended')->get();
         $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
         
-        return view('admin.stations', compact('approvedVendors', 'rejectedVendors'));
+        return view('admin.stations', compact('approvedVendors', 'suspendedVendors', 'rejectedVendors'));
+    }
+
+    public function suspend($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $vendor->update(['status' => 'Suspended']);
+        return redirect()->route('admin.stations')->with('success', "Akun vendor {$vendor->company_name} telah dibekukan sementara.");
+    }
+
+    public function activate($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $vendor->update(['status' => 'Approved']);
+        return redirect()->route('admin.stations')->with('success', "Akun vendor {$vendor->company_name} telah diaktifkan kembali.");
     }
 }
