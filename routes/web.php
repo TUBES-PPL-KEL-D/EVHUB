@@ -52,10 +52,16 @@ Route::prefix('vendor')->group(function () {
     Route::resource('chargers', ChargerMachineController::class);
 });
 
-// Area Admin (Langgeng - PBI 9 & PBI 10)
+// Area Admin (Langgeng - PBI 9, 10, 11)
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations'); // Rute baru
+    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations');
+    
+    // Otorisasi Pendaftaran (PBI 10)
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
+
+    // Manajemen Status Akun (PBI 11)
+    Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('admin.vendors.suspend');
+    Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('admin.vendors.activate');
 });
