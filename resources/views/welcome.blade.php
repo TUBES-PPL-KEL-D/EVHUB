@@ -26,7 +26,7 @@
             <div id="panelChargersList" class="space-y-4 mt-6">
                 </div>
 
-            <button class="w-full mt-6 bg-white text-teal-600 font-bold py-2 rounded-full shadow-md hover:bg-gray-50 transition">
+            <button onclick="alert('Fitur Booking sedang dalam tahap pengembangan! Tunggu update selanjutnya ya 🚀')" class="w-full mt-6 bg-white text-teal-600 font-bold py-2 rounded-full shadow-md hover:bg-gray-50 transition">
                 Book Now
             </button>
         </div>
