@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Kendaraan')
+@section('title', 'Edit Kendaraan')
 
 @section('content')
 <style>
@@ -117,8 +117,6 @@
     .step.active .step-label { color: #10b981; }
     .step.done .step-label { color: #10b981; }
     .step.pending .step-label { color: #94a3b8; }
-    #models-section { display: none; }
-    #plate-section { display: none; }
     .plate-input {
         font-family: 'Plus Jakarta Sans', monospace;
         font-size: 22px;
@@ -150,7 +148,6 @@
         border: 1.5px solid #a7f3d0;
         border-radius: 12px;
         padding: 14px 18px;
-        display: none;
     }
 </style>
 
@@ -161,23 +158,23 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Kembali ke Garasi
         </a>
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Tambah Kendaraan EV</h1>
-        <p class="mt-1 text-slate-500">Pilih merek dan model kendaraan listrik Anda, lalu masukkan plat nomor.</p>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Edit Kendaraan EV</h1>
+        <p class="mt-1 text-slate-500">Ubah merek, model, atau plat nomor kendaraan Anda.</p>
     </div>
 
     {{-- Step Indicator --}}
     <div class="step-indicator">
-        <div class="step active" id="step1-indicator">
-            <div class="step-num">1</div>
+        <div class="step done" id="step1-indicator">
+            <div class="step-num">✓</div>
             <span class="step-label">Pilih Merek</span>
         </div>
-        <div class="step-line" id="line1"></div>
-        <div class="step pending" id="step2-indicator">
-            <div class="step-num">2</div>
+        <div class="step-line done" id="line1"></div>
+        <div class="step done" id="step2-indicator">
+            <div class="step-num">✓</div>
             <span class="step-label">Pilih Model</span>
         </div>
-        <div class="step-line" id="line2"></div>
-        <div class="step pending" id="step3-indicator">
+        <div class="step-line done" id="line2"></div>
+        <div class="step active" id="step3-indicator">
             <div class="step-num">3</div>
             <span class="step-label">Plat Nomor</span>
         </div>
@@ -185,10 +182,11 @@
 
     <div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
         <div class="p-6 sm:p-8">
-            <form action="{{ route('vehicles.store') }}" method="POST" id="vehicle-form">
+            <form action="{{ route('vehicles.update', $vehicle->id) }}" method="POST" id="vehicle-form">
                 @csrf
-                <input type="hidden" name="merk" id="merk-hidden">
-                <input type="hidden" name="model" id="model-hidden">
+                @method('PUT')
+                <input type="hidden" name="merk" id="merk-hidden" value="{{ $vehicle->merk }}">
+                <input type="hidden" name="model" id="model-hidden" value="{{ $vehicle->model }}">
 
                 {{-- Step 1: Brand Selection --}}
                 <div id="brand-section">
@@ -213,10 +211,14 @@
                             ['name' => 'DENZA',    'img' => 'denza'],
                             ['name' => 'Jaecoo',   'img' => 'jaecoo'],
                         ];
+                        $currentMerk = $vehicle->merk;
+                        $currentModel = $vehicle->model;
                         @endphp
 
                         @foreach($brands as $brand)
-                        <div class="brand-card" onclick="selectBrand('{{ $brand['name'] }}', this)">
+                        <div class="brand-card {{ $currentMerk === $brand['name'] ? 'selected' : '' }}"
+                             id="brand-{{ Str::slug($brand['name']) }}"
+                             onclick="selectBrand('{{ $brand['name'] }}', this)">
                             <div class="check-icon">
                                 <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -230,22 +232,23 @@
                 {{-- Step 2: Model Selection --}}
                 <div id="models-section" class="mt-6">
                     <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Pilih Model — <span id="selected-brand-label" class="text-emerald-600"></span></h2>
+                        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Pilih Model — <span id="selected-brand-label" class="text-emerald-600">{{ $currentMerk }}</span></h2>
                         <button type="button" onclick="resetBrand()" class="text-xs text-slate-400 hover:text-red-500 transition flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             Ganti Merek
                         </button>
                     </div>
                     <div class="flex flex-wrap gap-2" id="model-chips">
-                        {{-- Populated by JS --}}
+                        {{-- Populated by JS on load --}}
                     </div>
                 </div>
 
                 {{-- Step 3: License Plate --}}
                 <div id="plate-section" class="mt-6">
                     <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Masukkan Plat Nomor</h2>
-                    <input type="text" name="license_plate" id="license_plate" placeholder="D 1234 ABC"
-                        required maxlength="12"
+                    <input type="text" name="license_plate" id="license_plate"
+                        placeholder="D 1234 ABC" required maxlength="12"
+                        value="{{ old('license_plate', $vehicle->license_plate) }}"
                         class="plate-input"
                         oninput="this.value = this.value.toUpperCase(); checkForm()">
                     @error('license_plate')
@@ -256,9 +259,9 @@
                     <div class="summary-box mt-4" id="summary-box">
                         <p class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2">Ringkasan Kendaraan</p>
                         <div class="flex gap-6 text-sm">
-                            <div><span class="text-slate-400">Merek</span><br><strong id="sum-merk" class="text-slate-800">-</strong></div>
-                            <div><span class="text-slate-400">Model</span><br><strong id="sum-model" class="text-slate-800">-</strong></div>
-                            <div><span class="text-slate-400">Plat</span><br><strong id="sum-plate" class="text-slate-800">-</strong></div>
+                            <div><span class="text-slate-400">Merek</span><br><strong id="sum-merk" class="text-slate-800">{{ $currentMerk }}</strong></div>
+                            <div><span class="text-slate-400">Model</span><br><strong id="sum-model" class="text-slate-800">{{ $currentModel }}</strong></div>
+                            <div><span class="text-slate-400">Plat</span><br><strong id="sum-plate" class="text-slate-800">{{ $vehicle->license_plate }}</strong></div>
                         </div>
                     </div>
                 </div>
@@ -269,9 +272,9 @@
                         class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
                         Batal
                     </a>
-                    <button type="submit" id="submit-btn" disabled
-                        class="px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 bg-slate-300 cursor-not-allowed">
-                        Simpan Kendaraan
+                    <button type="submit" id="submit-btn"
+                        class="px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200">
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>
@@ -299,40 +302,38 @@ const evModels = {
     'Jaecoo':   ['J5', 'J5 EV', 'J7', 'J8'],
 };
 
-let selectedBrand = null;
-let selectedModel = null;
+// Pre-load existing values from server
+let selectedBrand = '{{ $currentMerk }}';
+let selectedModel = '{{ $currentModel }}';
+
+function renderModels(brand, activeModel) {
+    const chipsContainer = document.getElementById('model-chips');
+    chipsContainer.innerHTML = '';
+    if (!evModels[brand]) return;
+    evModels[brand].forEach(model => {
+        const chip = document.createElement('div');
+        chip.className = 'model-chip' + (model === activeModel ? ' selected' : '');
+        chip.textContent = model;
+        chip.onclick = () => selectModel(model, chip);
+        chipsContainer.appendChild(chip);
+    });
+}
 
 function selectBrand(brand, el) {
     selectedBrand = brand;
     selectedModel = null;
 
-    // UI: highlight brand card
     document.querySelectorAll('.brand-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
 
-    // Update hidden input
     document.getElementById('merk-hidden').value = brand;
     document.getElementById('model-hidden').value = '';
-
-    // Update step indicator
-    setStep(2);
-
-    // Show model section
     document.getElementById('selected-brand-label').textContent = brand;
-    const chipsContainer = document.getElementById('model-chips');
-    chipsContainer.innerHTML = '';
-    evModels[brand].forEach(model => {
-        const chip = document.createElement('div');
-        chip.className = 'model-chip';
-        chip.textContent = model;
-        chip.onclick = () => selectModel(model, chip);
-        chipsContainer.appendChild(chip);
-    });
-    document.getElementById('models-section').style.display = 'block';
 
-    // Hide plate section if brand changed
+    setStep(2);
+    renderModels(brand, null);
+    document.getElementById('models-section').style.display = 'block';
     document.getElementById('plate-section').style.display = 'none';
-    document.getElementById('summary-box').style.display = 'none';
     checkForm();
 }
 
@@ -344,7 +345,6 @@ function resetBrand() {
     document.getElementById('model-hidden').value = '';
     document.getElementById('models-section').style.display = 'none';
     document.getElementById('plate-section').style.display = 'none';
-    document.getElementById('summary-box').style.display = 'none';
     setStep(1);
     checkForm();
 }
@@ -356,32 +356,34 @@ function selectModel(model, el) {
 
     document.getElementById('model-hidden').value = model;
     document.getElementById('plate-section').style.display = 'block';
-
     setStep(3);
     checkForm();
-
-    // Smooth scroll to plate input
-    setTimeout(() => {
-        document.getElementById('plate-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
 }
 
 function setStep(step) {
-    const steps = ['step1-indicator', 'step2-indicator', 'step3-indicator'];
-    const lines = ['line1', 'line2'];
-
-    steps.forEach((id, i) => {
+    const steps = [
+        { id: 'step1-indicator' },
+        { id: 'step2-indicator' },
+        { id: 'step3-indicator' },
+    ];
+    steps.forEach(({ id }, i) => {
         const el = document.getElementById(id);
         el.className = 'step';
-        if (i + 1 < step) el.classList.add('done');
-        else if (i + 1 === step) el.classList.add('active');
-        else el.classList.add('pending');
+        const numEl = el.querySelector('.step-num');
+        if (i + 1 < step) {
+            el.classList.add('done');
+            numEl.textContent = '✓';
+        } else if (i + 1 === step) {
+            el.classList.add('active');
+            numEl.textContent = i + 1;
+        } else {
+            el.classList.add('pending');
+            numEl.textContent = i + 1;
+        }
     });
-
-    lines.forEach((id, i) => {
+    ['line1', 'line2'].forEach((id, i) => {
         const el = document.getElementById(id);
-        el.className = 'step-line';
-        if (i + 1 < step) el.classList.add('done');
+        el.className = 'step-line' + (i + 1 < step ? ' done' : '');
     });
 }
 
@@ -393,18 +395,31 @@ function checkForm() {
 
     if (merk && model && plate.length >= 4) {
         btn.disabled = false;
-        btn.classList.remove('bg-slate-300', 'cursor-not-allowed');
+        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        btn.style.boxShadow = '0 6px 20px rgba(16,185,129,0.35)';
+        btn.style.cursor = 'pointer';
 
-        // Update summary
         document.getElementById('sum-merk').textContent = merk;
         document.getElementById('sum-model').textContent = model;
         document.getElementById('sum-plate').textContent = plate;
         document.getElementById('summary-box').style.display = 'block';
     } else {
         btn.disabled = true;
-        btn.classList.add('bg-slate-300', 'cursor-not-allowed');
-        document.getElementById('summary-box').style.display = 'none';
+        btn.style.background = '#cbd5e1';
+        btn.style.boxShadow = 'none';
+        btn.style.cursor = 'not-allowed';
     }
 }
+
+// Initialize on page load with existing vehicle data
+window.addEventListener('DOMContentLoaded', () => {
+    if (selectedBrand) {
+        document.getElementById('models-section').style.display = 'block';
+        document.getElementById('plate-section').style.display = 'block';
+        renderModels(selectedBrand, selectedModel);
+        setStep(3);
+        checkForm();
+    }
+});
 </script>
 @endsection
