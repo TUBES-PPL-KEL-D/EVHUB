@@ -88,8 +88,24 @@
 
 
         <div class="bg-white shadow rounded-lg overflow-hidden border border-red-100">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
+            <div class="p-6 flex flex-col gap-5">
+                <div class="flex items-center justify-between gap-5">
+                    <div>
+                        <h3 class="text-lg font-bold text-red-600">Logout</h3>
+                        <p class="text-sm text-gray-500 mt-1">Setelah akun dilogout, Anda tidak akan keluar dari akses layanan EVHUB.</p>
+                    </div>
+                    <div>
+                        <form action="{{ route('logout') }}" method="POST" 
+                              onsubmit="return confirm('Apakah Anda yakin ingin logout? Anda akan segera dikeluarkan dari sistem.')">
+                            @csrf
+                            @method('POST')
+                            <button type="submit" class="w-40 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold py-2 px-4 rounded-md transition duration-200 cursor-pointer">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between gap-5">
                     <div>
                         <h3 class="text-lg font-bold text-red-600">Nonaktifkan Akun</h3>
                         <p class="text-sm text-gray-500 mt-1">Setelah akun dinonaktifkan, Anda tidak akan bisa mengakses layanan EV-HUB untuk sementara waktu.</p>
@@ -99,8 +115,8 @@
                               onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan akun? Anda akan segera dikeluarkan dari sistem.')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold py-2 px-4 rounded-md transition duration-200 cursor-pointer">
-                                Nonaktifkan Sekarang
+                            <button type="submit" class="w-40 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold py-2 px-4 rounded-md transition duration-200 cursor-pointer">
+                                Nonaktifkan
                             </button>
                         </form>
                     </div>
