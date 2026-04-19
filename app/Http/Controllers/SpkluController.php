@@ -14,6 +14,7 @@ class SpkluController extends Controller
         $spklus = Spklu::select('name', 'address', 'latitude', 'longitude')->get();
 
         // Mengirimkan data $spklus ke file resources/views/welcome.blade.php
-        return view('welcome', compact('spklus'));
+        return view('vendor.map', compact('spklus'));
+
     }
 }
