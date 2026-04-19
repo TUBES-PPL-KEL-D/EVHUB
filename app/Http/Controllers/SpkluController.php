@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Spklu; // Pastikan model Spklu di-import
+use App\Models\Spklu; 
 use Illuminate\Http\Request;
 
 class SpkluController extends Controller
@@ -16,5 +16,12 @@ class SpkluController extends Controller
         // Mengirimkan data $spklus ke file resources/views/welcome.blade.php
         return view('vendor.map', compact('spklus'));
 
+    }
+
+    public function getSpkluData()
+    {
+        // Mengambil data SPKLU beserta relasi daftar mesin charger
+        $spklus = Spklu::with('chargers')->get();
+        return response()->json($spklus);
     }
 }
