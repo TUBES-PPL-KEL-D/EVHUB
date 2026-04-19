@@ -21,7 +21,7 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Mengambil data SPKLU dari backend Laravel
+        // Mengambil data SPKLU dari sebuah backend di Laravel
         var spklus = @json($spklus);
 
         // Melakukan perulangan untuk menaruh marker di setiap lokasi
