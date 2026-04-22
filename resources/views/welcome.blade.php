@@ -1,42 +1,81 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-4 relative h-screen">
-    <h1 class="text-2xl font-bold mb-4">Peta Lokasi SPKLU</h1>
+<style>
+    /* Menghilangkan semua jarak bawaan dari layout.app */
+    main { padding: 0 !important; margin: 0 !important; }
+    .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    body { overflow: hidden; } /* Biar ga ada scrollbar ganda di web */
     
-    <div id="map" class="w-full h-[80vh] rounded-xl shadow-md z-0"></div>
+    /* Scrollbar tipis untuk panel melayang */
+    #sidePanel::-webkit-scrollbar { width: 5px; }
+    #sidePanel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    <div id="spkluModal" class="fixed inset-0 z-50 hidden bg-black/20 backdrop-blur-md flex items-end sm:items-center justify-center transition-opacity duration-300">        <div class="bg-white w-full sm:w-[400px] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl relative transform transition-transform duration-300 translate-y-full sm:translate-y-0" id="modalContent">
-            
-            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4 sm:hidden"></div>
+    /* Animasi transisi */
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
 
-            <div class="flex justify-between items-start mb-1">
-                <h2 id="modalName" class="text-2xl font-extrabold text-gray-900 leading-tight">Nama SPKLU</h2>
-                <button onclick="closeModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full p-2 ml-4">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
+<div class="relative w-full" style="height: calc(100vh - 64px);">
+    
+    <div id="map" class="absolute inset-0 z-0"></div>
 
-            <div class="flex items-center space-x-2 mb-3">
-                <span class="flex h-3 w-3 relative">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+    <div id="sidePanel" class="absolute left-4 top-4 bottom-4 w-[calc(100%-32px)] md:w-[420px] bg-white/95 backdrop-blur-xl shadow-2xl z-10 flex flex-col rounded-3xl border border-gray-200/50 overflow-hidden transition-all duration-300">
+        
+        <div class="p-5 border-b border-gray-100 bg-white/80">
+            <div class="relative group">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4">
+                    <svg class="w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </span>
-                <span class="text-sm font-bold text-green-600">Tersedia</span>
+                <input type="text" placeholder="Cari SPKLU..." class="w-full pl-12 pr-4 py-3 bg-gray-100/50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none font-semibold transition-all shadow-inner">
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto relative">
+            
+            <div id="listView" class="p-5 animate-fadeIn">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="font-black text-gray-800 text-sm uppercase tracking-wider">Stasiun Terdekat</h3>
+                    <span class="text-[11px] font-black text-blue-700 bg-blue-100 px-3 py-1 rounded-md" id="totalStations">0 LOKASI</span>
+                </div>
+                
+                <div id="panelList" class="space-y-3">
+                    </div>
             </div>
 
-            <p id="modalAddress" class="text-sm text-gray-500 mb-5 line-clamp-2">Alamat detail SPKLU...</p>
-            
-            <hr class="border-gray-100 mb-5">
+            <div id="detailView" class="hidden p-5 animate-fadeIn min-h-full">
+                <button onclick="showList()" class="flex items-center space-x-2 text-gray-400 hover:text-blue-600 transition-all mb-6 group w-fit">
+                    <div class="bg-gray-100 p-2 rounded-full group-hover:bg-blue-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </div>
+                    <span class="font-black text-[11px] uppercase tracking-widest">Kembali</span>
+                </button>
 
-            <h3 class="text-lg font-bold text-gray-800 mb-3">Pilih Tipe Charger</h3>
-            <div id="modalChargers" class="space-y-3 max-h-64 overflow-y-auto pr-1 pb-2">
+                <h2 id="panelName" class="text-2xl font-black text-gray-900 mb-2 leading-tight">Nama SPKLU</h2>
+                <p id="panelAddress" class="text-sm text-gray-500 mb-6 leading-relaxed">Alamat lengkap stasiun pengisian...</p>
+
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Status</p>
+                        <p class="text-sm font-bold text-green-600 flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>Buka 24 Jam
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Harga / kWh</p>
+                        <p class="text-sm font-bold text-gray-800">Rp 2.466</p>
+                    </div>
                 </div>
 
-            <div class="mt-6">
-                <button onclick="alert('Sabar ya, fitur Booking masih dalam pengembangan!')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition-all">
-                    Pilih & Lanjut Booking
-                </button>
+                <h3 class="text-sm font-black text-gray-800 mb-4 uppercase tracking-wider">Daftar Charger</h3>
+                <div id="panelChargers" class="space-y-3">
+                    </div>
+
+                <div class="mt-8 pb-4">
+                    <button onclick="alert('Sabar ya, fitur Booking masih dalam pengembangan!')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all">
+                        Pilih & Lanjut Booking
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -46,87 +85,94 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+    window.spkluData = [];
+    var map;
+
     document.addEventListener("DOMContentLoaded", function() {
-        // Inisialisasi Peta (Titik tengah Bandung)
-        var map = L.map('map').setView([-6.914744, 107.609810], 12);
+        // Inisialisasi Peta
+        map = L.map('map', { zoomControl: false }).setView([-6.914744, 107.609810], 12);
+        
+        // Pindah zoom control ke kanan atas/bawah biar gak ketutup panel
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
         // Fetch data API
         fetch('/api/spklus')
             .then(response => response.json())
             .then(data => {
+                window.spkluData = data;
+                document.getElementById('totalStations').innerText = `${data.length} LOKASI`;
+                
+                renderListView(data);
+                
                 data.forEach(spklu => {
                     var marker = L.marker([spklu.latitude, spklu.longitude]).addTo(map);
-                    
-                    marker.on('click', function() {
-                        openModal(spklu);
-                    });
+                    marker.on('click', () => selectStation(spklu.id));
                 });
             });
     });
 
-    function openModal(spklu) {
-        const modal = document.getElementById('spkluModal');
-        const modalContent = document.getElementById('modalContent');
-        
-        // Tampilkan backgroud overlay
-        modal.classList.remove('hidden');
-        
-        // Animasi slide up (khusus mobile) delay sedikit biar mulus
-        setTimeout(() => {
-            modalContent.classList.remove('translate-y-full');
-        }, 10);
-
-        document.getElementById('modalName').innerText = spklu.name;
-        document.getElementById('modalAddress').innerText = spklu.address;
-
-        let chargerList = document.getElementById('modalChargers');
-        chargerList.innerHTML = ''; // Reset list
-
-        if(spklu.chargers && spklu.chargers.length > 0) {
-            spklu.chargers.forEach(charger => {
-                // Tentukan warna status
-                let statusColor = charger.status === 'Available' ? 'text-green-700 bg-green-100 border-green-200' : 'text-orange-700 bg-orange-100 border-orange-200';
-                let statusText = charger.status === 'Available' ? 'Tersedia' : 'Maintenance';
-
-                // Bikin bentuk Card persis Mockup
-                let cardHTML = `
-                    <div class="border border-gray-200 rounded-xl p-4 flex justify-between items-center hover:border-blue-500 hover:shadow-md cursor-pointer transition-all bg-white group">
-                        <div>
-                            <h4 class="font-extrabold text-gray-800 text-base group-hover:text-blue-600 transition-colors">${charger.charger_type}</h4>
-                            <p class="text-sm font-semibold text-gray-500 mt-0.5">${charger.capacity_kw} kW</p>
-                            <span class="inline-block mt-2 px-2.5 py-1 text-xs font-bold rounded-lg border ${statusColor}">
-                                ${statusText}
-                            </span>
-                        </div>
-                        <div class="bg-gray-50 p-3 rounded-full group-hover:bg-blue-50 transition-colors">
-                            <svg class="w-8 h-8 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                        </div>
+    function renderListView(data) {
+        const listContainer = document.getElementById('panelList');
+        listContainer.innerHTML = '';
+        data.forEach(spklu => {
+            let totalChargers = spklu.chargers ? spklu.chargers.length : 0;
+            let cardHTML = `
+                <div onclick="selectStation(${spklu.id})" class="p-4 rounded-2xl bg-white border border-gray-100 hover:border-blue-500 hover:shadow-lg cursor-pointer transition-all group">
+                    <h4 class="font-black text-gray-800 text-sm group-hover:text-blue-600">${spklu.name}</h4>
+                    <p class="text-[11px] text-gray-400 mt-1 line-clamp-1">${spklu.address}</p>
+                    <div class="flex items-center mt-3 space-x-2 text-[10px] font-black uppercase">
+                        <span class="bg-gray-50 text-gray-500 px-2 py-1 rounded-md border border-gray-100">
+                            ${totalChargers} Mesin
+                        </span>
+                        <span class="text-green-600">Buka 24 Jam</span>
                     </div>
-                `;
-                chargerList.insertAdjacentHTML('beforeend', cardHTML);
-            });
-        } else {
-            chargerList.innerHTML = '<div class="text-center text-gray-500 text-sm py-4">Belum ada mesin charger.</div>';
+                </div>`;
+            listContainer.insertAdjacentHTML('beforeend', cardHTML);
+        });
+    }
+
+    function selectStation(id) {
+        const spklu = window.spkluData.find(s => s.id === id);
+        if (spklu) {
+            document.getElementById('listView').classList.add('hidden');
+            document.getElementById('detailView').classList.remove('hidden');
+            document.getElementById('panelName').innerText = spklu.name;
+            document.getElementById('panelAddress').innerText = spklu.address;
+
+            let chargerList = document.getElementById('panelChargers');
+            chargerList.innerHTML = '';
+            
+            if (spklu.chargers && spklu.chargers.length > 0) {
+                spklu.chargers.forEach(charger => {
+                    chargerList.insertAdjacentHTML('beforeend', `
+                        <div class="p-3.5 rounded-xl bg-gray-50 border border-gray-100 flex justify-between items-center group hover:bg-white hover:border-blue-500 transition-all">
+                            <div>
+                                <p class="text-xs font-black text-gray-800 uppercase">${charger.charger_type}</p>
+                                <div class="flex items-center text-[11px] font-bold text-gray-500 mt-0.5">
+                                    <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path></svg>
+                                    ${charger.capacity_kw} kW
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-black px-2.5 py-1.5 rounded-md bg-white border border-gray-100 text-blue-600 uppercase tracking-widest">${charger.status}</span>
+                        </div>`);
+                });
+            } else {
+                chargerList.innerHTML = '<p class="text-[11px] text-gray-400 italic text-center py-4 bg-gray-50 rounded-xl">Data mesin tidak tersedia.</p>';
+            }
+            
+            // Offset peta supaya pin stasiun agak geser ke kanan (biar gak ketutup panel)
+            map.flyTo([spklu.latitude, spklu.longitude], 15);
         }
     }
 
-    function closeModal() {
-        const modalContent = document.getElementById('modalContent');
-        const modal = document.getElementById('spkluModal');
-        
-        // Animasi slide down
-        modalContent.classList.add('translate-y-full');
-        
-        // Sembunyikan modal setelah animasi selesai
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+    function showList() {
+        document.getElementById('detailView').classList.add('hidden');
+        document.getElementById('listView').classList.remove('hidden');
+        map.flyTo([-6.914744, 107.609810], 12);
     }
 </script>
 @endsection
