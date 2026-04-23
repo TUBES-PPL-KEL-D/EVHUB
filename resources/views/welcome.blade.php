@@ -2,16 +2,13 @@
 
 @section('content')
 <style>
-    /* Menghilangkan semua jarak bawaan dari layout.app */
     main { padding: 0 !important; margin: 0 !important; }
     .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
     body { overflow: hidden; } /* Biar ga ada scrollbar ganda di web */
     
-    /* Scrollbar tipis untuk panel melayang */
     #sidePanel::-webkit-scrollbar { width: 5px; }
     #sidePanel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    /* Animasi transisi */
     .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
