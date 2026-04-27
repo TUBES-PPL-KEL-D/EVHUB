@@ -1,20 +1,25 @@
 <?php
 
-use App\Http\Controllers\VendorProfileController;
-use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\SpkluController;
+use App\Http\Controllers\VendorProfileController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ChargerMachineController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
+// ==========================================
+// 1. HALAMAN UTAMA (LANDING PAGE)
+// ==========================================
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-// Area Autentikasi (Wisnu)
+// ==========================================
+// 2. AREA AUTENTIKASI (Wisnu)
+// ==========================================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -31,39 +36,56 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [UserController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Area Pengendara (Byan)
-Route::prefix('rider')->middleware('auth')->group(function () {
+// ==========================================
+// 3. AREA PENGENDARA (Byan & Azka/Aimee)
+// ==========================================
+Route::prefix('rider')->name('rider.')->middleware('auth')->group(function () {
+    
+    // Garasi Digital (Byan)
     Route::resource('vehicles', VehicleController::class);
-    Route::get('/peta', [SpkluController::class, 'index'])->name('welcome');
-
+    
+    // Peta Lokasi SPKLU (Azka & Aimee) -> Nama rute diperbaiki menjadi map
+    Route::get('/peta', [SpkluController::class, 'index'])->name('map');
+    
 });
 
-// Area Vendor (Fakhri & Riehand)
+// ==========================================
+// 4. AREA VENDOR (Fakhri & Riehand)
+// ==========================================
 $vendorMiddleware = app()->environment('local') ? [] : ['auth'];
 
 Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(function () {
+    
+    // Profil & Dokumen Vendor (Fakhri)
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
-});
-// Area Vendor (Riehand)
-Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(function () {
+    
+    // Manajemen Mesin Charger (Riehand) -> Digabung ke blok ini
     Route::resource('chargers', ChargerMachineController::class);
+    
 });
 
-// Area Admin (Langgeng - PBI 9, 10, 11)
-Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('admin.stations');
+// ==========================================
+// 5. AREA ADMIN (Langgeng - PBI 9, 10, 11)
+// ==========================================
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('stations');
     
     // Otorisasi Pendaftaran (PBI 10)
-    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('admin.vendors.approve');
-    Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('admin.vendors.reject');
+    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
+    Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
 
     // Manajemen Status Akun (PBI 11)
-    Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('admin.vendors.suspend');
-    Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('admin.vendors.activate');
+    Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
+    Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
+    
 });
 
+// ==========================================
+// 6. AREA API (Azka/Aimee)
+// ==========================================
 // Route untuk mengambil data JSON relasi SPKLU dan Charger
 Route::get('/api/spklus', [SpkluController::class, 'getSpkluData']);
