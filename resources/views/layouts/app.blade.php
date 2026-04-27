@@ -41,7 +41,9 @@
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Garasi Kendaraan</a>
                     <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
                     
-                    <a href="{{ route('profile') }}" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">A</a>
+                    <a href="{{ route('profile') }}" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">
+                        {{ Str::upper(substr(Auth::user()->name, 0, 1)) }}
+                    </a>
                 </div>
             @endauth
         </nav>

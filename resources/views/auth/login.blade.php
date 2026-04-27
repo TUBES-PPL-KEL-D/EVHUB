@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center px-4 bg-gray-800 bg-transparent">
+<div class="flex items-center justify-center px-4 bg-gray-800 bg-transparent">
     
     <div class="max-w-md w-full bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl">
         <div class="mb-10">
@@ -32,7 +32,7 @@
                 <label class="block text-[#3A6D7E] font-bold mb-2 ml-1">Email</label>
                 <div class="relative">
                     <input type="email" name="email" value="{{ old('email') }}" 
-                        placeholder="Enter Your Email"
+                        placeholder="Masukkan email Anda"
                         class="w-full pl-4 pr-12 py-4 bg-[#B8D7DB] border-none rounded-2xl focus:ring-2 focus:ring-[#2D7A84] text-gray-700 placeholder-[#5A8D9E]" 
                         required autofocus>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -47,7 +47,7 @@
                 <label class="block text-[#3A6D7E] font-bold mb-2 ml-1">Password</label>
                 <div class="relative">
                     <input type="password" name="password" 
-                        placeholder="Enter Your Password"
+                        placeholder="Masukkan password Anda"
                         class="w-full pl-4 pr-12 py-4 bg-[#B8D7DB] border-none rounded-2xl focus:ring-2 focus:ring-[#2D7A84] text-gray-700 placeholder-[#5A8D9E]" 
                         required>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -64,7 +64,7 @@
             </div> -->
 
             <button type="submit" class="w-full bg-[#4DA1A9] hover:bg-[#3D8A91] text-white py-4 rounded-2xl shadow-lg transition-all duration-200 font-bold text-xl mb-4 mt-8">
-                Get Started
+                Login
             </button>
         </form>
 
