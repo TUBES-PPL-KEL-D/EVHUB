@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="flex items-center justify-center px-4 bg-gray-800 bg-transparent">
     
     <div class="max-w-md w-full bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl">
@@ -8,15 +9,16 @@
             <h1 class="text-4xl font-extrabold text-[#2D7A84] tracking-tight uppercase">Welcome!</h1>
             <p class="text-2xl text-[#3A6D7E] mt-1 font-medium">Login To Start</p>
         </div>
-
+        
         @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-lg">
+            <div class="mb-4 p-3 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 {{ session('success') }}
             </div>
         @endif
 
+        {{-- Notifikasi Error Umum (Misal: Akun Tidak Aktif / Email Salah) --}}
         @if($errors->any())
-            <div class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-lg">
+            <div class="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 text-sm">
                 <ul class="list-disc list-inside">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -68,9 +70,11 @@
             </button>
         </form>
 
-        <p class="mt-8 text-center text-[#3A6D7E] font-bold text-sm">
+        <p class="mt-6 text-center text-gray-600 text-sm">
             Belum punya akun? 
-            <a href="{{ route('register') }}" class="underline">Daftar Sekarang</a>
+            <a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline">
+                Daftar Sekarang
+            </a>
         </p>
     </div>
 </div>

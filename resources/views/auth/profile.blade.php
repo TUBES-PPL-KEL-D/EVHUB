@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold text-gray-800">Pengaturan Profil</h1>
             <p class="text-gray-600">Kelola informasi akun Anda di platform EV-HUB.</p>
         </div>
-        <a href="javascript:history.back()" class="flex py-2 px-5 rounded-md items-center text-sm font-medium bg-green-700 text-white hover:text-white hover:bg-green-800 transition duration-200">
+        <a href="javascript:history.back()" class="flex py-2 px-5 rounded-md items-center text-sm font-medium bg-blue-600 text-white hover:text-white hover:bg-blue-700 transition duration-200">
             Kembali
         </a>
 
@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="mt-8 flex justify-end">
-                        <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 px-6 rounded-md shadow transition duration-200 cursor-pointer">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-md shadow transition duration-200 cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>
