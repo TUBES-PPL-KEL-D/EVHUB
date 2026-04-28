@@ -10,7 +10,6 @@ class SpkluController extends Controller
     public function index()
     {
         // Mengambil data koordinat dan info SPKLU dari database
-        // Kolom yang diambil disesuaikan dengan kebutuhan peta
         $spklus = Spklu::select('name', 'address', 'latitude', 'longitude')->get();
 
         // Mengirimkan data $spklus ke file resources/views/welcome.blade.php
@@ -20,7 +19,7 @@ class SpkluController extends Controller
 
     public function getSpkluData()
     {
-        // Mengambil data SPKLU beserta relasi daftar mesin charger
+        // Mengambil data SPKLU
         $spklus = Spklu::with('chargers')->get();
         return response()->json($spklus);
     }
