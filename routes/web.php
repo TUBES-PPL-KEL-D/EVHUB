@@ -54,14 +54,13 @@ Route::prefix('rider')->name('rider.')->middleware('auth')->group(function () {
 // ==========================================
 $vendorMiddleware = app()->environment('local') ? [] : ['auth'];
 
+// Gunakan satu grup besar dengan prefix dan name yang seragam
 Route::prefix('vendor')->name('vendor.')->middleware($vendorMiddleware)->group(function () {
-    
-    // Profil & Dokumen Vendor (Fakhri)
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
-    
-    // Manajemen Mesin Charger (Riehand) -> Digabung ke blok ini
+
+    // Pindahkan rute chargers ke sini agar otomatis memiliki nama 'vendor.chargers.*'
     Route::resource('chargers', ChargerMachineController::class);
     
 });

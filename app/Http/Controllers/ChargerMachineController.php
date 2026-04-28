@@ -12,19 +12,22 @@ class ChargerMachineController extends Controller
 {
     // Read: Menampilkan daftar mesin charger milik vendor
     public function index()
-    {
-        $chargers = ChargerMachine::with('spklu')
-            ->where('vendor_id', Auth::id() ?? 1) // Gunakan Auth sesungguhnya nanti
-            ->get();
-        return view('vendor.chargers.index', compact('chargers'));
-    }
+{
+    // Mengambil data charger milik vendor yang sedang login beserta info SPKLU-nya
+    $chargers = ChargerMachine::with('spklu')
+        ->where('vendor_id', auth()->id())
+        ->get();
+
+    return view('vendor.chargers.index', compact('chargers'));
+}
 
     // Create: Menampilkan form tambah
     public function create()
-    {
-        $spklus = Spklu::all(); // Mengambil data SPKLU untuk opsi dropdown
-        return view('vendor.chargers.create', compact('spklus'));
-    }
+{
+    // Mengambil daftar stasiun SPKLU untuk dipilih di formulir
+    $spklus = Spklu::all();
+    return view('vendor.chargers.create', compact('spklus'));
+}
 
     // Store: Memproses data simpan
     public function store(Request $request)
