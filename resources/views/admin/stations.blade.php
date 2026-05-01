@@ -19,6 +19,7 @@
 
     <div class="grid grid-cols-1 gap-10">
         
+        <!-- BAGIAN 1: VENDOR AKTIF -->
         <div class="bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-[0_10px_40px_rgb(0,0,0,0.03)] border border-white p-8">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center space-x-3">
@@ -38,7 +39,7 @@
                         </div>
                         <div>
                             <div class="font-extrabold text-slate-900 text-lg">{{ $vendor->company_name }}</div>
-                            <div class="text-xs text-slate-500 font-bold tracking-wide uppercase">{{ $vendor->user->email }}</div>
+                            <div class="text-xs text-slate-500 font-bold tracking-wide uppercase">{{ $vendor->user->email ?? '-' }}</div>
                         </div>
                     </div>
                     <form action="{{ route('admin.vendors.suspend', $vendor->id) }}" method="POST">
@@ -52,6 +53,7 @@
             </div>
         </div>
 
+        <!-- BAGIAN 2: VENDOR DITANGGUHKAN -->
         <div class="bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-[0_10px_40px_rgb(0,0,0,0.03)] border border-white p-8">
             <div class="flex items-center space-x-3 mb-8">
                 <div class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
@@ -64,21 +66,52 @@
                 @forelse($suspendedVendors as $vendor)
                 <div class="bg-rose-50/30 border border-rose-100 p-5 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center font-black text-lg">
-                            !
-                        </div>
+                        <div class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center font-black text-lg">!</div>
                         <div>
                             <div class="font-extrabold text-slate-900 text-lg italic">{{ $vendor->company_name }}</div>
                             <div class="text-xs text-rose-600 font-black tracking-widest uppercase">Akun Ditangguhkan</div>
                         </div>
                     </div>
-                    <form action="{{ route('admin.vendors.activate', $vendor->id) }}" method="POST">
-                        @csrf @method('PATCH')
-                        <button type="submit" class="bg-emerald-500 text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">RE_ACTIVATE</button>
-                    </form>
+                    <div class="flex space-x-2">
+                        <form action="{{ route('admin.vendors.activate', $vendor->id) }}" method="POST">
+                            @csrf @method('PATCH')
+                            <button type="submit" class="bg-emerald-500 text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">RE_ACTIVATE</button>
+                        </form>
+                        <form action="{{ route('admin.vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Hapus PERMANEN vendor ini? Data dan file legalitas akan musnah.');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="bg-slate-900 text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 transition-colors shadow-lg">HAPUS</button>
+                        </form>
+                    </div>
                 </div>
                 @empty
                 <div class="text-center py-10 bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold uppercase tracking-widest text-xs">Tidak ada akun yang dibekukan</div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- BAGIAN 3: VENDOR DITOLAK -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-[0_10px_40px_rgb(0,0,0,0.03)] border border-white p-8">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Riwayat Penolakan</h2>
+            </div>
+            
+            <div class="space-y-4">
+                @forelse($rejectedVendors as $vendor)
+                <div class="bg-slate-50 border border-slate-100 p-5 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4 hover:bg-white transition-colors">
+                    <div>
+                        <div class="font-extrabold text-slate-900 text-lg">{{ $vendor->company_name }}</div>
+                        <div class="text-xs text-slate-500 font-bold tracking-wide uppercase">{{ $vendor->user->email ?? '-' }}</div>
+                    </div>
+                    <form action="{{ route('admin.vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Bersihkan data pendaftaran yang ditolak ini dari database?');">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="bg-rose-100 text-rose-600 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-colors">HAPUS PERMANEN</button>
+                    </form>
+                </div>
+                @empty
+                <div class="text-center py-10 bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold uppercase tracking-widest text-xs">Belum ada riwayat penolakan</div>
                 @endforelse
             </div>
         </div>

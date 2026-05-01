@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminDashboardController extends Controller
 {
@@ -28,7 +29,6 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', "Pendaftaran {$vendor->company_name} telah ditolak.");
     }
 
-    // Fungsi untuk PBI 11
     public function stations()
     {
         $approvedVendors = Vendor::with('user')->where('status', 'Approved')->get();
@@ -50,5 +50,25 @@ class AdminDashboardController extends Controller
         $vendor = Vendor::findOrFail($id);
         $vendor->update(['status' => 'Approved']);
         return redirect()->route('admin.stations')->with('success', "Akun vendor {$vendor->company_name} telah diaktifkan kembali.");
+    }
+
+    // PBI 12: Delete
+    public function destroy($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $companyName = $vendor->company_name;
+
+        if ($vendor->legality_document_path) {
+            Storage::disk('public')->delete($vendor->legality_document_path);
+        }
+
+        $user = $vendor->user;
+        $vendor->delete();
+
+        if ($user) {
+            $user->delete();
+        }
+
+        return redirect()->route('admin.stations')->with('success', "Data vendor $companyName beserta akunnya telah dihapus permanen dari sistem.");
     }
 }
