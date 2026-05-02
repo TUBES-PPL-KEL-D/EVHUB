@@ -17,10 +17,12 @@
 
     <!-- THE MERGING BACKGROUND TRICK -->
     <div class="fixed inset-0 z-0 flex">
+        <!-- Foto di kiri (Lebar 45%) -->
         <div class="w-full lg:w-[45%] h-full relative">
             <img src="{{ asset('images/bgr.png') }}" alt="EV Background" class="absolute inset-0 w-full h-full object-cover object-left" />
             <div class="absolute inset-0 bg-gradient-to-r from-black/20 via-slate-50/60 to-slate-50"></div>
         </div>
+        <!-- Area solid di kanan -->
         <div class="hidden lg:block lg:w-[55%] h-full bg-slate-50"></div>
     </div>
 
@@ -37,22 +39,27 @@
             </div>
             
             <div class="flex items-center space-x-8 text-sm font-bold text-slate-500">
-                <!-- Navigasi Utama Selalu Muncul (Mode Pre-Production) -->
+                
+                <!-- MENU INI SEMENTARA DITAMPILKAN SECARA PAKSA UNTUK TESTING -->
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Verifikasi</a>
                 <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
                 
-                <!-- DROPDOWN PROFIL INTERAKTIF (Aman dari Error Auth) -->
+                <!-- DROPDOWN PROFIL INTERAKTIF (BYPASS AUTH) -->
                 <div class="relative group">
                     <div class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-emerald-600 font-extrabold ml-4 cursor-pointer hover:bg-slate-50 transition">
+                        <!-- Jika Login: Huruf Awal Nama. Jika Tidak: 'T' (Tester) -->
                         {{ Auth::check() ? substr(Auth::user()->name, 0, 1) : 'T' }}
                     </div>
                     
                     <div class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div class="py-2">
                             <div class="px-4 py-2 border-b border-slate-100 mb-1">
-                                <p class="text-xs text-slate-400">Login sebagai:</p>
+                                <p class="text-xs text-slate-400">Status Akses:</p>
+                                <!-- Jika Login: Nama Asli. Jika Tidak: Tulisan Tester Mode -->
                                 <p class="text-sm font-bold text-slate-800 truncate">{{ Auth::check() ? Auth::user()->name : 'Tester Mode' }}</p>
                             </div>
+                            
+                            @auth
                             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 font-bold transition">Pengaturan Akun</a>
                             <div class="border-t border-slate-100 my-1"></div>
                             
@@ -60,6 +67,9 @@
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 font-bold transition">Keluar Sistem</button>
                             </form>
+                            @else
+                            <a href="{{ route('login') }}" class="block px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 font-bold transition">Login Sekarang</a>
+                            @endauth
                         </div>
                     </div>
                 </div>
