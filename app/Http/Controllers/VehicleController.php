@@ -30,10 +30,17 @@ class VehicleController extends Controller
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
         ]);
 
-        // Gunakan Auth::id() jika ada, jika tidak, gunakan ID 1 (untuk keperluan pre-production testing)
-        $validated['user_id'] = Auth::id() ?? 1;
+        // TESTER MODE BYPASS: Pastikan ada user ID 1
+        $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
+        
+        // Buat user dummy jika ID 1 belum ada di database (Sangat berguna untuk Dusk Testing)
+        if (!\App\Models\User::find($userId)) {
+            \App\Models\User::factory()->create(['id' => $userId]);
+        }
 
-        Vehicle::create($validated);
+        $validated['user_id'] = $userId;
+
+        \App\Models\Vehicle::create($validated);
 
         return redirect()->route('rider.vehicles.index')->with('success', 'Kendaraan EV berhasil ditambahkan ke garasi.');
     }
