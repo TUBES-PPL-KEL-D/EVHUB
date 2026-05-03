@@ -10,16 +10,13 @@ use App\Models\User;
 
 class AdminVerificationTest extends DuskTestCase
 {
-    // Ini akan mereset database khusus untuk testing secara otomatis
     use DatabaseMigrations;
 
     public function test_alur_verifikasi_dan_manajemen_vendor()
     {
         $this->browse(function (Browser $browser) {
-            // 1. Persiapan Data: Buat User dan Vendor Approved
+            // 1. SETUP DATA
             $user = User::factory()->create();
-            
-            // Kita buat vendor yang statusnya sudah 'Pending' untuk di-approve
             $vendor = Vendor::create([
                 'user_id' => $user->id,
                 'company_name' => 'PT Antre Verifikasi',
@@ -28,35 +25,31 @@ class AdminVerificationTest extends DuskTestCase
                 'status' => 'Pending',
             ]);
 
-            // ==========================================
-            // PBI 9 & 10: DASHBOARD & APPROVE
-            // ==========================================
+            // 2. APPROVE VENDOR (DASHBOARD)
             $browser->visit('/admin/dashboard')
                     ->assertSee('PT Antre Verifikasi')
-                    // Gunakan click ketimbang press untuk menghindari masalah z-index/overlay
-                    ->click('form[action*="approve"] button') 
+                    ->press('TERIMA') 
                     ->waitForText('Semua Selesai!', 10);
 
-            // ==========================================
-            // PBI 11 & 12: STASIUN, SUSPEND, DAN DESTROY
-            // ==========================================
+            // 3. MENUJU HALAMAN STASIUN
             $browser->visit('/admin/stations')
-                    ->assertSee('PT Antre Verifikasi');
+                    ->waitForText('PT Antre Verifikasi', 10);
 
-            // Matikan konfirmasi JS agar robot tidak berhenti
+            // 4. PROSES SUSPEND (Bypass Confirm)
             $browser->script("window.confirm = function(){ return true; };");
+            $browser->press('SUSPEND_ACC')
+                    ->pause(3000)
+                    // Berdasarkan screenshot, teksnya KAPITAL karena class uppercase
+                    ->waitForText('AKUN DITANGGUHKAN', 10); 
 
-            // Klik tombol SUSPEND_ACC
-            $browser->click('form[action*="suspend"] button')
-                    ->pause(2000)
-                    // Gunakan assertSee daripada waitForText jika teks sudah ada di judul bagian
-                    ->assertSee('Daftar Suspend'); 
-
-            // Klik tombol HAPUS pada vendor yang sudah disuspend
-            $browser->click('form[action*="destroy"] button')
-                    ->pause(2000)
-                    ->assertSee('Belum ada vendor aktif')
-                    ->assertSee('Tidak ada akun yang dibekukan');
+            // 5. PROSES HAPUS (Bypass Confirm)
+            $browser->script("window.confirm = function(){ return true; };");
+            $browser->press('HAPUS')
+                    ->pause(3000);
+            
+            // 6. VERIFIKASI AKHIR (WAJIB KAPITAL SESUAI SCREENSHOT)
+            $browser->waitForText('BELUM ADA VENDOR AKTIF', 10)
+                    ->assertSee('TIDAK ADA AKUN YANG DIBEKUKAN');
         });
     }
 }
