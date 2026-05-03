@@ -35,8 +35,14 @@
                         <small style="color: #6c757d;">Jam: {{ $charger->operational_hours }}</small>
                     </td>
                     <td style="padding: 12px;">{{ $charger->spklu->name ?? 'Tidak Terhubung' }}</td>
-                    <td style="padding: 12px;">
-                        Tipe: {{ $charger->connector_type }}<br>
+                    <td style="padding: 12px; line-height: 1.6;">
+                        <!-- PBI 30: Menampilkan Data Referensi Tipe Port -->
+                        <div style="margin-bottom: 8px;">
+                            <span style="background-color: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid #bae6fd; display: inline-block;">
+                                🔌 PORT: {{ strtoupper($charger->connector_type) }}
+                            </span>
+                        </div>
+    
                         Kapasitas: {{ $charger->capacity_kw }} kW<br>
                         Harga: Rp {{ number_format($charger->price_per_kwh, 0, ',', '.') }}/kWh
                     </td>
