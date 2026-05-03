@@ -157,7 +157,7 @@
 <div class="max-w-3xl mx-auto py-10 sm:px-6">
     {{-- Header --}}
     <div class="mb-8">
-        <a href="{{ route('vehicles.index') }}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-emerald-600 transition mb-4">
+        <a href="{{ route('rider.vehicles.index') }}" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-emerald-600 transition mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Kembali ke Garasi
         </a>
@@ -185,7 +185,7 @@
 
     <div class="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-100">
         <div class="p-6 sm:p-8">
-            <form action="{{ route('vehicles.store') }}" method="POST" id="vehicle-form">
+            <form action="{{ route('rider.vehicles.store') }}" method="POST" id="vehicle-form">
                 @csrf
                 <input type="hidden" name="merk" id="merk-hidden">
                 <input type="hidden" name="model" id="model-hidden">
@@ -216,7 +216,8 @@
                         @endphp
 
                         @foreach($brands as $brand)
-                        <div class="brand-card" onclick="selectBrand('{{ $brand['name'] }}', this)">
+                        <!-- PERBAIKAN: id="brand-{{ Str::slug($brand['name']) }}" ditambahkan di sini -->
+                        <div class="brand-card" id="brand-{{ Str::slug($brand['name']) }}" onclick="selectBrand('{{ $brand['name'] }}', this)">
                             <div class="check-icon">
                                 <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
@@ -265,7 +266,7 @@
 
                 {{-- Actions --}}
                 <div class="mt-8 flex justify-end gap-3">
-                    <a href="{{ route('vehicles.index') }}"
+                    <a href="{{ route('rider.vehicles.index') }}"
                         class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
                         Batal
                     </a>

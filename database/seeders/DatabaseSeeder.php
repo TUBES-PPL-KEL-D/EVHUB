@@ -81,5 +81,10 @@ class DatabaseSeeder extends Seeder
             'legality_document_path' => null,
             'status' => 'Pending',
         ]);
+
+        // manggil vehicle seeder
+        $this->call([
+            VehicleSeeder::class,
+        ]);
     }
 }
