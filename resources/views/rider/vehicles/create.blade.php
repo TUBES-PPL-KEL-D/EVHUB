@@ -44,20 +44,40 @@
     .brand-card.selected .check-icon {
         display: flex;
     }
+    .brand-img-container {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 2px solid rgba(16, 185, 129, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px auto;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(16,185,129,0.1);
+        overflow: hidden;
+    }
+    .brand-card:hover .brand-img-container {
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 12px 24px rgba(16,185,129,0.15), inset 0 1px 0 rgba(16,185,129,0.2);
+        transform: translateY(-2px);
+    }
+    .brand-card.selected .brand-img-container {
+        border-color: rgba(16, 185, 129, 1);
+        background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));
+        box-shadow: 0 0 20px rgba(16,185,129,0.4), inset 0 1px 0 rgba(16,185,129,0.3);
+    }
     .brand-img {
         width: 100%;
-        height: 56px;
-        object-fit: contain;
+        height: 100%;
+        object-fit: cover;
         object-position: center;
-        margin-bottom: 12px;
         transition: transform 0.3s ease;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        border-radius: 50%;
     }
     .brand-card:hover .brand-img {
-        transform: scale(1.05);
-    }
-    .brand-card.selected .brand-img {
-        filter: drop-shadow(0 0 15px rgba(16,185,129,0.3));
+        transform: scale(1.1);
     }
     .model-chip {
         cursor: pointer;
@@ -249,7 +269,9 @@
                             <div class="check-icon">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
-                            <img src="{{ asset('images/cars/' . $brand['img'] . '.png') }}" alt="{{ $brand['name'] }}" class="brand-img">
+                            <div class="brand-img-container">
+                                <img src="{{ asset('images/cars/' . $brand['img'] . '.png') }}" alt="{{ $brand['name'] }}" class="brand-img">
+                            </div>
                             <div class="text-sm font-bold text-slate-300">{{ $brand['name'] }}</div>
                         </div>
                         @endforeach
