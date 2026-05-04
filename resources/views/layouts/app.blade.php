@@ -41,6 +41,7 @@
             <div class="flex items-center space-x-8 text-sm font-bold text-slate-500">
                 
                 <!-- MENU INI SEMENTARA DITAMPILKAN SECARA PAKSA UNTUK TESTING -->
+                <a href="{{ route('rider.map') }}" class="{{ request()->routeIs('rider.map') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Peta SPKLU</a>
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Verifikasi</a>
                 <a href="{{ route('admin.stations') }}" class="{{ request()->routeIs('admin.stations') ? 'text-emerald-600 border-b-2 border-emerald-500 pb-1' : 'hover:text-emerald-600 transition' }}">Riwayat Stasiun</a>
                 
