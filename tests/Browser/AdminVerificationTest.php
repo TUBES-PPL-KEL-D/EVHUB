@@ -53,8 +53,8 @@ class AdminVerificationTest extends DuskTestCase
             $browser->visit('/admin/dashboard')
                     ->assertSee('PT Lolos Verifikasi')
                     ->press('TERIMA')
-                    ->pause(3000) // Memberi waktu proses database
-                    ->refresh()   // Paksa refresh untuk membersihkan DOM lama
+                    ->pause(3000) 
+                    ->refresh()  
                     ->waitForText('Semua Selesai!', 10)
                     ->assertDontSee('PT Lolos Verifikasi');
         });
@@ -99,7 +99,7 @@ class AdminVerificationTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) {
             $browser->visit('/admin/stations')
-                    ->script("window.confirm = function(){ return true; };"); // Bypass dialog
+                    ->script("window.confirm = function(){ return true; };"); 
             
             $browser->press('SUSPEND_ACC')
                     ->pause(2000)
@@ -124,7 +124,7 @@ class AdminVerificationTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) {
             $browser->visit('/admin/stations')
-                    ->script("window.confirm = function(){ return true; };"); // Bypass dialog
+                    ->script("window.confirm = function(){ return true; };"); 
             
             $browser->press('HAPUS')
                     ->pause(2000)

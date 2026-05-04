@@ -27,7 +27,7 @@
         <div class="md:flex md:items-center md:justify-between">
             <div class="flex-1 min-w-0"></div>
             <div class="mt-4 flex md:mt-0 md:ml-4">
-                <a href="{{ route('vehicles.create') }}"
+                <a href="{{ route('rider.vehicles.create') }}"
                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
                     + Tambah Kendaraan
                 </a>
@@ -120,7 +120,7 @@
 
                         {{-- Action Buttons --}}
                         <div class="flex gap-2 pt-3 border-t border-gray-100">
-                            <a href="{{ route('vehicles.edit', $vehicle->id) }}"
+                            <a href="{{ route('rider.vehicles.edit', $vehicle->id) }}"
                                class="flex-1 inline-flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors duration-150">
                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -129,7 +129,7 @@
                                 Edit
                             </a>
 
-                            <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST"
+                            <form action="{{ route('rider.vehicles.destroy', $vehicle->id) }}" method="POST"
                                   onsubmit="return confirm('Apakah Anda yakin ingin menghapus kendaraan ini?');"
                                   class="flex-1">
                                 @csrf
