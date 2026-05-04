@@ -42,6 +42,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
     Route::resource('vehicles', VehicleController::class);
     // Pemetaan SPKLU (Azka & Aimee)
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
+Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)

@@ -23,4 +23,42 @@ class SpkluController extends Controller
         $spklus = Spklu::with('chargers')->get();
         return response()->json($spklus);
     }
+
+    public function getDynamicMarkers()
+    {
+        $spklus = Spklu::with('chargers.machines')->get()->map(function ($spklu) {
+            $available = 0;
+            $total = 0;
+
+            foreach ($spklu->chargers as $charger) {
+                foreach ($charger->machines as $machine) {
+                    $total++;
+                    // Sesuaikan string 'available' dengan isi database kamu
+                    if (strtolower($machine->status) === 'available') {
+                        $available++;
+                    }
+                }
+            }
+
+            if ($total === 0) {
+                $status = 'offline';
+            } elseif ($available > 0) {
+                $status = 'tersedia';
+            } else {
+                $status = 'penuh';
+            }
+
+            return [
+                'id' => $spklu->id,
+                'name' => $spklu->name,
+                'latitude' => $spklu->latitude,
+                'longitude' => $spklu->longitude,
+                'status' => $status,
+                'available' => $available,
+                'total' => $total,
+            ];
+        });
+
+        return response()->json($spklus);
+    }
 }
