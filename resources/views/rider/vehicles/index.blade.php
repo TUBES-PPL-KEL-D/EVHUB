@@ -45,7 +45,7 @@
                       d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h10l2-2zM15 7l4 4v5h-4V7z"/>
             </svg>
             <p class="text-gray-500 text-sm">Belum ada kendaraan EV di garasi Anda.</p>
-            <a href="{{ route('vehicles.create') }}"
+            <a href="{{ route('rider.vehicles.create') }}"
                class="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-150">
                 + Tambah Kendaraan Pertama
             </a>
