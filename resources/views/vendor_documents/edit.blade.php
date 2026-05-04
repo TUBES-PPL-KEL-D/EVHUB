@@ -3,7 +3,8 @@
 @section('title', 'Perbaikan Dokumen Legalitas')
 
 @section('content')
-    <div class="mx-auto max-w-4xl">
+    <div class="vendor-scope" style="color: #0f172a;">
+        <div class="mx-auto max-w-4xl">
         <div class="mb-6">
             <h1 class="mt-2 text-3xl font-bold text-slate-900">Perbaiki & Unggah Ulang Dokumen</h1>
             <p class="mt-2 text-slate-600">Status dokumen Anda ditolak. Silakan unggah dokumen legalitas yang sudah diperbaiki.</p>
@@ -59,6 +60,7 @@
                     </div>
                 </div>
             </form>
+        </div>
         </div>
     </div>
 @endsection

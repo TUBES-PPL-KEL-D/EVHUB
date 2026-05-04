@@ -3,7 +3,8 @@
 @section('title', 'Profil Vendor')
 
 @section('content')
-	<div class="mx-auto max-w-4xl">
+	<div class="vendor-scope" style="color: #0f172a;">
+		<div class="mx-auto max-w-4xl">
 		@if (session('success'))
 			<div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
 				{{ session('success') }}
@@ -51,6 +52,7 @@
 					<a href="{{ route('vendor.documents.create') }}" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">Lanjut Upload Legalitas</a>
 				</div>
 			</div>
+		</div>
 		</div>
 	</div>
 @endsection
