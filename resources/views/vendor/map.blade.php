@@ -7,7 +7,7 @@
     <!-- Header Halaman -->
     <div class="mb-8">
         <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Jaringan <span class="text-emerald-500">SPKLU</span></h1>
-        <p class="text-slate-500 font-medium mt-2">Pantau lokasi dan ketersediaan stasiun pengisian daya EV secara real-time.</p>
+        <p class="text-slate-700 font-medium mt-2">Pantau lokasi dan ketersediaan stasiun pengisian daya EV secara real-time.</p>
     </div>
 
     <!-- Card Container untuk Peta -->
@@ -15,7 +15,7 @@
         
         <!-- Status Legend (Indikator Warna) -->
         <div class="absolute top-8 right-8 z-[1000] bg-white/95 backdrop-blur px-4 py-3 rounded-xl shadow-md border border-slate-100 flex flex-col gap-2">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Status Mesin</h3>
+            <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Status Mesin</h3>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></span>
                 <span class="text-sm font-medium text-slate-700">Tersedia</span>
@@ -91,9 +91,9 @@
                                     </div>
                                     
                                     <div class="bg-slate-50 rounded-lg p-3 mt-3 border border-slate-100">
-                                        <p class="text-xs text-slate-500 mb-1 uppercase font-bold tracking-wider">Ketersediaan Mesin</p>
+                                        <p class="text-xs text-slate-700 mb-1 uppercase font-bold tracking-wider">Ketersediaan Mesin</p>
                                         <p class="text-base m-0 text-slate-800">
-                                            <b class="text-xl ${textColor}">${spklu.available}</b> <span class="text-slate-400 font-medium text-sm">dari ${spklu.total}</span>
+                                            <b class="text-xl ${textColor}">${spklu.available}</b> <span class="text-slate-600 font-medium text-sm">dari ${spklu.total}</span>
                                         </p>
                                     </div>
                                 </div>
