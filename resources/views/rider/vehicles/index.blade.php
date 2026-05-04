@@ -1,6 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .vehicle-img-container {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 2px solid rgba(16, 185, 129, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(16,185,129,0.1);
+        overflow: hidden;
+    }
+    .group:hover .vehicle-img-container {
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 12px 24px rgba(16,185,129,0.15), inset 0 1px 0 rgba(16,185,129,0.2);
+    }
+    .vehicle-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.3s ease;
+        border-radius: 50%;
+    }
+    .group:hover .vehicle-img {
+        transform: scale(1.08);
+    }
+</style>
 <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
 
     @if(session('success'))
@@ -82,9 +113,11 @@
                     {{-- Car Illustration --}}
                     <div class="h-44 flex items-center justify-center bg-slate-900/60 p-6 border-b border-slate-700/50 group-hover:bg-slate-900/80 transition-colors">
                         @if($imageSrc)
-                            <img src="{{ $imageSrc }}"
-                                 alt="{{ $vehicle->merk }}"
-                                 class="h-full w-full object-contain drop-shadow-2xl">
+                            <div class="vehicle-img-container">
+                                <img src="{{ $imageSrc }}"
+                                     alt="{{ $vehicle->merk }}"
+                                     class="vehicle-img">
+                            </div>
                         @else
                             <div class="flex flex-col items-center justify-center text-slate-600">
                                 <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
