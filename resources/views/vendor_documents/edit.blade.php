@@ -3,11 +3,11 @@
 @section('title', 'Perbaikan Dokumen Legalitas')
 
 @section('content')
-    <div class="vendor-scope" style="color: #0f172a;">
+    <div class="vendor-scope">
         <div class="mx-auto max-w-4xl">
         <div class="mb-6">
-            <h1 class="mt-2 text-3xl font-bold text-slate-900">Perbaiki & Unggah Ulang Dokumen</h1>
-            <p class="mt-2 text-slate-600">Status dokumen Anda ditolak. Silakan unggah dokumen legalitas yang sudah diperbaiki.</p>
+            <h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">Perbaiki & Unggah Ulang Dokumen</h1>
+            <p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">Status dokumen Anda ditolak. Silakan unggah dokumen legalitas yang sudah diperbaiki.</p>
         </div>
 
         @if ($errors->any())
@@ -24,7 +24,7 @@
         <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
             <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
                 <h2 class="text-lg font-semibold text-slate-900">Form Perbaikan Dokumen</h2>
-                <p class="mt-1 text-sm text-slate-500">Perusahaan: {{ $vendor->company_name }}</p>
+                <p class="mt-1 text-sm font-medium text-slate-700">Perusahaan: {{ $vendor->company_name }}</p>
             </div>
 
             <form action="{{ route('vendor.documents.update', $vendor) }}" method="POST" enctype="multipart/form-data" class="space-y-6 px-6 py-6">
@@ -49,11 +49,11 @@
                         class="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 file:mr-4 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700"
                         required
                     >
-                    <p class="mt-2 text-sm text-slate-500">Format: PDF, JPG, JPEG, PNG. Maksimal 5 MB.</p>
+                    <p class="mt-2 text-sm text-slate-700">Format: PDF, JPG, JPEG, PNG. Maksimal 5 MB.</p>
                 </div>
 
                 <div class="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-slate-500">Setelah upload ulang, status akan kembali menjadi Pending.</p>
+                    <p class="text-sm font-medium text-slate-600">Setelah upload ulang, status akan kembali menjadi Pending.</p>
                     <div class="flex gap-3">
                         <a href="{{ route('vendor.status') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</a>
                         <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Simpan Perbaikan</button>

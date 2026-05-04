@@ -7,11 +7,11 @@
 @endphp
 
 @section('content')
-	<div class="vendor-scope" style="color: #0f172a;">
+	<div class="vendor-scope">
 		<div class="mx-auto max-w-4xl">
 		<div class="mb-6">
-			<h1 class="mt-2 text-3xl font-bold text-slate-900">Isi Profil Entitas Perusahaan Vendor</h1>
-			<p class="mt-2 text-slate-600">Lengkapi data perusahaan untuk memulai pendaftaran vendor baru di EV-HUB.</p>
+			<h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">Isi Profil Entitas Perusahaan Vendor</h1>
+			<p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">Lengkapi data perusahaan untuk memulai pendaftaran vendor baru di EV-HUB.</p>
 		</div>
 
 		@if ($errors->any())
