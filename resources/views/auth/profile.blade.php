@@ -48,7 +48,7 @@
                         
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
-                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
+                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" required
                                 class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 border">
                         </div>
 
