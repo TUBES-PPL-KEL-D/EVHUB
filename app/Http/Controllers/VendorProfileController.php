@@ -76,15 +76,13 @@ class VendorProfileController extends Controller
             ]);
         }
 
-        if ($hadProfile) {
-            return redirect()
-                ->route('vendor.profile.show', $vendorProfile)
-                ->with('success', 'Profil vendor berhasil diperbarui.');
-        }
+        $message = $hadProfile 
+            ? 'Profil vendor berhasil diperbarui.'
+            : 'Profil vendor berhasil disimpan. Silakan review dan lanjut upload dokumen legalitas.';
 
         return redirect()
-            ->route('vendor.documents.create')
-            ->with('success', 'Profil vendor berhasil disimpan. Lanjut upload dokumen legalitas.');
+            ->route('vendor.profile.show', $vendorProfile)
+            ->with('success', $message);
     }
 
     public function show(Request $request, VendorProfile $vendorProfile)
