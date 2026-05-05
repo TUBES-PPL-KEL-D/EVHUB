@@ -16,7 +16,7 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'company_name',
-        'legality_document_path',
+        // 'legality_document_path',
         'status',
     ];
 
