@@ -65,7 +65,6 @@
                     data.forEach(spklu => {
                         if (spklu.latitude && spklu.longitude) {
                             
-                            // Sesuaikan warna status dengan palet desain (Emerald & Rose)
                             let statusColor = 'bg-slate-400'; 
                             let textColor = 'text-slate-700';
                             
@@ -78,22 +77,48 @@
                                 textColor = 'text-rose-700';
                             }
 
-                            // Desain popup UI mengikuti gaya kartu aplikasi
+                            // --- PERBAIKAN PBI 30: Membaca Array charger_machines ---
+                            let machines = spklu.charger_machines || []; // Laravel mengubah camelCase jadi snake_case di JSON
+                            let portContent = '';
+
+                            if (machines.length > 0) {
+                                machines.forEach(machine => {
+                                    // Menggunakan connector_type dan capacity_kw sesuai database
+                                    portContent += `
+                                        <div class="flex justify-between items-center bg-white border border-slate-100 rounded-md px-2 py-1.5 mb-1 shadow-sm">
+                                            <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
+                                            <span class="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded font-bold">${machine.capacity_kw} kW</span>
+                                        </div>
+                                    `;
+                                });
+                            } else {
+                                portContent = '<p class="text-[11px] text-slate-400 italic">Informasi port belum tersedia</p>';
+                            }
+
                             let popupContent = `
-                                <div class="p-2 min-w-[200px] font-sans">
+                                <div class="p-2 min-w-[220px] font-sans">
                                     <h4 class="text-slate-900 font-bold text-lg leading-tight mb-1">${spklu.name}</h4>
                                     
-                                    <div class="flex items-center gap-2 mt-3 mb-2">
+                                    <div class="flex items-center gap-2 mt-2 mb-3">
                                         <span class="w-2.5 h-2.5 rounded-full ${statusColor} shadow-sm animate-pulse"></span>
                                         <span class="text-[11px] font-extrabold ${textColor} uppercase tracking-widest">
                                             ${spklu.status}
                                         </span>
                                     </div>
+
+                                    <!-- Bagian Detail Port (PBI 30) -->
+                                    <div class="mb-3">
+                                        <p class="text-[10px] text-slate-500 mb-1.5 uppercase font-bold tracking-wider">Tipe Port & Detail</p>
+                                        <div class="max-h-[120px] overflow-y-auto pr-1">
+                                            ${portContent}
+                                        </div>
+                                    </div>
                                     
-                                    <div class="bg-slate-50 rounded-lg p-3 mt-3 border border-slate-100">
-                                        <p class="text-xs text-slate-700 mb-1 uppercase font-bold tracking-wider">Ketersediaan Mesin</p>
+                                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                                        <p class="text-xs text-slate-700 mb-1 uppercase font-bold tracking-wider">Ketersediaan Total</p>
                                         <p class="text-base m-0 text-slate-800">
-                                            <b class="text-xl ${textColor}">${spklu.available}</b> <span class="text-slate-600 font-medium text-sm">dari ${spklu.total}</span>
+                                            <b class="text-xl ${textColor}">${spklu.available}</b> 
+                                            <span class="text-slate-600 font-medium text-sm">dari ${spklu.total}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -104,7 +129,7 @@
                             } else {
                                 let marker = L.marker([spklu.latitude, spklu.longitude]).addTo(map);
                                 marker.bindPopup(popupContent, {
-                                    className: 'custom-popup' // Opsi untuk styling tambahan via CSS jika diperlukan
+                                    className: 'custom-popup'
                                 });
                                 activeMarkers[spklu.id] = marker;
                             }
