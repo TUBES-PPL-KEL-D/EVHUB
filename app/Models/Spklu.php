@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Spklu extends Model
 {
+    // Tambahkan izin fillable ini agar fungsi create() di controller bisa berjalan
+    protected $fillable = [
+        'vendor_id',
+        'name',
+        'address',
+        'latitude',
+        'longitude',
+    ];
     
     public function chargerMachines()
     {

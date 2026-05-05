@@ -4,36 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\ChargerMachine;
 use App\Models\Spklu;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ChargerMachineController extends Controller
 {
-    // Read: Menampilkan daftar mesin charger milik vendor
+    /**
+     * Cek status vendor. 
+     * [PRE-PRODUCTION BYPASS AKTIF]
+     */
+    private function checkVendorStatus()
+    {
+        // --- BYPASS UNTUK TESTING / PRE-PRODUCTION ---
+        // Memaksa sistem selalu menggunakan Vendor dengan ID 1
+        $vendor = \App\Models\Vendor::find(1);
+        
+        return $vendor;
+
+        // --- KODE ASLI UNTUK PRODUCTION NANTI (Jangan dihapus) ---
+        /*
+        $userId = Auth::id(); 
+        $vendor = Vendor::where('user_id', $userId)->first();
+
+        if (!$vendor || $vendor->status !== 'Approved') {
+            return false;
+        }
+        return $vendor;
+        */
+    }
+
     public function index()
-{
-    // Mengambil data charger milik vendor yang sedang login beserta info SPKLU-nya
-    $chargers = ChargerMachine::with('spklu')
-        ->where('vendor_id', auth()->id())
-        ->get();
+    {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')
+                ->with('error', 'Akses ditolak! Vendor ID 1 tidak ditemukan di database.');
+        }
 
-    return view('vendor.chargers.index', compact('chargers'));
-}
+        $chargers = ChargerMachine::with('spklu')
+            ->where('vendor_id', $vendor->id)
+            ->get();
 
-    // Create: Menampilkan form tambah
+        return view('vendor.chargers.index', compact('chargers'));
+    }
+
     public function create()
-{
-    // Mengambil daftar stasiun SPKLU untuk dipilih di formulir
-    $spklus = Spklu::all();
-    return view('vendor.chargers.create', compact('spklus'));
-}
+    {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
+        }
 
-    // Store: Memproses data simpan
+        return view('vendor.chargers.create');
+    }
+
     public function store(Request $request)
     {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
+        }
+
         $validatedData = $request->validate([
-            'spklu_id' => 'required|exists:spklus,id',
+            'spklu_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'name' => 'required|string|max:255',
             'connector_type' => 'required|string|max:100',
             'capacity_kw' => 'required|numeric|min:1',
@@ -42,35 +80,49 @@ class ChargerMachineController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        $spklu = Spklu::create([
+            'vendor_id' => $vendor->id,
+            'name' => $validatedData['spklu_name'],
+            'address' => $validatedData['address'],
+            'latitude' => $validatedData['latitude'],
+            'longitude' => $validatedData['longitude'],
+        ]);
+
         $path = $request->file('photo')->store('chargers', 'public');
 
         ChargerMachine::create([
-            'vendor_id' => Auth::id() ?? 1,
-            'spklu_id' => $validatedData['spklu_id'],
+            'vendor_id' => $vendor->id, 
+            'spklu_id' => $spklu->id,
             'name' => $validatedData['name'],
             'connector_type' => $validatedData['connector_type'],
             'capacity_kw' => $validatedData['capacity_kw'],
             'price_per_kwh' => $validatedData['price_per_kwh'],
             'operational_hours' => $validatedData['operational_hours'],
             'photo_path' => $path,
-            'status' => 'available', // Default saat create
+            'status' => 'available',
         ]);
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil ditambahkan!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Infrastruktur SPKLU dan Mesin berhasil diletakkan pada peta!');
     }
 
-    // Edit: Menampilkan form edit
     public function edit(ChargerMachine $charger)
     {
-        $spklus = Spklu::all();
-        return view('vendor.chargers.edit', compact('charger', 'spklus'));
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
+        }
+
+        return view('vendor.chargers.edit', compact('charger'));
     }
 
-    // Update: Memproses pembaruan data
     public function update(Request $request, ChargerMachine $charger)
     {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
+        }
+
         $validatedData = $request->validate([
-            'spklu_id' => 'required|exists:spklus,id',
             'name' => 'required|string|max:255',
             'connector_type' => 'required|string|max:100',
             'capacity_kw' => 'required|numeric|min:1',
@@ -81,7 +133,6 @@ class ChargerMachineController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            // Hapus foto lama
             if (Storage::disk('public')->exists($charger->photo_path)) {
                 Storage::disk('public')->delete($charger->photo_path);
             }
@@ -90,17 +141,28 @@ class ChargerMachineController extends Controller
 
         $charger->update($validatedData);
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil diperbarui!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Detail mesin charger berhasil diperbarui!');
     }
 
-    // Delete: Memproses penghapusan data
     public function destroy(ChargerMachine $charger)
     {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
+        }
+
+        $spklu_id = $charger->spklu_id;
+
         if (Storage::disk('public')->exists($charger->photo_path)) {
             Storage::disk('public')->delete($charger->photo_path);
         }
+        
         $charger->delete();
+        
+        if ($spklu_id) {
+            Spklu::where('id', $spklu_id)->delete();
+        }
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Mesin charger berhasil dihapus!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!');
     }
 }

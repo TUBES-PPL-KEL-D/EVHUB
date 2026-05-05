@@ -24,10 +24,10 @@ class ChargerMachine extends Model
 
     public function vendor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        // UBAH DARI User::class MENJADI Vendor::class
+        return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 
-    // Relasi: Menghubungkan Mesin Charger ke SPKLU
     public function spklu(): BelongsTo
     {
         return $this->belongsTo(Spklu::class, 'spklu_id');
