@@ -17,6 +17,13 @@ class SpkluController extends Controller
 
     }
 
+    public function getMarkers()
+{
+    $spklus = Spklu::with('chargerMachines')->get();
+
+    return response()->json($spklus);
+}
+
     public function getSpkluData()
     {
         // Mengambil data SPKLU

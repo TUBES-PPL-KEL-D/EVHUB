@@ -9,7 +9,7 @@ class Spklu extends Model
     
     public function chargerMachines()
     {
-        return $this->hasMany(ChargerMachine::class, 'spklu_id');
+        return $this->hasMany(ChargerMachine::class, 'spklu_id', 'id');
     }
 
     // buat modal
