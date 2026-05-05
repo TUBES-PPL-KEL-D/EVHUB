@@ -1,81 +1,111 @@
 @extends('layouts.app')
 
+@section('title', 'Edit Mesin Charger')
+
 @section('content')
-<div class="container" style="padding: 20px; max-width: 700px; margin: auto; font-family: sans-serif;">
-    <h2 style="margin-bottom: 20px;">Edit Mesin Charger</h2>
-
-    @if ($errors->any())
-        <div style="background-color: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #f5c6cb;">
-            <ul style="margin: 0; padding-left: 20px;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ route('vendor.chargers.update', $charger->id) }}" method="POST" enctype="multipart/form-data" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        @csrf
-        @method('PUT')
-
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Pilih Lokasi SPKLU <span style="color:red;">*</span></label>
-            <select name="spklu_id" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px;">
-                <option value="">-- Silakan Pilih SPKLU --</option>
-                @foreach($spklus as $spklu)
-                    <option value="{{ $spklu->id }}" {{ (old('spklu_id', $charger->spklu_id) == $spklu->id) ? 'selected' : '' }}>{{ $spklu->name }}</option>
-                @endforeach
-            </select>
+<div class="vendor-scope">
+    <div class="mx-auto max-w-4xl">
+        
+        <!-- Header Section -->
+        <div class="mb-6">
+            <h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">Edit Mesin Charger</h1>
+            <p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">Perbarui detail spesifikasi atau status operasional mesin Anda.</p>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Nama Mesin <span style="color:red;">*</span></label>
-            <input type="text" name="name" value="{{ old('name', $charger->name) }}" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Tipe Konektor <span style="color:red;">*</span></label>
-            <input type="text" name="connector_type" value="{{ old('connector_type', $charger->connector_type) }}" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
-        </div>
-
-        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-            <div style="flex: 1;">
-                <label style="font-weight: bold; display: block; margin-bottom: 8px;">Kapasitas (kW) <span style="color:red;">*</span></label>
-                <input type="number" name="capacity_kw" value="{{ old('capacity_kw', $charger->capacity_kw) }}" min="1" step="0.01" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
+        <!-- Alert Errors -->
+        @if ($errors->any())
+            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
+                <p class="font-semibold">Ada kesalahan pada form:</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <div style="flex: 1;">
-                <label style="font-weight: bold; display: block; margin-bottom: 8px;">Harga (Rp/kWh) <span style="color:red;">*</span></label>
-                <input type="number" name="price_per_kwh" value="{{ old('price_per_kwh', $charger->price_per_kwh) }}" min="0" step="0.01" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
+        @endif
+
+        <!-- Form Card -->
+        <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
+            <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
+                <h2 class="text-lg font-semibold text-slate-900">Form Update Infrastruktur</h2>
             </div>
-        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Jam Operasional <span style="color:red;">*</span></label>
-            <input type="text" name="operational_hours" value="{{ old('operational_hours', $charger->operational_hours) }}" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box;">
-        </div>
+            <!-- FORM START -->
+            <form action="{{ route('vendor.chargers.update', $charger->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6 px-6 py-6">
+                @csrf
+                @method('PUT')
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Status Mesin <span style="color:red;">*</span></label>
-            <select name="status" required style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px;">
-                <option value="available" {{ old('status', $charger->status) == 'available' ? 'selected' : '' }}>Available (Tersedia)</option>
-                <option value="unavailable" {{ old('status', $charger->status) == 'unavailable' ? 'selected' : '' }}>Unavailable (Tidak Tersedia)</option>
-                <option value="maintenance" {{ old('status', $charger->status) == 'maintenance' ? 'selected' : '' }}>Maintenance (Perawatan)</option>
-            </select>
-        </div>
+                <div class="rounded-2xl border border-slate-100 bg-slate-50/50 p-5">
+                    <div class="grid gap-6 md:grid-cols-2">
+                        
+                        <!-- Info SPKLU (Read Only - Tidak bisa diubah) -->
+                        <div class="md:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-slate-700">Lokasi SPKLU Terhubung</label>
+                            <input type="text" value="{{ $charger->spklu->name ?? 'Tidak diketahui' }} - {{ $charger->spklu->address ?? '' }}" class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none cursor-not-allowed" disabled>
+                            <p class="mt-1 text-xs text-slate-400">Lokasi SPKLU terikat secara permanen dan tidak dapat diubah di halaman ini.</p>
+                        </div>
 
-        <div style="margin-bottom: 25px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Update Foto (Opsional)</label>
-            <div style="margin-bottom: 10px;">
-                <img src="{{ asset('storage/' . $charger->photo_path) }}" alt="Foto Saat Ini" style="max-height: 120px; border-radius: 5px; border: 1px solid #ccc; display: block;">
-            </div>
-            <input type="file" name="photo" accept="image/jpeg, image/png, image/jpg" style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; background-color: #f8f9fa; box-sizing: border-box;">
-            <small style="color: #6c757d; display: block; margin-top: 5px;">Biarkan kosong jika tidak ingin mengubah foto mesin.</small>
-        </div>
+                        <!-- Info Mesin -->
+                        <div>
+                            <label for="name" class="mb-2 block text-sm font-medium text-slate-700">Nama/Model Mesin</label>
+                            <input type="text" name="name" id="name" value="{{ old('name', $charger->name) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                        </div>
 
-        <div style="text-align: right;">
-            <a href="{{ route('vendor.chargers.index') }}" style="text-decoration: none; color: #6c757d; margin-right: 20px; font-weight: bold;">Batal</a>
-            <button type="submit" style="background-color: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 15px;">Update Data</button>
+                        <div>
+                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor</label>
+                            <input type="text" name="connector_type" id="connector_type" value="{{ old('connector_type', $charger->connector_type) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                        </div>
+
+                        <div>
+                            <label for="capacity_kw" class="mb-2 block text-sm font-medium text-slate-700">Kapasitas (kW)</label>
+                            <input type="number" name="capacity_kw" id="capacity_kw" value="{{ old('capacity_kw', $charger->capacity_kw) }}" min="1" step="0.01" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                        </div>
+
+                        <div>
+                            <label for="price_per_kwh" class="mb-2 block text-sm font-medium text-slate-700">Harga per kWh (Rp)</label>
+                            <input type="number" name="price_per_kwh" id="price_per_kwh" value="{{ old('price_per_kwh', $charger->price_per_kwh) }}" min="0" step="0.01" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                        </div>
+
+                        <div>
+                            <label for="operational_hours" class="mb-2 block text-sm font-medium text-slate-700">Jam Operasional</label>
+                            <input type="text" name="operational_hours" id="operational_hours" value="{{ old('operational_hours', $charger->operational_hours) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                        </div>
+
+                        <!-- Status Mesin (PBI 17) -->
+                        <div>
+                            <label for="status" class="mb-2 block text-sm font-medium text-slate-700">Status Operasional <span class="text-red-500">*</span></label>
+                            <select name="status" id="status" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <option value="available" {{ old('status', $charger->status) == 'available' ? 'selected' : '' }}>🟢 Available (Tersedia)</option>
+                                <option value="unavailable" {{ old('status', $charger->status) == 'unavailable' ? 'selected' : '' }}>🔴 Unavailable (Tidak Tersedia)</option>
+                                <option value="maintenance" {{ old('status', $charger->status) == 'maintenance' ? 'selected' : '' }}>🟡 Maintenance (Perawatan)</option>
+                            </select>
+                        </div>
+
+                        <!-- Foto Mesin -->
+                        <div class="md:col-span-2">
+                            <label for="photo" class="mb-2 block text-sm font-medium text-slate-700">Update Foto Mesin (Opsional)</label>
+                            
+                            @if($charger->photo_path)
+                            <div class="mb-3">
+                                <img src="{{ asset('storage/' . $charger->photo_path) }}" alt="Foto Saat Ini" class="h-32 w-48 rounded-xl object-cover border border-slate-200 shadow-sm">
+                            </div>
+                            @endif
+                            
+                            <input type="file" name="photo" id="photo" accept="image/jpeg, image/png, image/jpg" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-2 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                            <p class="mt-1 text-xs text-slate-500">Biarkan kosong jika Anda tidak ingin mengubah foto mesin saat ini.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-end">
+                    <div class="flex gap-3">
+                        <a href="{{ route('vendor.chargers.index') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</a>
+                        <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-[#34CBDA] px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600">Update Data</button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 @endsection
