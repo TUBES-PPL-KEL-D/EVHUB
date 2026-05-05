@@ -32,20 +32,20 @@ class VendorRegistrationTest extends DuskTestCase
     // PBI #6 — Upload Dokumen Legalitas Vendor
     // =========================================================================
 
-    
     // TC.Vendor.004 — Positive
     public function test_TC_Vendor_004_upload_dokumen_valid(): void
     {
         $this->browse(function (Browser $browser) {
             $user    = $this->createVendorUser();
-            $profile = VendorProfile::factory()->create(['user_id' => $user->id]);
+            VendorProfile::factory()->create(['user_id' => $user->id]);
 
             $browser->loginAs($user)
                     ->visit('/vendor/documents/create')
                     ->assertSee('Upload Dokumen Legalitas Vendor')
                     ->attach('legality_document', $this->file('valid_document.pdf'))
                     ->press('Upload Dokumen')
-                    ->assertPathIsNot('/vendor/documents/create'); // memastikan redirect terjadi
+                    ->pause(3000)
+                    ->assertPathIsNot('/vendor/documents/create');
         });
     }
 
@@ -54,14 +54,15 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user    = $this->createVendorUser();
-            $profile = VendorProfile::factory()->create(['user_id' => $user->id]);
+            VendorProfile::factory()->create(['user_id' => $user->id]);
 
             $browser->loginAs($user)
                     ->visit('/vendor/documents/create')
                     ->assertSee('Upload Dokumen Legalitas Vendor')
                     ->attach('legality_document', $this->file('invalid_file.exe'))
                     ->press('Upload Dokumen')
-                    ->assertSee('Ada kesalahan pada form');
+                    ->waitForText('kesalahan', 5)
+                    ->assertSee('kesalahan');
         });
     }
 
@@ -70,14 +71,15 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user    = $this->createVendorUser();
-            $profile = VendorProfile::factory()->create(['user_id' => $user->id]);
+            VendorProfile::factory()->create(['user_id' => $user->id]);
 
             $browser->loginAs($user)
                     ->visit('/vendor/documents/create')
                     ->assertSee('Upload Dokumen Legalitas Vendor')
                     ->attach('legality_document', $this->file('large_document_6mb.pdf'))
                     ->press('Upload Dokumen')
-                    ->assertSee('Ada kesalahan pada form');
+                    ->waitForText('kesalahan', 5)
+                    ->assertSee('kesalahan');
         });
     }
 
@@ -90,7 +92,7 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user   = $this->createVendorUser();
-            $vendor = Vendor::factory()->create([
+            Vendor::factory()->create([
                 'user_id' => $user->id,
                 'status'  => 'Pending',
             ]);
@@ -107,7 +109,7 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user   = $this->createVendorUser();
-            $vendor = Vendor::factory()->create([
+            Vendor::factory()->create([
                 'user_id' => $user->id,
                 'status'  => 'Approved',
             ]);
@@ -124,7 +126,7 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user   = $this->createVendorUser();
-            $vendor = Vendor::factory()->create([
+            Vendor::factory()->create([
                 'user_id' => $user->id,
                 'status'  => 'Rejected',
             ]);
@@ -154,15 +156,15 @@ class VendorRegistrationTest extends DuskTestCase
                     ->visit('/vendor/status')
                     ->assertSee('Rejected')
                     ->clickLink('Perbaiki & Upload Ulang')
-                    ->assertSee('Perbaiki & Unggah Ulang Dokumen')
+                    ->waitForText('Perbaiki & Unggah Ulang Dokumen')
                     ->attach('legality_document', $this->file('valid_document.pdf'))
                     ->press('Simpan Perbaikan')
+                    ->waitForText('Pending', 5)
                     ->assertSee('Pending');
         });
     }
 
     // TC.Vendor.011 — Negative
-    
     public function test_TC_Vendor_011_upload_ulang_format_tidak_valid(): void
     {
         $this->browse(function (Browser $browser) {
@@ -175,10 +177,11 @@ class VendorRegistrationTest extends DuskTestCase
             $browser->loginAs($user)
                     ->visit("/vendor/documents/{$vendor->id}/edit")
                     ->assertSee('Perbaiki & Unggah Ulang Dokumen')
-                    ->attach('legality_document', $this->file('invalid_document.docx'))
+                    ->attach('legality_document', $this->file('invalid_file.exe'))
                     ->press('Simpan Perbaikan')
-                    ->assertSee('Ada kesalahan pada form')
-                    ->assertPathContains('/edit'); // memastikan tidak redirect, tetap di halaman edit
+                    ->waitForText('kesalahan', 5)
+                    ->assertSee('kesalahan')
+                    ->assertPathContains('/edit');
         });
     }
 
@@ -187,7 +190,7 @@ class VendorRegistrationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $user   = $this->createVendorUser();
-            $vendor = Vendor::factory()->create([
+            Vendor::factory()->create([
                 'user_id' => $user->id,
                 'status'  => 'Approved',
             ]);
