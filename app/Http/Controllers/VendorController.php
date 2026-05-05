@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class VendorController extends Controller
 {
@@ -20,15 +21,26 @@ class VendorController extends Controller
             abort(401);
         }
 
-        return User::firstOrCreate(
-            ['email' => 'vendor.local@test.dev'],
-            [
-                'name' => 'Vendor Local',
-                'password' => Hash::make('password123'),
-                'role' => 'vendor',
-                'phone' => '081234567890',
-            ]
-        );
+        $localUserId = $request->session()->get('local_vendor_user_id');
+
+        if ($localUserId) {
+            $existingLocalUser = User::find($localUserId);
+            if ($existingLocalUser) {
+                return $existingLocalUser;
+            }
+        }
+
+        $user = User::create([
+            'name' => 'Vendor Local '.now()->format('His'),
+            'email' => 'vendor.local+'.Str::lower((string) Str::uuid()).'@test.dev',
+            'password' => Hash::make('password123'),
+            'role' => 'vendor',
+            'phone' => '081234567890',
+        ]);
+
+        $request->session()->put('local_vendor_user_id', $user->id);
+
+        return $user;
     }
 
     protected function ensureOwner(Request $request, Vendor $vendor): void
