@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
@@ -31,7 +33,7 @@ class GarasiDigitalTest extends DuskTestCase
                     ->pause(300)
                     ->type('#license_plate', 'B 1234 CD')
                     ->waitFor('#submit-btn:not([disabled])', 5)
-                    ->press('Simpan Kendaraan')
+                    ->click('#submit-btn')
                     ->waitForLocation('/rider/vehicles', 10)
                     ->assertSee('BYD')
                     ->assertSee('Dolphin');
@@ -116,7 +118,7 @@ class GarasiDigitalTest extends DuskTestCase
                         ]);
                     })
                     ->waitFor('#submit-btn:not([disabled])', 5)
-                    ->press('Simpan Perubahan')
+                    ->click('#submit-btn')
                     ->waitForLocation('/rider/vehicles', 10)
                     ->assertSee('BinguoEV')
                     ->assertDontSee('Air EV Long Range');
@@ -154,7 +156,7 @@ class GarasiDigitalTest extends DuskTestCase
                         $browser->script(["checkForm();"]);
                     })
                     ->waitFor('#submit-btn:not([disabled])', 5)
-                    ->press('Simpan Perubahan')
+                    ->click('#submit-btn')
                     ->pause(500)
                     ->assertPathContains('/edit')
                     ->assertSee('The license plate has already been taken.');
