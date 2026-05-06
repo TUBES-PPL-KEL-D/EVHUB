@@ -170,7 +170,7 @@
                 <span class="text-xl font-bold text-white">EV-HUB</span>
             </div>
             <div class="text-slate-400 text-sm font-medium">
-                &copy; 2026 EV-HUB. Kelompok D - S1 Sistem Informasi. All rights reserved.
+                &copy; 2026 EV-HUB. All rights reserved.
             </div>
             <div class="flex space-x-4">
                 <a href="#" class="text-slate-400 hover:text-emerald-400 transition-colors">Kebijakan Privasi</a>
