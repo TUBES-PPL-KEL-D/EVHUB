@@ -4,7 +4,7 @@
 @section('content')
 <div class="space-y-10 animate-fade-in-up">
     <div>
-        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Manajemen <span class="text-emerald-500">Stasiun</span></h1>
+        <h1 class="text-4xl font-extrabold text-white tracking-tight">Manajemen <span class="text-emerald-500">Stasiun</span></h1>
         <p class="text-slate-500 font-medium mt-2">Kontrol operasional dan status kemitraan vendor SPKLU.</p>
     </div>
 
