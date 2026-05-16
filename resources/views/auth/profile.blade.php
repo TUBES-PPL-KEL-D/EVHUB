@@ -29,6 +29,23 @@
     @endif
 
     <div class="space-y-8">
+        <div class="bg-gradient-to-r from-slate-800/60 to-emerald-950/30 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/20 shadow-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="p-3.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Saldo EV-Wallet</p>
+                    <h2 class="text-2xl font-black text-white mt-0.5">Rp 150.000 <span class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md ml-1 border border-emerald-500/10">Dummy</span></h2>
+                </div>
+            </div>
+            <button type="button" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 hover:border-emerald-500/30 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-200 shadow-md">
+                + Isi Saldo
+            </button>
+        </div>
+
         <div class="bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
             <div class="p-8">
                 <form action="{{ route('profile.update') }}" method="POST">
