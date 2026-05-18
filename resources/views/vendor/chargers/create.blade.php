@@ -74,8 +74,17 @@
                         </div>
 
                         <div>
-                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor</label>
-                            <input type="text" name="connector_type" id="connector_type" value="{{ old('connector_type') }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="CCS2 / CHAdeMO / Type 2" required>
+                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor (Standar Internasional) <span class="text-red-500">*</span></label>
+                            <select name="connector_type" id="connector_type" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <option value="" disabled {{ old('connector_type') ? '' : 'selected' }}>-- Pilih Standar Konektor --</option>
+                                <option value="Type 1" {{ old('connector_type') == 'Type 1' ? 'selected' : '' }}>Type 1 (J1772) - AC</option>
+                                <option value="Type 2" {{ old('connector_type') == 'Type 2' ? 'selected' : '' }}>Type 2 (Mennekes) - AC</option>
+                                <option value="CCS1" {{ old('connector_type') == 'CCS1' ? 'selected' : '' }}>CCS1 - DC Fast Charging</option>
+                                <option value="CCS2" {{ old('connector_type') == 'CCS2' ? 'selected' : '' }}>CCS2 - DC Fast Charging</option>
+                                <option value="CHAdeMO" {{ old('connector_type') == 'CHAdeMO' ? 'selected' : '' }}>CHAdeMO - DC Fast Charging</option>
+                                <option value="GB/T" {{ old('connector_type') == 'GB/T' ? 'selected' : '' }}>GB/T - Standar China (AC/DC)</option>
+                                <option value="NACS" {{ old('connector_type') == 'NACS' ? 'selected' : '' }}>NACS (Tesla) - AC/DC</option>
+                            </select>
                         </div>
 
                         <div>
@@ -151,9 +160,31 @@ document.addEventListener('DOMContentLoaded', function () {
         // Buat marker baru
         marker = L.marker([lat, lng]).addTo(map);
 
-        // Isi input hidden
+        // Isi input hidden koordinat
         document.getElementById('latitude').value = lat;
         document.getElementById('longitude').value = lng;
+
+        // --- IMPLEMENTASI PBI: REVERSE GEOCODING (Alamat Otomatis) ---
+        var addressInput = document.getElementById('address');
+        addressInput.value = 'Sedang mencari alamat...'; // Indikator loading UI
+
+        // Memanggil API Nominatim OpenStreetMap
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    // Masukkan hasil alamat lengkap ke input box
+                    addressInput.value = data.display_name;
+                } else {
+                    addressInput.value = '';
+                    alert('Alamat spesifik tidak ditemukan di titik ini. Silakan ketik manual.');
+                }
+            })
+            .catch(error => {
+                console.error('Geocoding Error:', error);
+                addressInput.value = '';
+                alert('Gagal mengambil data alamat karena masalah jaringan. Silakan ketik manual.');
+            });
     });
 
     // Fix map render issue in hidden/flex layouts

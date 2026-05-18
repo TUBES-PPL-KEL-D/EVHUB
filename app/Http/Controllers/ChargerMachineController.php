@@ -73,7 +73,7 @@ class ChargerMachineController extends Controller
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
             'operational_hours' => 'required|string|max:255',
@@ -124,7 +124,7 @@ class ChargerMachineController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
             'operational_hours' => 'required|string|max:255',
