@@ -98,8 +98,13 @@
                         </div>
 
                         <div>
-                            <label for="operational_hours" class="mb-2 block text-sm font-medium text-slate-700">Jam Operasional</label>
-                            <input type="text" name="operational_hours" id="operational_hours" value="{{ old('operational_hours') }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="08:00 - 22:00 atau 24 Jam" required>
+                            <label class="mb-2 block text-sm font-medium text-slate-700">Jam Operasional <span class="text-red-500">*</span></label>
+                            <div class="flex items-center gap-2">
+                                <input type="time" name="open_time" id="open_time" value="{{ old('open_time') }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <span class="text-slate-500 font-medium">s/d</span>
+                                <input type="time" name="close_time" id="close_time" value="{{ old('close_time') }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                            </div>
+                            <p class="mt-1 text-xs text-slate-500">Pilih jam buka dan jam tutup standar (24 jam format).</p>
                         </div>
 
                         <div>
