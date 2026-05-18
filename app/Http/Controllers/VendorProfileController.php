@@ -60,9 +60,12 @@ class VendorProfileController extends Controller
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'company_email' => ['nullable', 'email', 'max:255'],
-            'company_phone' => ['nullable', 'string', 'max:30'],
+            // enforce numeric-only phone (6-20 digits) to match "nomor harus nomor"
+            'company_phone' => ['nullable', 'regex:/^\d{6,20}$/'],
             'company_address' => ['required', 'string', 'max:1000'],
             'company_description' => ['nullable', 'string', 'max:2000'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $vendorProfile = VendorProfile::updateOrCreate(
