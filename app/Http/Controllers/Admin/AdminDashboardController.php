@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
+use App\Models\Ticket; // Tambahan model Ticket untuk PBI 9
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,8 +12,19 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
+        // 1. Menarik data vendor yang menunggu persetujuan (PBI Sprint 1)
         $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
-        return view('admin.dashboard', compact('pendingVendors'));
+
+        // 2. Menarik data laporan kendala terbaru (Improvement PBI 9 - Sprint 2)
+        // Kita ambil 5 tiket terbaru yang statusnya masih 'pending'
+        $recentTickets = Ticket::with('user')
+            ->where('status', 'pending') 
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Mengirimkan kedua variabel tersebut ke halaman view dashboard
+        return view('admin.dashboard', compact('pendingVendors', 'recentTickets'));
     }
 
     public function approve($id)
