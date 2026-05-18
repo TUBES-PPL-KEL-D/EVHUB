@@ -52,8 +52,18 @@
                         </div>
 
                         <div>
-                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor</label>
-                            <input type="text" name="connector_type" id="connector_type" value="{{ old('connector_type', $charger->connector_type) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor (Standar Internasional) <span class="text-red-500">*</span></label>
+                            <select name="connector_type" id="connector_type" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <option value="" disabled>-- Pilih Standar Konektor --</option>
+                                @php $currentConnector = old('connector_type', $charger->connector_type); @endphp
+                                <option value="Type 1" {{ $currentConnector == 'Type 1' ? 'selected' : '' }}>Type 1 (J1772) - AC</option>
+                                <option value="Type 2" {{ $currentConnector == 'Type 2' ? 'selected' : '' }}>Type 2 (Mennekes) - AC</option>
+                                <option value="CCS1" {{ $currentConnector == 'CCS1' ? 'selected' : '' }}>CCS1 - DC Fast Charging</option>
+                                <option value="CCS2" {{ $currentConnector == 'CCS2' ? 'selected' : '' }}>CCS2 - DC Fast Charging</option>
+                                <option value="CHAdeMO" {{ $currentConnector == 'CHAdeMO' ? 'selected' : '' }}>CHAdeMO - DC Fast Charging</option>
+                                <option value="GB/T" {{ $currentConnector == 'GB/T' ? 'selected' : '' }}>GB/T - Standar China (AC/DC)</option>
+                                <option value="NACS" {{ $currentConnector == 'NACS' ? 'selected' : '' }}>NACS (Tesla) - AC/DC</option>
+                            </select>
                         </div>
 
                         <div>
