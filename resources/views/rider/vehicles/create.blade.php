@@ -234,8 +234,19 @@
 
             <form action="{{ route('rider.vehicles.store') }}" method="POST" id="vehicle-form">
                 @csrf
-                <input type="hidden" name="merk" id="merk-hidden">
-                <input type="hidden" name="model" id="model-hidden">
+
+                @if ($errors->any())
+                    <div class="mb-6 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <input type="hidden" name="merk" id="merk-hidden" value="{{ old('merk') }}">
+                <input type="hidden" name="model" id="model-hidden" value="{{ old('model') }}">
 
                 {{-- Step 1: Brand Selection --}}
                 <div id="brand-section">
@@ -304,6 +315,7 @@
                         <input type="text" name="license_plate" id="license_plate" placeholder="D 1234 ABC"
                             required maxlength="12"
                             class="plate-input mb-2"
+                            value="{{ old('license_plate') }}"
                             oninput="this.value = this.value.toUpperCase(); checkForm()">
                         <p class="text-center text-slate-500 text-sm mb-8">Pastikan plat nomor sesuai dengan STNK kendaraan Anda.</p>
                         
@@ -371,6 +383,26 @@ const evModels = {
 let selectedBrand = null;
 let selectedModel = null;
 
+function renderModels(brand, activeModel = null) {
+    const chipsContainer = document.getElementById('model-chips');
+    chipsContainer.innerHTML = '';
+
+    if (evModels[brand]) {
+        evModels[brand].forEach(model => {
+            const chip = document.createElement('div');
+            chip.className = 'model-chip';
+            chip.textContent = model;
+            if (model === activeModel) {
+                chip.classList.add('selected');
+                selectedModel = model;
+                document.getElementById('model-hidden').value = model;
+            }
+            chip.onclick = () => selectModel(model, chip);
+            chipsContainer.appendChild(chip);
+        });
+    }
+}
+
 function selectBrand(brand, el) {
     selectedBrand = brand;
     selectedModel = null;
@@ -384,18 +416,7 @@ function selectBrand(brand, el) {
     setStep(2);
 
     document.getElementById('selected-brand-label').textContent = brand;
-    const chipsContainer = document.getElementById('model-chips');
-    chipsContainer.innerHTML = '';
-    
-    if(evModels[brand]) {
-        evModels[brand].forEach(model => {
-            const chip = document.createElement('div');
-            chip.className = 'model-chip';
-            chip.textContent = model;
-            chip.onclick = () => selectModel(model, chip);
-            chipsContainer.appendChild(chip);
-        });
-    }
+    renderModels(brand, null);
     
     document.getElementById('models-section').style.display = 'block';
     document.getElementById('plate-section').style.display = 'none';
@@ -473,6 +494,40 @@ function checkForm() {
         btn.disabled = true;
         document.getElementById('summary-box').style.display = 'none';
     }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const oldBrand = document.getElementById('merk-hidden').value;
+    const oldModel = document.getElementById('model-hidden').value;
+    const oldPlate = document.getElementById('license_plate').value.trim();
+
+    if (oldBrand) {
+        const cardId = 'brand-' + slugify(oldBrand);
+        const brandCard = document.getElementById(cardId);
+        if (brandCard) {
+            brandCard.classList.add('selected');
+        }
+
+        document.getElementById('selected-brand-label').textContent = oldBrand;
+        renderModels(oldBrand, oldModel);
+        document.getElementById('models-section').style.display = 'block';
+
+        if (oldModel) {
+            document.getElementById('plate-section').style.display = 'block';
+            setStep(3);
+        } else {
+            setStep(2);
+        }
+
+        if (oldBrand && oldModel && oldPlate) {
+            document.getElementById('summary-box').style.display = 'block';
+        }
+        checkForm();
+    }
+});
+
+function slugify(text) {
+    return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 }
 </script>
 @endsection
