@@ -9,6 +9,7 @@ use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\WalletController;
 
 // 1. HALAMAN UTAMA (LANDING PAGE)
 Route::get('/', function () {
@@ -42,7 +43,11 @@ Route::prefix('rider')->name('rider.')->group(function () {
     Route::resource('vehicles', VehicleController::class);
     // Pemetaan SPKLU (Azka & Aimee)
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
-Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
+    Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
+    // Wallet (Wisnu)
+    Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');
+    
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)
