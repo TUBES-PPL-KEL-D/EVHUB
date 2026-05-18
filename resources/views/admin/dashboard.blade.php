@@ -35,6 +35,7 @@
                         <tr class="border-b border-slate-700/50 text-slate-400 text-sm uppercase tracking-wider">
                             <th class="py-4 px-4 font-semibold">Nama Perusahaan</th>
                             <th class="py-4 px-4 font-semibold">NPWP</th>
+                            <th class="py-4 px-4 font-semibold text-center">Dokumen</th>
                             <th class="py-4 px-4 font-semibold text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -43,6 +44,18 @@
                         <tr class="hover:bg-slate-700/20 transition-colors">
                             <td class="py-4 px-4 text-white font-medium">{{ $vendor->company_name ?? '-' }}</td>
                             <td class="py-4 px-4 text-slate-300 font-mono text-sm">{{ $vendor->npwp ?? '-' }}</td>
+                            
+                            <td class="py-4 px-4 text-center">
+                                @if($vendor->legality_document_path)
+                                    <a href="{{ asset('storage/' . $vendor->legality_document_path) }}" target="_blank" class="inline-flex items-center text-blue-400 hover:text-blue-300 hover:underline text-sm font-medium transition-all">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        Lihat File
+                                    </a>
+                                @else
+                                    <span class="text-slate-500 text-xs italic">Tidak ada file</span>
+                                @endif
+                            </td>
+
                             <td class="py-4 px-4 text-right space-x-2">
                                 <form action="{{ route('admin.vendors.approve', $vendor->id) }}" method="POST" class="inline">
                                     @csrf @method('PATCH')
