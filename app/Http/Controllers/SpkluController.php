@@ -33,18 +33,23 @@ class SpkluController extends Controller
 
     public function getDynamicMarkers()
     {
-        $spklus = Spklu::with('chargers.machines')->get()->map(function ($spklu) {
+        $spklus = Spklu::with('chargerMachines')->get()->map(function ($spklu) {
             $available = 0;
             $total = 0;
+            $charger_machines = [];
 
-            foreach ($spklu->chargers as $charger) {
-                foreach ($charger->machines as $machine) {
-                    $total++;
-                    // Sesuaikan string 'available' dengan isi database kamu
-                    if (strtolower($machine->status) === 'available') {
-                        $available++;
-                    }
+            foreach ($spklu->chargerMachines as $machine) {
+                $total++;
+                // Sesuaikan string 'available' dengan isi database kamu
+                if (strtolower($machine->status) === 'available') {
+                    $available++;
                 }
+
+                $charger_machines[] = [
+                    'connector_type' => $machine->connector_type,
+                    'capacity_kw' => $machine->capacity_kw,
+                    'status' => strtolower($machine->status)
+                ];
             }
 
             if ($total === 0) {
@@ -63,6 +68,7 @@ class SpkluController extends Controller
                 'status' => $status,
                 'available' => $available,
                 'total' => $total,
+                'charger_machines' => $charger_machines,
             ];
         });
 
