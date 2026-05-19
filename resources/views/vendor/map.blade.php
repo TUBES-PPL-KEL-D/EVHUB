@@ -84,10 +84,33 @@
 
                             if (machines.length > 0) {
                                 machines.forEach(machine => {
+                                    let machineStatusText = '';
+                                    let machineStatusClass = '';
+                                    let machineStatusBadge = '';
+                                    if (machine.status === 'available') {
+                                        machineStatusText = 'Tersedia';
+                                        machineStatusClass = 'bg-emerald-50 text-emerald-600';
+                                        machineStatusBadge = 'bg-emerald-500';
+                                    } else if (machine.status === 'maintenance') {
+                                        machineStatusText = 'Perbaikan';
+                                        machineStatusClass = 'bg-slate-100 text-slate-600';
+                                        machineStatusBadge = 'bg-slate-400';
+                                    } else {
+                                        machineStatusText = 'Dipakai';
+                                        machineStatusClass = 'bg-rose-50 text-rose-600';
+                                        machineStatusBadge = 'bg-rose-500';
+                                    }
+
                                     portContent += `
-                                        <div class="flex justify-between items-center bg-white border border-slate-100 rounded-md px-2 py-1.5 mb-1 shadow-sm">
-                                            <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
-                                            <span class="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded font-bold">${machine.capacity_kw} kW</span>
+                                        <div class="flex flex-col bg-white border border-slate-100 rounded-md p-2 mb-1 shadow-sm">
+                                            <div class="flex justify-between items-center mb-1.5">
+                                                <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
+                                                <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-bold">${machine.capacity_kw} kW</span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="w-2 h-2 rounded-full ${machineStatusBadge}"></span>
+                                                <span class="text-[9px] font-bold ${machineStatusClass} px-1.5 py-0.5 rounded uppercase tracking-widest">${machineStatusText}</span>
+                                            </div>
                                         </div>
                                     `;
                                 });
