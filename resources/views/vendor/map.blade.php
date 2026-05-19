@@ -4,16 +4,13 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto">
-    <!-- Header Halaman -->
     <div class="mb-8">
         <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Jaringan <span class="text-emerald-500">SPKLU</span></h1>
         <p class="text-slate-700 font-medium mt-2">Pantau lokasi dan ketersediaan stasiun pengisian daya EV secara real-time.</p>
     </div>
 
-    <!-- Card Container untuk Peta -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 relative">
         
-        <!-- Status Legend (Indikator Warna) -->
         <div class="absolute top-8 right-8 z-[1000] bg-white/95 backdrop-blur px-4 py-3 rounded-xl shadow-md border border-slate-100 flex flex-col gap-2">
             <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Status Mesin</h3>
             <div class="flex items-center gap-2">
@@ -30,7 +27,13 @@
             </div>
         </div>
 
-        <!-- Wadah Peta -->
+        <button id="btn-locate-me" class="absolute top-36 left-8 z-[1000] bg-white p-3 rounded-xl shadow-md border border-slate-200 hover:bg-slate-50 transition-all group focus:outline-none flex items-center justify-center" title="Temukan Lokasi Saya">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M2 12h2m16 0h2" />
+            </svg>
+        </button>
+
         <div id="map" class="w-full h-[600px] rounded-xl z-0 border border-slate-200"></div>
     </div>
 </div>
@@ -40,17 +43,16 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Titik tengah awal peta (Diatur ke koordinat Bandung)
+        // Titik tengah awal peta (Bandung)
         var map = L.map('map', {
-            zoomControl: false // Kita matikan zoom bawaan untuk dikustomisasi posisinya nanti jika perlu
+            zoomControl: false 
         }).setView([-6.914744, 107.609810], 13);
 
-        // Tambahkan Zoom Control di posisi bawah kanan agar tidak tertutup legend
+        // Zoom Control di bawah kanan
         L.control.zoom({
             position: 'bottomright'
         }).addTo(map);
 
-        // Menambahkan tile layer OpenStreetMap (Desain standar)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
@@ -77,13 +79,11 @@
                                 textColor = 'text-rose-700';
                             }
 
-                            // --- PERBAIKAN PBI 30: Membaca Array charger_machines ---
-                            let machines = spklu.charger_machines || []; // Laravel mengubah camelCase jadi snake_case di JSON
+                            let machines = spklu.charger_machines || []; 
                             let portContent = '';
 
                             if (machines.length > 0) {
                                 machines.forEach(machine => {
-                                    // Menggunakan connector_type dan capacity_kw sesuai database
                                     portContent += `
                                         <div class="flex justify-between items-center bg-white border border-slate-100 rounded-md px-2 py-1.5 mb-1 shadow-sm">
                                             <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
@@ -106,7 +106,6 @@
                                         </span>
                                     </div>
 
-                                    <!-- Bagian Detail Port (PBI 30) -->
                                     <div class="mb-3">
                                         <p class="text-[10px] text-slate-500 mb-1.5 uppercase font-bold tracking-wider">Tipe Port & Detail</p>
                                         <div class="max-h-[120px] overflow-y-auto pr-1">
@@ -127,7 +126,11 @@
                             if (activeMarkers[spklu.id]) {
                                 activeMarkers[spklu.id].setPopupContent(popupContent);
                             } else {
-                                let marker = L.marker([spklu.latitude, spklu.longitude]).addTo(map);
+                                // KEMBALI MENGGUNAKAN MARKER PIN BIRU STANDAR LEAFLET
+                                let marker = L.marker([spklu.latitude, spklu.longitude], {
+                                    id: spklu.id // simpan ID untuk mempermudah tracking
+                                }).addTo(map);
+                                
                                 marker.bindPopup(popupContent, {
                                     className: 'custom-popup'
                                 });
@@ -141,11 +144,68 @@
 
         fetchAndRenderMarkers();
         setInterval(fetchAndRenderMarkers, 5000);
+
+        // --- LOGIKA UTAMA FITUR LOKASI SAYA (PBI 21) ---
+        let userMarker = null;
+        let locateBtn = document.getElementById('btn-locate-me');
+
+        locateBtn.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                // Beri efek transisi warna saat tombol ditekan
+                locateBtn.classList.add('text-blue-500');
+
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let userLat = position.coords.latitude;
+                    let userLng = position.coords.longitude;
+
+                    // Terbangkan peta ke koordinat GPS pengendara
+                    map.flyTo([userLat, userLng], 15, {
+                        animate: true,
+                        duration: 1.5
+                    });
+
+                    // Icon penanda lokasi pengguna (Titik biru berdenyut khas GPS)
+                    let userLocationIcon = L.divIcon({
+                        className: 'user-gps-marker',
+                        html: `
+                            <div class="relative flex items-center justify-center">
+                                <div class="absolute w-8 h-8 bg-blue-400 rounded-full opacity-40 animate-ping"></div>
+                                <div class="w-4 h-4 bg-blue-600 border-2 border-white rounded-full shadow-md"></div>
+                            </div>
+                        `,
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8]
+                    });
+
+                    // Jika marker lokasi sudah ada, update posisinya saja. Jika belum, buat baru.
+                    if (userMarker) {
+                        userMarker.setLatLng([userLat, userLng]);
+                    } else {
+                        userMarker = L.marker([userLat, userLng], {icon: userLocationIcon}).addTo(map);
+                        userMarker.bindPopup('<b class="text-blue-600">Lokasi Anda Sekarang</b>');
+                    }
+
+                    locateBtn.classList.remove('text-blue-500');
+
+                }, function(error) {
+                    alert('Gagal mendeteksi lokasi. Pastikan GPS perangkat Anda sudah aktif.');
+                    locateBtn.classList.remove('text-blue-500');
+                }, {
+                    enableHighAccuracy: true // Menggunakan hardware GPS agar lokasi presisi
+                });
+            } else {
+                alert('Browser Anda tidak mendukung deteksi lokasi (Geolocation).');
+            }
+        });
     });
 </script>
 
 <style>
-    /* Styling khusus untuk merapikan Popup Leaflet agar menyatu dengan Tailwind */
+    /* Reset style divIcon bawaan Leaflet untuk marker GPS */
+    .user-gps-marker {
+        background: transparent;
+        border: none;
+    }
     .leaflet-popup-content-wrapper {
         border-radius: 1rem;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
