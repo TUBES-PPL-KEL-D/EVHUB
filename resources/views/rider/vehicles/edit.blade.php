@@ -274,9 +274,18 @@
                             required maxlength="12" value="{{ old('license_plate', $vehicle->license_plate) }}"
                             class="plate-input mb-2"
                             oninput="this.value = this.value.toUpperCase(); checkForm()">
-                        <p class="text-center text-slate-500 text-sm mb-8">Pastikan plat nomor sesuai dengan STNK kendaraan Anda.</p>
+                        <p class="text-center text-slate-500 text-sm mb-4">Pastikan plat nomor sesuai dengan STNK kendaraan Anda.</p>
+
+                        <label class="block text-sm font-semibold text-slate-200 mb-2" for="battery_service_date">Jadwal Servis Baterai Berikutnya</label>
+                        <input type="date" name="battery_service_date" id="battery_service_date"
+                            class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4"
+                            value="{{ old('battery_service_date', optional($vehicle->battery_service_date)->format('Y-m-d')) }}">
+                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan tanggal servis untuk mendapatkan pengingat baterai di garasi.</p>
                         
                         @error('license_plate')
+                            <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>
+                        @enderror
+                        @error('battery_service_date')
                             <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>
                         @enderror
 

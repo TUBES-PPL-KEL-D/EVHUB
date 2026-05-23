@@ -63,6 +63,21 @@
                 </a>
             </div>
         </div>
+
+        @if(isset($serviceDueVehicles) && $serviceDueVehicles->isNotEmpty())
+            <div class="rounded-3xl border border-rose-500/30 bg-rose-500/10 p-5 text-white shadow-lg shadow-rose-500/10">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Pengingat Servis Baterai</h2>
+                        <p class="text-sm text-slate-200 mt-1">Ada {{ $serviceDueVehicles->count() }} kendaraan yang perlu pemeriksaan servis baterai segera.</p>
+                    </div>
+                    <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm text-rose-100">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+                        Periksa jadwal servis baterai Anda
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- Card Grid --}}
@@ -144,6 +159,22 @@
                                 {{ strtoupper($vehicle->license_plate) }}
                             </span>
                         </div>
+
+                        @if($vehicle->isBatteryServiceDue())
+                            <div class="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-rose-100">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wider font-bold text-rose-200">Pengingat Servis Baterai</p>
+                                        <p class="text-sm mt-1">Jadwal servis: <strong>{{ $vehicle->battery_service_date->format('d M Y') }}</strong></p>
+                                    </div>
+                                    <span class="inline-flex items-center rounded-full bg-rose-500/20 px-3 py-1 text-[11px] font-semibold uppercase text-rose-100">{{ $vehicle->batteryServiceStatus() }}</span>
+                                </div>
+                            </div>
+                        @elseif(! $vehicle->battery_service_date)
+                            <div class="mb-6 rounded-2xl border border-slate-700/50 bg-slate-800/70 p-4 text-slate-300">
+                                <p class="text-sm">Jadwal servis baterai belum diatur. Tambahkan tanggal servis di edit kendaraan.</p>
+                            </div>
+                        @endif
 
                         {{-- Spacer pushes buttons to bottom --}}
                         <div class="flex-1"></div>

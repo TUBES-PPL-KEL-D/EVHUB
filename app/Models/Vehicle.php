@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ConnectorMatchingService;
@@ -14,6 +15,11 @@ class Vehicle extends Model
         'model',
         'license_plate',
         'connector_type',
+        'battery_service_date',
+    ];
+
+    protected $casts = [
+        'battery_service_date' => 'date',
     ];
 
     // Relasi ke User (Pemilik Kendaraan)
@@ -61,5 +67,40 @@ class Vehicle extends Model
     {
         $connectors = ConnectorMatchingService::getAvailableConnectors();
         return $connectors[$this->connector_type] ?? 'Unknown';
+    }
+
+    public function isBatteryServiceDue(): bool
+    {
+        if (! $this->battery_service_date) {
+            return false;
+        }
+
+        return $this->battery_service_date->isPast() || $this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30));
+    }
+
+    public function batteryServiceStatus(): string
+    {
+        if (! $this->battery_service_date) {
+            return 'Jadwal servis belum diatur';
+        }
+
+        if ($this->battery_service_date->isPast()) {
+            return 'Lewat jatuh tempo';
+        }
+
+        if ($this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30))) {
+            return 'Segera servis';
+        }
+
+        return 'Akan datang';
+    }
+
+    public function batteryServiceDueInDays(): ?int
+    {
+        if (! $this->battery_service_date) {
+            return null;
+        }
+
+        return $this->battery_service_date->diffInDays(Carbon::now(), false);
     }
 }
