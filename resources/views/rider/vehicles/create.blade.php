@@ -147,7 +147,7 @@
     .step.done .step-label { color: #10b981; }
     .step.pending .step-label { color: #64748b; }
     
-    #models-section, #plate-section { display: none; }
+    #models-section, #connector-section, #plate-section { display: none; }
     
     /* Input Form Styling */
     .plate-input {
@@ -228,6 +228,11 @@
                 <div class="step-line" id="line2"></div>
                 <div class="step pending" id="step3-indicator">
                     <div class="step-num">3</div>
+                    <span class="step-label hidden sm:block">Konektor</span>
+                </div>
+                <div class="step-line" id="line3"></div>
+                <div class="step pending" id="step4-indicator">
+                    <div class="step-num">4</div>
                     <span class="step-label hidden sm:block">Plat Nomor</span>
                 </div>
             </div>
@@ -305,7 +310,48 @@
                     </div>
                 </div>
 
-                {{-- Step 3: License Plate --}}
+                {{-- Step 3: Connector Type (Optional) --}}
+                <div id="connector-section" class="mt-10 pt-8 border-t border-slate-700/50">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Tipe Konektor <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded ml-auto">Opsional</span>
+                    </h2>
+                    
+                    <div class="max-w-2xl">
+                        <p class="text-slate-400 text-sm mb-6">Pilih tipe konektor pengisian daya kendaraan Anda (bisa diatur kemudian):</p>
+                        
+                        @php
+                            $connectors = [
+                                'CCS' => 'CCS (Combined Charging System)',
+                                'CHAdeMO' => 'CHAdeMO',
+                                'Type2' => 'Type 2 / Mennekes',
+                                'GB/T' => 'GB/T',
+                                'Tesla' => 'Tesla Connector',
+                            ];
+                        @endphp
+                        
+                        <div class="space-y-3">
+                            @foreach($connectors as $value => $label)
+                            <label class="flex items-center gap-4 p-4 rounded-lg border border-slate-700 hover:border-slate-600 hover:bg-slate-700/30 cursor-pointer transition {{ old('connector_type') === $value ? 'bg-emerald-500/10 border-emerald-500' : 'bg-slate-800/30' }}">
+                                <input type="radio" name="connector_type" value="{{ $value }}" 
+                                    {{ old('connector_type') === $value ? 'checked' : '' }}
+                                    onchange="checkForm()" class="w-4 h-4 rounded-full accent-emerald-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-white">{{ $label }}</div>
+                                </div>
+                                @if($value === 'CCS')
+                                    <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded">Populer</span>
+                                @endif
+                            </label>
+                            @endforeach
+                        </div>
+
+                        @error('connector_type')
+                            <p class="mt-4 text-sm text-rose-500 bg-rose-500/10 py-2 px-3 rounded-lg">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Step 4: License Plate --}}
                 <div id="plate-section" class="mt-10 pt-8 border-t border-slate-700/50">
                     <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Identitas Kendaraan
@@ -326,7 +372,7 @@
                         {{-- Summary --}}
                         <div class="summary-box" id="summary-box">
                             <p class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 border-b border-emerald-500/20 pb-2">Ringkasan Pendaftaran</p>
-                            <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="grid grid-cols-2 gap-4 text-center mb-6 pb-6 border-b border-emerald-500/20">
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Merek</span>
                                     <strong id="sum-merk" class="text-white text-lg"></strong>
@@ -334,6 +380,12 @@
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Model</span>
                                     <strong id="sum-model" class="text-white text-lg"></strong>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-center mb-4">
+                                <div>
+                                    <span class="text-slate-400 text-xs block mb-1 uppercase">Konektor</span>
+                                    <strong id="sum-connector" class="text-emerald-400 text-lg"></strong>
                                 </div>
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Plat</span>
@@ -434,7 +486,9 @@ function resetBrand() {
     document.querySelectorAll('.brand-card').forEach(c => c.classList.remove('selected'));
     document.getElementById('merk-hidden').value = '';
     document.getElementById('model-hidden').value = '';
+    document.querySelector('input[name="connector_type"]').checked = false;
     document.getElementById('models-section').style.display = 'none';
+    document.getElementById('connector-section').style.display = 'none';
     document.getElementById('plate-section').style.display = 'none';
     document.getElementById('summary-box').style.display = 'none';
     setStep(1);
@@ -447,20 +501,20 @@ function selectModel(model, el) {
     el.classList.add('selected');
 
     document.getElementById('model-hidden').value = model;
-    document.getElementById('plate-section').style.display = 'block';
+    document.getElementById('connector-section').style.display = 'block';
+    document.getElementById('plate-section').style.display = 'none';
 
     setStep(3);
     checkForm();
 
     setTimeout(() => {
-        document.getElementById('plate-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        document.getElementById('license_plate').focus();
+        document.getElementById('connector-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 }
 
 function setStep(step) {
-    const steps = ['step1-indicator', 'step2-indicator', 'step3-indicator'];
-    const lines = ['line1', 'line2'];
+    const steps = ['step1-indicator', 'step2-indicator', 'step3-indicator', 'step4-indicator'];
+    const lines = ['line1', 'line2', 'line3'];
 
     steps.forEach((id, i) => {
         const el = document.getElementById(id);
@@ -481,13 +535,45 @@ function checkForm() {
     const plate = document.getElementById('license_plate').value.trim();
     const merk = document.getElementById('merk-hidden').value;
     const model = document.getElementById('model-hidden').value;
+    const connector = document.querySelector('input[name="connector_type"]:checked')?.value || '';
     const btn = document.getElementById('submit-btn');
 
+    // Show plate section if model is selected
+    if (merk && model) {
+        if (!document.getElementById('plate-section').style.display || document.getElementById('plate-section').style.display === 'none') {
+            document.getElementById('plate-section').style.display = 'block';
+            if (connector) {
+                setStep(4);
+            } else {
+                setStep(3); // Step 3 is connector, but we're allowing to skip
+            }
+            setTimeout(() => {
+                document.getElementById('plate-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('license_plate').focus();
+            }, 100);
+        }
+    }
+
+    // Form valid jika: merk + model + plate. Connector optional!
     if (merk && model && plate.length >= 4) {
         btn.disabled = false;
         
+        // Get connector display name
+        const connectorNames = {
+            'CCS': 'CCS (Combined Charging System)',
+            'CHAdeMO': 'CHAdeMO',
+            'Type2': 'Type 2 / Mennekes',
+            'GB/T': 'GB/T',
+            'Tesla': 'Tesla Connector',
+        };
+        
         document.getElementById('sum-merk').textContent = merk;
         document.getElementById('sum-model').textContent = model;
+        if (connector) {
+            document.getElementById('sum-connector').textContent = connectorNames[connector] || connector;
+        } else {
+            document.getElementById('sum-connector').textContent = 'Belum dipilih';
+        }
         document.getElementById('sum-plate').textContent = plate;
         document.getElementById('summary-box').style.display = 'block';
     } else {
@@ -499,6 +585,7 @@ function checkForm() {
 window.addEventListener('DOMContentLoaded', () => {
     const oldBrand = document.getElementById('merk-hidden').value;
     const oldModel = document.getElementById('model-hidden').value;
+    const oldConnector = document.querySelector('input[name="connector_type"]:checked')?.value || '';
     const oldPlate = document.getElementById('license_plate').value.trim();
 
     if (oldBrand) {
@@ -513,13 +600,18 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('models-section').style.display = 'block';
 
         if (oldModel) {
-            document.getElementById('plate-section').style.display = 'block';
+            document.getElementById('connector-section').style.display = 'block';
             setStep(3);
         } else {
             setStep(2);
         }
 
-        if (oldBrand && oldModel && oldPlate) {
+        if (oldConnector) {
+            document.getElementById('plate-section').style.display = 'block';
+            setStep(4);
+        }
+
+        if (oldBrand && oldModel && oldConnector && oldPlate) {
             document.getElementById('summary-box').style.display = 'block';
         }
         checkForm();

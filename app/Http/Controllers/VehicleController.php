@@ -28,6 +28,7 @@ class VehicleController extends Controller
             'merk' => 'required|string|max:50',
             'model' => 'required|string|max:100',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
+            'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
         ]);
 
         // TESTER MODE BYPASS: Pastikan ada user ID 1
@@ -66,6 +67,7 @@ class VehicleController extends Controller
             'merk' => 'required|string|max:50',
             'model' => 'required|string|max:100',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate,' . $vehicle->id,
+            'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
         ]);
 
         $vehicle->update($validated);

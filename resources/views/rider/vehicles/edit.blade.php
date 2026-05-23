@@ -152,8 +152,13 @@
                     <span class="step-label hidden sm:block">Model</span>
                 </div>
                 <div class="step-line done" id="line2"></div>
-                <div class="step active" id="step3-indicator">
-                    <div class="step-num">3</div>
+                <div class="step done" id="step3-indicator">
+                    <div class="step-num">✓</div>
+                    <span class="step-label hidden sm:block">Konektor</span>
+                </div>
+                <div class="step-line done" id="line3"></div>
+                <div class="step active" id="step4-indicator">
+                    <div class="step-num">4</div>
                     <span class="step-label hidden sm:block">Data Baru</span>
                 </div>
             </div>
@@ -217,7 +222,48 @@
                     </div>
                 </div>
 
-                {{-- Step 3: License Plate & Summary --}}
+                {{-- Step 3: Connector Type (Optional) --}}
+                <div id="connector-section" class="mt-10 pt-8 border-t border-slate-700/50">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tipe Konektor <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded ml-auto">Opsional</span>
+                    </h2>
+                    
+                    <div class="max-w-2xl">
+                        <p class="text-slate-400 text-sm mb-6">Pilih tipe konektor pengisian daya kendaraan Anda (bisa diatur kemudian):</p>
+                        
+                        @php
+                            $connectors = [
+                                'CCS' => 'CCS (Combined Charging System)',
+                                'CHAdeMO' => 'CHAdeMO',
+                                'Type2' => 'Type 2 / Mennekes',
+                                'GB/T' => 'GB/T',
+                                'Tesla' => 'Tesla Connector',
+                            ];
+                        @endphp
+                        
+                        <div class="space-y-3">
+                            @foreach($connectors as $value => $label)
+                            <label class="flex items-center gap-4 p-4 rounded-lg border border-slate-700 hover:border-slate-600 hover:bg-slate-700/30 cursor-pointer transition {{ $vehicle->connector_type === $value ? 'bg-blue-500/10 border-blue-500' : 'bg-slate-800/30' }}">
+                                <input type="radio" name="connector_type" value="{{ $value }}" 
+                                    {{ $vehicle->connector_type === $value ? 'checked' : '' }}
+                                    onchange="checkForm()" class="w-4 h-4 rounded-full accent-blue-500">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-white">{{ $label }}</div>
+                                </div>
+                                @if($value === 'CCS')
+                                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Populer</span>
+                                @endif
+                            </label>
+                            @endforeach
+                        </div>
+
+                        @error('connector_type')
+                            <p class="mt-4 text-sm text-rose-500 bg-rose-500/10 py-2 px-3 rounded-lg">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Step 4: License Plate & Summary --}}
                 <div id="plate-section" class="mt-10 pt-8 border-t border-slate-700/50">
                     <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-blue-500"></span> Identitas Kendaraan
@@ -237,7 +283,7 @@
                         {{-- Summary --}}
                         <div class="summary-box" id="summary-box">
                             <p class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4 border-b border-blue-500/20 pb-2">Ringkasan Perubahan</p>
-                            <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="grid grid-cols-2 gap-4 text-center mb-6 pb-6 border-b border-blue-500/20">
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Merek</span>
                                     <strong id="sum-merk" class="text-white text-lg">{{ $vehicle->merk }}</strong>
@@ -245,6 +291,12 @@
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Model</span>
                                     <strong id="sum-model" class="text-white text-lg">{{ $vehicle->model }}</strong>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-center mb-4">
+                                <div>
+                                    <span class="text-slate-400 text-xs block mb-1 uppercase">Konektor</span>
+                                    <strong id="sum-connector" class="text-blue-400 text-lg">{{ $vehicle->connector_type ? $vehicle->getConnectorDisplayName() : 'Tidak dipilih' }}</strong>
                                 </div>
                                 <div>
                                     <span class="text-slate-400 text-xs block mb-1 uppercase">Plat</span>
@@ -346,12 +398,29 @@ function checkForm() {
     const plate = document.getElementById('license_plate').value.trim();
     const merk = document.getElementById('merk-hidden').value;
     const model = document.getElementById('model-hidden').value;
+    const connector = document.querySelector('input[name="connector_type"]:checked')?.value || '';
     const btn = document.getElementById('submit-btn');
 
+    // Form valid jika: merk + model + plate. Connector optional!
     if (merk && model && plate.length >= 4) {
         btn.disabled = false;
+        
+        // Get connector display name
+        const connectorNames = {
+            'CCS': 'CCS (Combined Charging System)',
+            'CHAdeMO': 'CHAdeMO',
+            'Type2': 'Type 2 / Mennekes',
+            'GB/T': 'GB/T',
+            'Tesla': 'Tesla Connector',
+        };
+        
         document.getElementById('sum-merk').textContent = merk;
         document.getElementById('sum-model').textContent = model;
+        if (connector) {
+            document.getElementById('sum-connector').textContent = connectorNames[connector] || connector;
+        } else {
+            document.getElementById('sum-connector').textContent = 'Belum dipilih';
+        }
         document.getElementById('sum-plate').textContent = plate;
     } else {
         btn.disabled = true;
