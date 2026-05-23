@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Ticket;
-use App\Models\VendorWarning; // Model baru untuk PBI 35
+use App\Models\VendorWarning; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel; // Tambahan library Excel
+use App\Exports\SpkluExport;         // Tambahan file export
 
 class AdminDashboardController extends Controller
 {
-    // ... (fungsi index, approve, dan reject biarkan persis seperti sebelumnya) ...
     public function index()
     {
         $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
@@ -33,10 +34,8 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', "Pendaftaran {$vendor->company_name} telah ditolak.");
     }
 
-    // --- REVISI UNTUK PBI 35 ---
     public function stations()
     {
-        // Tambahkan withCount('warnings') agar kita bisa menampilkan jumlah pelanggaran di UI
         $approvedVendors = Vendor::with('user')->withCount('warnings')->where('status', 'Approved')->get();
         $suspendedVendors = Vendor::with('user')->where('status', 'Suspended')->get();
         $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
@@ -44,22 +43,18 @@ class AdminDashboardController extends Controller
         return view('admin.stations', compact('approvedVendors', 'suspendedVendors', 'rejectedVendors'));
     }
 
-    // FITUR BARU PBI 35: Kirim Peringatan dan Otomatis Suspend
     public function sendWarning(Request $request, $id)
     {
         $request->validate(['message' => 'required|string|max:255']);
         $vendor = Vendor::findOrFail($id);
 
-        // 1. Catat peringatan ke database
         VendorWarning::create([
             'vendor_id' => $vendor->id,
             'message' => $request->message
         ]);
 
-        // 2. Hitung total peringatan
         $totalWarnings = $vendor->warnings()->count();
 
-        // 3. Logika Otomatis: Jika peringatan mencapai 3, langsung Suspend
         if ($totalWarnings >= 3) {
             $vendor->update(['status' => 'Suspended']);
             return redirect()->route('admin.stations')->with('success', "Peringatan ke-3 dikirim. Sistem secara OTOMATIS membekukan akun {$vendor->company_name} karena batas pelanggaran.");
@@ -77,11 +72,9 @@ class AdminDashboardController extends Controller
 
     public function activate($id)
     {
-        // Jika diaktifkan kembali, kita bisa mereset (menghapus) riwayat peringatannya agar bersih
         $vendor = Vendor::findOrFail($id);
         $vendor->warnings()->delete(); 
         $vendor->update(['status' => 'Approved']);
-        
         return redirect()->route('admin.stations')->with('success', "Akun vendor {$vendor->company_name} diaktifkan kembali dan riwayat pelanggaran diputihkan.");
     }
 
@@ -102,5 +95,10 @@ class AdminDashboardController extends Controller
         }
 
         return redirect()->route('admin.stations')->with('success', "Data vendor $companyName beserta akunnya telah dihapus permanen dari sistem.");
+    }
+
+    public function exportSpklu()
+    {
+        return Excel::download(new SpkluExport, 'Rekap_Audit_SPKLU_EVHUB.xlsx');
     }
 }
