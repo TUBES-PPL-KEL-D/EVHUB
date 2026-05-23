@@ -41,13 +41,14 @@ Route::middleware('auth')->group(function () {
 Route::prefix('rider')->name('rider.')->group(function () {
     // Garasi Digital (Byan)
     Route::resource('vehicles', VehicleController::class);
+
     // Pemetaan SPKLU (Azka & Aimee)
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
     Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
+
     // Wallet (Wisnu)
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');
-    
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)
@@ -56,6 +57,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+    
     // Manajemen Mesin (Riehand)
     Route::resource('chargers', ChargerMachineController::class);
 });
@@ -64,14 +66,14 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('stations');
+    
+    Route::get('/stations/export', [AdminDashboardController::class, 'exportSpklu'])->name('stations.export');
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
     Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
     Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
-
     Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
-    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
 });
 
 // 6. AREA API (LAYANAN DATA FRONTEND)

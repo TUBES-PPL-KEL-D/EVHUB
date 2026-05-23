@@ -24,4 +24,9 @@ class Spklu extends Model
     {
         return $this->hasMany(Charger::class, 'spklu_id');
     }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
 }
