@@ -47,4 +47,9 @@ class Vendor extends Model
     {
         return $this->hasMany(ChargerMachine::class);
     }
+
+    public function warnings()
+    {
+        return $this->hasMany(VendorWarning::class);
+    }
 }
