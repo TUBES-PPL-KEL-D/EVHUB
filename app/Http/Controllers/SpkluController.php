@@ -17,6 +17,12 @@ class SpkluController extends Controller
 
     }
 
+    public function show(Spklu $spklu)
+    {
+        $spklu->load(['chargerMachines', 'vendor.profile']);
+        return view('rider.spklu.show', compact('spklu'));
+    }
+
     public function getMarkers()
 {
     $spklus = Spklu::with('chargerMachines')->get();

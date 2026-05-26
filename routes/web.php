@@ -45,6 +45,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
     // Pemetaan SPKLU (Azka & Aimee)
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
     Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
+    Route::get('/spklu/{spklu}', [SpkluController::class, 'show'])->name('spklu.show');
 
     // Wallet (Wisnu)
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
