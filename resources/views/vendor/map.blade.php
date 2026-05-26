@@ -5,12 +5,26 @@
 @section('content')
 <div class="max-w-6xl mx-auto">
     <div class="mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Jaringan <span class="text-emerald-500">SPKLU</span></h1>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Jaringan <span class="text-blue-600">SPKLU</span></h1>
         <p class="text-slate-700 font-medium mt-2">Pantau lokasi dan ketersediaan stasiun pengisian daya EV secara real-time.</p>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 relative">
         
+        <div class="absolute top-8 left-8 z-[1000] flex gap-3">
+            <div class="relative">
+                <input type="text" id="search-spklu" placeholder="Cari nama atau alamat..." 
+                    class="w-64 bg-white/95 backdrop-blur border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-md outline-none transition-all">
+            </div>
+            <select id="filter-status" 
+                class="bg-white/95 backdrop-blur border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 block p-3 shadow-md outline-none cursor-pointer transition-all">
+                <option value="semua">Semua Status</option>
+                <option value="tersedia">Tersedia</option>
+                <option value="penuh">Penuh / Dipakai</option>
+                <option value="offline">Offline / Gangguan</option>
+            </select>
+        </div>
+
         <div class="absolute top-8 right-8 z-[1000] bg-white/95 backdrop-blur px-4 py-3 rounded-xl shadow-md border border-slate-100 flex flex-col gap-2">
             <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Status Mesin</h3>
             <div class="flex items-center gap-2">
@@ -27,7 +41,7 @@
             </div>
         </div>
 
-        <button id="btn-locate-me" class="absolute top-36 left-8 z-[1000] bg-white p-3 rounded-xl shadow-md border border-slate-200 hover:bg-slate-50 transition-all group focus:outline-none flex items-center justify-center" title="Temukan Lokasi Saya">
+        <button id="btn-locate-me" class="absolute top-28 left-8 z-[1000] bg-white/95 backdrop-blur p-3 rounded-xl shadow-md border border-slate-200 hover:border-blue-300 transition-all group focus:outline-none flex items-center justify-center mt-2" title="Temukan Lokasi Saya">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-600 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M2 12h2m16 0h2" />
@@ -43,15 +57,11 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Titik tengah awal peta (Bandung)
         var map = L.map('map', {
             zoomControl: false 
         }).setView([-6.914744, 107.609810], 13);
 
-        // Zoom Control di bawah kanan
-        L.control.zoom({
-            position: 'bottomright'
-        }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -60,13 +70,27 @@
 
         let activeMarkers = {};
 
+        // DOM Elements pencarian & filter
+        const searchInput = document.getElementById('search-spklu');
+        const filterStatus = document.getElementById('filter-status');
+
         function fetchAndRenderMarkers() {
-            fetch('{{ route('rider.api.spklu.markers') }}')
+            // Mengambil value dari input pencarian dan dropdown filter
+            let searchValue = searchInput.value;
+            let statusValue = filterStatus.value;
+            
+            // Menyusun URL dengan Query Parameters
+            let url = `{{ route('rider.api.spklu.markers') }}?search=${encodeURIComponent(searchValue)}&status=${statusValue}`;
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
+                    let fetchedIds = [];
+
                     data.forEach(spklu => {
                         if (spklu.latitude && spklu.longitude) {
-                            
+                            fetchedIds.push(spklu.id);
+
                             let statusColor = 'bg-slate-400'; 
                             let textColor = 'text-slate-700';
                             
@@ -84,33 +108,10 @@
 
                             if (machines.length > 0) {
                                 machines.forEach(machine => {
-                                    let machineStatusText = '';
-                                    let machineStatusClass = '';
-                                    let machineStatusBadge = '';
-                                    if (machine.status === 'available') {
-                                        machineStatusText = 'Tersedia';
-                                        machineStatusClass = 'bg-emerald-50 text-emerald-600';
-                                        machineStatusBadge = 'bg-emerald-500';
-                                    } else if (machine.status === 'maintenance') {
-                                        machineStatusText = 'Perbaikan';
-                                        machineStatusClass = 'bg-slate-100 text-slate-600';
-                                        machineStatusBadge = 'bg-slate-400';
-                                    } else {
-                                        machineStatusText = 'Dipakai';
-                                        machineStatusClass = 'bg-rose-50 text-rose-600';
-                                        machineStatusBadge = 'bg-rose-500';
-                                    }
-
                                     portContent += `
-                                        <div class="flex flex-col bg-white border border-slate-100 rounded-md p-2 mb-1 shadow-sm">
-                                            <div class="flex justify-between items-center mb-1.5">
-                                                <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
-                                                <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-bold">${machine.capacity_kw} kW</span>
-                                            </div>
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="w-2 h-2 rounded-full ${machineStatusBadge}"></span>
-                                                <span class="text-[9px] font-bold ${machineStatusClass} px-1.5 py-0.5 rounded uppercase tracking-widest">${machineStatusText}</span>
-                                            </div>
+                                        <div class="flex justify-between items-center bg-white border border-slate-100 rounded-md px-2 py-1.5 mb-1 shadow-sm">
+                                            <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
+                                            <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-bold">${machine.capacity_kw} kW</span>
                                         </div>
                                     `;
                                 });
@@ -149,9 +150,8 @@
                             if (activeMarkers[spklu.id]) {
                                 activeMarkers[spklu.id].setPopupContent(popupContent);
                             } else {
-                                // KEMBALI MENGGUNAKAN MARKER PIN BIRU STANDAR LEAFLET
                                 let marker = L.marker([spklu.latitude, spklu.longitude], {
-                                    id: spklu.id // simpan ID untuk mempermudah tracking
+                                    id: spklu.id
                                 }).addTo(map);
                                 
                                 marker.bindPopup(popupContent, {
@@ -161,33 +161,44 @@
                             }
                         }
                     });
+
+                    // Logika menghapus marker yang tidak ada di hasil pencarian/filter
+                    for (let id in activeMarkers) {
+                        if (!fetchedIds.includes(parseInt(id))) {
+                            map.removeLayer(activeMarkers[id]);
+                            delete activeMarkers[id];
+                        }
+                    }
                 })
                 .catch(error => console.error('Gagal mengambil data marker SPKLU:', error));
         }
 
         fetchAndRenderMarkers();
+        
+        // Panggil ulang pencarian saat pengguna mengetik atau mengubah status
+        searchInput.addEventListener('input', fetchAndRenderMarkers);
+        filterStatus.addEventListener('change', fetchAndRenderMarkers);
+
+        // Pertahankan interval auto-refresh untuk data ketersediaan real-time
         setInterval(fetchAndRenderMarkers, 5000);
 
-        // --- LOGIKA UTAMA FITUR LOKASI SAYA (PBI 21) ---
+        // --- LOKASI SAYA ---
         let userMarker = null;
         let locateBtn = document.getElementById('btn-locate-me');
 
         locateBtn.addEventListener('click', function() {
             if (navigator.geolocation) {
-                // Beri efek transisi warna saat tombol ditekan
                 locateBtn.classList.add('text-blue-500');
 
                 navigator.geolocation.getCurrentPosition(function(position) {
                     let userLat = position.coords.latitude;
                     let userLng = position.coords.longitude;
 
-                    // Terbangkan peta ke koordinat GPS pengendara
                     map.flyTo([userLat, userLng], 15, {
                         animate: true,
                         duration: 1.5
                     });
 
-                    // Icon penanda lokasi pengguna (Titik biru berdenyut khas GPS)
                     let userLocationIcon = L.divIcon({
                         className: 'user-gps-marker',
                         html: `
@@ -200,7 +211,6 @@
                         iconAnchor: [8, 8]
                     });
 
-                    // Jika marker lokasi sudah ada, update posisinya saja. Jika belum, buat baru.
                     if (userMarker) {
                         userMarker.setLatLng([userLat, userLng]);
                     } else {
@@ -209,12 +219,11 @@
                     }
 
                     locateBtn.classList.remove('text-blue-500');
-
                 }, function(error) {
                     alert('Gagal mendeteksi lokasi. Pastikan GPS perangkat Anda sudah aktif.');
                     locateBtn.classList.remove('text-blue-500');
                 }, {
-                    enableHighAccuracy: true // Menggunakan hardware GPS agar lokasi presisi
+                    enableHighAccuracy: true 
                 });
             } else {
                 alert('Browser Anda tidak mendukung deteksi lokasi (Geolocation).');
@@ -224,7 +233,6 @@
 </script>
 
 <style>
-    /* Reset style divIcon bawaan Leaflet untuk marker GPS */
     .user-gps-marker {
         background: transparent;
         border: none;
