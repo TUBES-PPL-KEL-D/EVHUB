@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateVendorHoursRequest;
 use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Http\Request;
@@ -66,6 +67,8 @@ class VendorProfileController extends Controller
             'company_description' => ['nullable', 'string', 'max:2000'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'opens_at' => ['nullable', 'date_format:H:i'],
+            'closes_at' => ['nullable', 'date_format:H:i'],
         ]);
 
         $vendorProfile = VendorProfile::updateOrCreate(
@@ -86,6 +89,21 @@ class VendorProfileController extends Controller
         return redirect()
             ->route('vendor.profile.show', $vendorProfile)
             ->with('success', $message);
+    }
+
+    public function updateHours(UpdateVendorHoursRequest $request, VendorProfile $vendorProfile)
+    {
+        $user = $this->resolveUser($request);
+
+        if ($vendorProfile->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $vendorProfile->update($request->only(['opens_at', 'closes_at']));
+
+        return redirect()
+            ->route('vendor.profile.show', $vendorProfile)
+            ->with('success', 'Jam operasional berhasil diperbarui.');
     }
 
     public function show(Request $request, VendorProfile $vendorProfile)
