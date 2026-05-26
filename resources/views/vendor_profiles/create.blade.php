@@ -104,6 +104,16 @@
 							placeholder="Jelaskan singkat bidang usaha atau layanan perusahaan"
 						>{{ old('company_description', $profile?->company_description) }}</textarea>
 					</div>
+				<div class="md:col-span-2 grid gap-4 md:grid-cols-2">
+					<div>
+						<label for="opens_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Buka</label>
+						<input type="time" name="opens_at" id="opens_at" value="{{ old('opens_at', $profile?->opens_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+					</div>
+					<div>
+						<label for="closes_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Tutup</label>
+						<input type="time" name="closes_at" id="closes_at" value="{{ old('closes_at', $profile?->closes_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+					</div>
+				</div>
 
 				</div>
 

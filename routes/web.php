@@ -55,6 +55,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
 Route::prefix('vendor')->name('vendor.')->group(function () {
     // Pendaftaran Vendor (Fakhri)
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
+    Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
     

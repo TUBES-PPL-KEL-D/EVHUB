@@ -34,6 +34,17 @@
 					<p class="mt-1 text-lg font-semibold text-slate-900">{{ $vendorProfile->company_phone ?? '-' }}</p>
 				</div>
 
+				<div class="rounded-2xl bg-slate-50 p-5">
+					<p class="text-sm font-semibold text-slate-700">Jam Operasional</p>
+					<p class="mt-1 text-lg font-semibold text-slate-900">
+						@if ($vendorProfile->opens_at || $vendorProfile->closes_at)
+							{{ $vendorProfile->opens_at ?? '-' }} — {{ $vendorProfile->closes_at ?? '-' }}
+						@else
+							Belum diatur
+						@endif
+					</p>
+				</div>
+
 				<div class="rounded-2xl bg-slate-50 p-5 md:col-span-2">
 					<p class="text-sm font-semibold text-slate-700">Alamat Perusahaan</p>
 					<p class="mt-1 whitespace-pre-line text-lg font-semibold text-slate-900">{{ $vendorProfile->company_address }}</p>
