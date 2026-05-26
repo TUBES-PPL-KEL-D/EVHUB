@@ -177,6 +177,6 @@ class ChargerMachineController extends Controller
             Spklu::where('id', $spklu_id)->delete();
         }
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!'); // Pastikan untuk menghapus data terkait di database jika diperlukan
     }
 }
