@@ -136,13 +136,17 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                                    <div class="bg-slate-50 rounded-lg p-3 border border-slate-100 mb-2">
                                         <p class="text-xs text-slate-700 mb-1 uppercase font-bold tracking-wider">Ketersediaan Total</p>
                                         <p class="text-base m-0 text-slate-800">
                                             <b class="text-xl ${textColor}">${spklu.available}</b> 
                                             <span class="text-slate-600 font-medium text-sm">dari ${spklu.total}</span>
                                         </p>
                                     </div>
+                                    
+                                    <a href="/rider/spklu/${spklu.id}" class="block w-full bg-emerald-500 hover:bg-emerald-600 text-white text-center font-bold text-xs py-2 px-4 rounded-lg transition-colors mt-1">
+                                        Lihat Fasilitas SPKLU
+                                    </a>
                                 </div>
                             `;
 

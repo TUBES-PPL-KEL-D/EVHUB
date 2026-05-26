@@ -36,7 +36,7 @@ class Vendor extends Model
      */
     public function profile()
     {
-        return $this->hasOne(VendorProfile::class);
+        return $this->hasOne(VendorProfile::class, 'user_id', 'user_id');
     }
 
     /**
