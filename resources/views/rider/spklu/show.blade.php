@@ -4,6 +4,22 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto space-y-8">
+    @if(session('error'))
+        <div class="bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-xl text-sm font-medium">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="bg-amber-50 border border-amber-200 text-amber-600 px-4 py-3 rounded-xl text-sm font-medium">
+            <p class="font-bold mb-1">Gagal memproses transaksi:</p>
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <!-- Header Section -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
@@ -106,6 +122,28 @@
                                 <div class="flex justify-between items-center py-2 border-b border-slate-50">
                                     <span class="text-sm text-slate-500 font-medium">Tarif</span>
                                     <span class="text-sm font-bold text-slate-800">Rp {{ number_format($machine->price_per_kwh, 0, ',', '.') }} <span class="text-xs text-slate-500 font-normal">/ kWh</span></span>
+                                </div>
+
+                                <div class="pt-2">
+                                    @if(strtolower($machine->status) === 'available')
+                                        <form action="{{ route('rider.transactions.start') }}" method="POST">
+                                            
+                                            @csrf
+                                            <input type="hidden" name="charger_machine_id" value="{{ $machine->id }}">
+                                            
+                                            <button type="submit" onclick="return confirm('Apakah Anda yakin ingin mulai mengisi daya di mesin ini?')" 
+                                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                </svg>
+                                                Mulai Pengisian Daya
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button disabled class="w-full bg-slate-100 text-slate-400 font-semibold py-2.5 px-4 rounded-xl text-sm cursor-not-allowed border border-slate-200">
+                                            Mesin Tidak Tersedia
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
