@@ -56,8 +56,8 @@ class TransactionController extends Controller
                 'user_id' => Auth::id(),
                 'charger_machine_id' => $machine->id,
                 'status' => 'pending',
-                'energy_consumed' => 0, // diisi nanti pas stop
-                'total_price' => 0,      // diisi nanti pas stop
+                'energy_consumed' => 0, 
+                'total_price' => 0,
                 'started_at' => now(),
                 'finished_at' => null,
             ]);
@@ -133,7 +133,6 @@ class TransactionController extends Controller
                 'amount' => $totalPrice,
             ]);
 
-            // Di dalam method stopCharging() bagian proses sukses:
             $transaction->chargerMachine->update(['status' => 'available']);
             
             DB::commit();
