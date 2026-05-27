@@ -10,6 +10,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\TransactionController;
 
 // 1. HALAMAN UTAMA (LANDING PAGE)
 Route::get('/', function () {
@@ -50,6 +51,11 @@ Route::prefix('rider')->name('rider.')->group(function () {
     // Wallet (Wisnu)
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');
+
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::post('/transactions/start', [TransactionController::class, 'startCharging'])->name('transactions.start');
+    Route::post('/transactions/{id}/stop', [TransactionController::class, 'stopCharging'])->name('transactions.stop');
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)

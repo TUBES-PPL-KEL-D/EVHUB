@@ -122,5 +122,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VehicleSeeder::class,
         ]);
+
+        $this->call([
+            // Pastikan VendorSeeder & SpkluSeeder dipanggil lebih dulu sebelum ChargerMachineSeeder
+            ChargerMachineSeeder::class,
+        ]);
+
     }
 }

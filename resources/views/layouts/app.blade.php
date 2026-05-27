@@ -45,6 +45,7 @@
             <a href="{{ url('admin/dashboard') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Dashboard Admin</a>
             <a href="{{ url('rider/peta') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Peta SPKLU</a>
             <a href="{{ url('rider/vehicles') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Garasi Digital</a>
+            <a href="{{ url('rider/transactions') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Riwayat Transaksi</a>
         </div>
         @endif
 
