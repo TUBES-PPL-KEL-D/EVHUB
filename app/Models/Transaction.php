@@ -12,6 +12,7 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'charger_machine_id',
+        'vehicle_id',
         'energy_consumed',
         'total_price',
         'started_at',
@@ -42,5 +43,10 @@ class Transaction extends Model
     public function walletHistory()
     {
         return $this->hasOne(WalletHistory::class, 'reference_id');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
 }

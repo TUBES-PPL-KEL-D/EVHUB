@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('charger_machine_id')->constrained('charger_machines')->onDelete('cascade');
+            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles')->onDelete('cascade');
             $table->decimal('energy_consumed', 6, 2)->comment('Dihitung dalam kWh');
             $table->decimal('total_price', 10, 2);
             $table->timestamp('started_at')->nullable();
