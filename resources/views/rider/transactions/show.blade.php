@@ -35,6 +35,14 @@
                 <span class="text-slate-500">Waktu Pengisian</span>
                 <span class="text-white font-medium">{{ $transaction->created_at->format('d F Y, H:i') }} WIB</span>
             </div>
+            <div class="flex justify-between border-t border-slate-700/50 pt-4">
+                <span class="text-slate-500">Kendaraan</span>
+                <span class="text-white font-medium">{{ $transaction->vehicle->merk }} {{ $transaction->vehicle->model }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-slate-500">Nomor Kendaraan (No. Polisi)</span>
+                <span class="text-white font-mono font-semibold bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{{ $transaction->vehicle->license_plate }}</span>
+            </div>
             <div class="flex justify-between">
                 <span class="text-slate-500">Stasiun SPKLU</span>
                 <span class="text-white font-medium">{{ $transaction->chargerMachine->spklu->name ?? 'SPKLU Pusat' }}</span>

@@ -62,4 +62,9 @@ class Vehicle extends Model
         $connectors = ConnectorMatchingService::getAvailableConnectors();
         return $connectors[$this->connector_type] ?? 'Unknown';
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'vehicle_id');
+    }
 }

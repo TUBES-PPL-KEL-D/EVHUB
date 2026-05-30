@@ -54,6 +54,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
 
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('/transactions/prepare/{machine_id}', [TransactionController::class, 'prepareCharging'])->name('transactions.prepare');
     Route::post('/transactions/start', [TransactionController::class, 'startCharging'])->name('transactions.start');
     Route::post('/transactions/{id}/stop', [TransactionController::class, 'stopCharging'])->name('transactions.stop');
 });

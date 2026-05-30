@@ -126,19 +126,13 @@
 
                                 <div class="pt-2">
                                     @if(strtolower($machine->status) === 'available')
-                                        <form action="{{ route('rider.transactions.start') }}" method="POST">
-                                            
-                                            @csrf
-                                            <input type="hidden" name="charger_machine_id" value="{{ $machine->id }}">
-                                            
-                                            <button type="submit" onclick="return confirm('Apakah Anda yakin ingin mulai mengisi daya di mesin ini?')" 
-                                                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2">
+                                        <a href="{{ route('rider.transactions.prepare', $machine->id) }}" 
+                                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                 </svg>
-                                                Mulai Pengisian Daya
-                                            </button>
-                                        </form>
+                                            Pilih & Mulai Pengisian
+                                        </a>
                                     @else
                                         <button disabled class="w-full bg-slate-100 text-slate-400 font-semibold py-2.5 px-4 rounded-xl text-sm cursor-not-allowed border border-slate-200">
                                             Mesin Tidak Tersedia
