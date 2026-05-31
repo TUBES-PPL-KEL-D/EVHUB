@@ -160,6 +160,33 @@
                             </span>
                         </div>
 
+                        @if($vehicle->battery_percentage !== null && $vehicle->estimated_full_range_km !== null)
+                            <div class="mb-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-emerald-100">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="text-xs uppercase tracking-wider font-semibold text-emerald-200">Perkiraan Jarak Tersisa</p>
+                                        <p class="text-2xl font-bold text-white">{{ $vehicle->remaining_range }} km</p>
+                                    </div>
+                                    <div class="text-right text-sm text-slate-200">
+                                        <p>{{ $vehicle->battery_percentage }}% baterai</p>
+                                        <p class="mt-1">Jarak penuh: {{ $vehicle->estimated_full_range_km }} km</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 h-2 rounded-full bg-slate-700 overflow-hidden">
+                                    <div class="h-full rounded-full bg-emerald-400" style="width: {{ max(0, min(100, $vehicle->battery_percentage)) }}%;"></div>
+                                </div>
+                            </div>
+                        @elseif($vehicle->battery_percentage !== null)
+                            <div class="mb-6 rounded-2xl border border-slate-700/50 bg-slate-800/70 p-4 text-slate-300">
+                                <p class="text-sm">Persentase baterai terdaftar: <strong>{{ $vehicle->battery_percentage }}%</strong>.</p>
+                                <p class="text-sm mt-1">Tambahkan perkiraan jarak penuh kendaraan di menu edit untuk menghitung sisa jarak.</p>
+                            </div>
+                        @else
+                            <div class="mb-6 rounded-2xl border border-slate-700/50 bg-slate-800/70 p-4 text-slate-300">
+                                <p class="text-sm">Tambahkan persentase baterai dan perkiraan jarak penuh kendaraan di menu edit untuk melihat kalkulasi jarak tempuh.</p>
+                            </div>
+                        @endif
+
                         @if($vehicle->isBatteryServiceDue())
                             <div class="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-rose-100">
                                 <div class="flex items-center justify-between gap-2">

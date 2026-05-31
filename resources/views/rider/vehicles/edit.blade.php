@@ -280,8 +280,31 @@
                         <input type="date" name="battery_service_date" id="battery_service_date"
                             class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4"
                             value="{{ old('battery_service_date', optional($vehicle->battery_service_date)->format('Y-m-d')) }}">
-                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan tanggal servis untuk mendapatkan pengingat baterai di garasi.</p>
-                        
+                        <p class="text-center text-slate-500 text-sm mb-6">Masukkan tanggal servis untuk mendapatkan pengingat baterai di garasi.</p>
+
+                        <label class="block text-sm font-semibold text-slate-200 mb-2" for="battery_percentage">Persentase Baterai Saat Ini</label>
+                        <input type="number" name="battery_percentage" id="battery_percentage"
+                            min="0" max="100" step="1"
+                            class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4"
+                            value="{{ old('battery_percentage', $vehicle->battery_percentage) }}"
+                            placeholder="Contoh: 65">
+                        <p class="text-center text-slate-500 text-sm mb-6">Nilai persentase baterai digunakan untuk menghitung jarak tempuh tersisa.</p>
+
+                        <label class="block text-sm font-semibold text-slate-200 mb-2" for="estimated_full_range_km">Perkiraan Jarak Penuh Kendaraan (km)</label>
+                        <input type="number" name="estimated_full_range_km" id="estimated_full_range_km"
+                            min="1" step="1"
+                            class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4"
+                            value="{{ old('estimated_full_range_km', $vehicle->estimated_full_range_km) }}"
+                            placeholder="Contoh: 320">
+                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak penuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
+
+                        @error('battery_percentage')
+                            <p class="mt-4 text-sm text-rose-500 bg-rose-500/10 py-2 px-3 rounded-lg">{{ $message }}</p>
+                        @enderror
+                        @error('estimated_full_range_km')
+                            <p class="mt-4 text-sm text-rose-500 bg-rose-500/10 py-2 px-3 rounded-lg">{{ $message }}</p>
+                        @enderror
+
                         @error('license_plate')
                             <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>
                         @enderror

@@ -34,6 +34,8 @@ class VehicleController extends Controller
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
             'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
             'battery_service_date' => 'nullable|date',
+            'battery_percentage' => 'nullable|integer|min:0|max:100',
+            'estimated_full_range_km' => 'nullable|integer|min:1',
         ]);
 
         // TESTER MODE BYPASS: Pastikan ada user ID 1
@@ -74,6 +76,8 @@ class VehicleController extends Controller
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate,' . $vehicle->id,
             'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
             'battery_service_date' => 'nullable|date',
+            'battery_percentage' => 'nullable|integer|min:0|max:100',
+            'estimated_full_range_km' => 'nullable|integer|min:1',
         ]);
 
         $vehicle->update($validated);

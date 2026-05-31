@@ -59,10 +59,14 @@
         let activeMarkers = {};
 
         function fetchAndRenderMarkers() {
-            fetch('{{ route('rider.api.spklu.markers') }}')
+            fetch('{{ route('rider.api.spklu.markers.match') }}')
                 .then(response => response.json())
                 .then(data => {
-                    data.forEach(spklu => {
+                    // response shape: { active_connector, active_vehicle, spklus: [] }
+                    const activeConnector = data?.active_connector || null;
+                    const spklus = Array.isArray(data) ? data : (data.spklus || []);
+
+                    spklus.forEach(spklu => {
                         if (spklu.latitude && spklu.longitude) {
                             
                             let statusColor = 'bg-slate-400'; 
@@ -78,21 +82,33 @@
                             }
 
                             // --- PERBAIKAN PBI 30: Membaca Array charger_machines ---
-                            let machines = spklu.charger_machines || []; // Laravel mengubah camelCase jadi snake_case di JSON
+                            let machines = spklu.charger_machines || spklu.chargerMachines || []; // normalize
                             let portContent = '';
+                            // Build a set of connector types for matched chargers for quick lookup
+                            const matchedIds = new Set((spklu.matched_chargers || []).map(m => m.id));
 
                             if (machines.length > 0) {
                                 machines.forEach(machine => {
-                                    // Menggunakan connector_type dan capacity_kw sesuai database
+                                    const isMatched = matchedIds.has(machine.id);
                                     portContent += `
-                                        <div class="flex justify-between items-center bg-white border border-slate-100 rounded-md px-2 py-1.5 mb-1 shadow-sm">
-                                            <span class="text-[11px] font-bold text-slate-700">${machine.connector_type}</span>
-                                            <span class="text-[10px] px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded font-bold">${machine.capacity_kw} kW</span>
+                                        <div class="flex justify-between items-center ${isMatched ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'} rounded-md px-2 py-1.5 mb-1 shadow-sm">
+                                            <span class="text-[11px] font-bold text-slate-700">${machine.connector_type || 'Unknown'}</span>
+                                            <span class="text-[10px] px-1.5 py-0.5 ${isMatched ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-50 text-emerald-600'} rounded font-bold">${machine.capacity_kw ?? '-'} kW</span>
+                                            ${isMatched ? '<span class="ml-2 text-[11px] font-semibold text-emerald-700">✓ Kompatibel</span>' : ''}
                                         </div>
                                     `;
                                 });
                             } else {
                                 portContent = '<p class="text-[11px] text-slate-400 italic">Informasi port belum tersedia</p>';
+                            }
+
+                            let compatibilityBadge = '';
+                            if (activeConnector) {
+                                compatibilityBadge = spklu.compatible
+                                    ? `<span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-2 py-1 text-[11px] font-semibold">✓ Kompatibel dengan ${activeConnector}</span>`
+                                    : `<span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 px-2 py-1 text-[11px] font-semibold">✗ Tidak Kompatibel dengan ${activeConnector}</span>`;
+                            } else {
+                                compatibilityBadge = `<span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 px-2 py-1 text-[11px] font-semibold">Pilih kendaraan di garasi</span>`;
                             }
 
                             let popupContent = `
@@ -104,6 +120,11 @@
                                         <span class="text-[11px] font-extrabold ${textColor} uppercase tracking-widest">
                                             ${spklu.status}
                                         </span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <p class="text-[10px] text-slate-500 mb-1.5 uppercase font-bold tracking-wider">Kecocokan Connector</p>
+                                        ${compatibilityBadge}
                                     </div>
 
                                     <!-- Bagian Detail Port (PBI 30) -->

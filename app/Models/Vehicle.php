@@ -16,10 +16,14 @@ class Vehicle extends Model
         'license_plate',
         'connector_type',
         'battery_service_date',
+        'battery_percentage',
+        'estimated_full_range_km',
     ];
 
     protected $casts = [
         'battery_service_date' => 'date',
+        'battery_percentage' => 'integer',
+        'estimated_full_range_km' => 'integer',
     ];
 
     // Relasi ke User (Pemilik Kendaraan)
@@ -93,6 +97,20 @@ class Vehicle extends Model
         }
 
         return 'Akan datang';
+    }
+
+    public function calculateRemainingRange(): ?int
+    {
+        if ($this->battery_percentage === null || $this->estimated_full_range_km === null) {
+            return null;
+        }
+
+        return (int) round($this->estimated_full_range_km * ($this->battery_percentage / 100));
+    }
+
+    public function getRemainingRangeAttribute(): ?int
+    {
+        return $this->calculateRemainingRange();
     }
 
     public function batteryServiceDueInDays(): ?int
