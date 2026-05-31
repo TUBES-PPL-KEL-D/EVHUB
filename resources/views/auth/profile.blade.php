@@ -28,68 +28,93 @@
         </div>
     @endif
 
-    <div class="space-y-8">
-        <div class="bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
-            <div class="p-8">
-                <form action="{{ route('profile.update') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="col-span-1">
-                            <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Nama Lengkap</label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                                class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white placeholder-slate-500 p-3.5 transition-all outline-none @error('name') border-rose-500 @enderror">
-                            @error('name') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="col-span-1">
-                            <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Alamat Email</label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white placeholder-slate-500 p-3.5 transition-all outline-none @error('email') border-rose-500 @enderror">
-                            @error('email') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="col-span-1">
-                            <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Nomor Telepon</label>
-                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" required
-                                class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
-                        </div>
-
-                        <div class="col-span-1">
-                            <label class="block text-sm font-bold text-slate-300 mb-2 ml-1 text-opacity-60">Role Akun</label>
-                            <div class="w-full bg-slate-900/80 border border-slate-700/50 rounded-2xl p-3.5 text-emerald-500 font-bold flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                                {{ strtoupper($user->role) }}
-                            </div>
-                        </div>
+    @if(auth()->check() && auth()->user()->role === 'rider')
+        <div class="space-y-8">
+            <div class="bg-gradient-to-r from-slate-800/60 to-emerald-950/30 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/20 shadow-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
                     </div>
-
-                    <div class="mt-10 pt-8 border-t border-slate-700/50">
-                        <h3 class="text-xs font-black text-emerald-500 mb-6 uppercase tracking-[0.2em]">Keamanan (Opsional)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Password Baru</label>
-                                <input type="password" name="password" placeholder="Isi jika ingin ganti"
-                                    class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
-                                @error('password') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Konfirmasi Password</label>
-                                <input type="password" name="password_confirmation" placeholder="Ulangi password baru"
-                                    class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
-                            </div>
-                        </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Saldo EV-Wallet</p>
+                        <h2 class="text-2xl font-black text-white mt-0.5">Rp{{ number_format($user->balance, 0, ',', '.') }} <span class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md ml-1 border border-emerald-500/10">Saldo</span></h2>
                     </div>
-
-                    <div class="mt-10 flex justify-end">
-                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-4 px-10 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95 cursor-pointer">
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+                </div>
+                <a href="{{ route('rider.wallet.index') }}" type="button" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 hover:border-emerald-500/30 font-bold py-2.5 px-5 rounded-xl text-sm transition-all duration-200 shadow-md">
+                    + Isi Saldo
+                </a>
             </div>
-        </div>
+        @endif
+
+       <div class="bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
+    <div class="p-8">
+        <form action="{{ route('profile.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="col-span-1">
+                    <label class="block text-sm font-bold text-slate-300 mb-2 ml-1 text-opacity-60">User ID</label>
+                    <input type="text" value="{{ $user->id }}" readonly
+                        class="w-full bg-slate-900/80 border border-slate-700/50 rounded-2xl p-3.5 text-slate-400 font-mono select-all outline-none cursor-not-allowed">
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Nama Lengkap</label>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required
+                        class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white placeholder-slate-500 p-3.5 transition-all outline-none @error('name') border-rose-500 @enderror">
+                    @error('name') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Alamat Email</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" required
+                        class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white placeholder-slate-500 p-3.5 transition-all outline-none @error('email') border-rose-500 @enderror">
+                    @error('email') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Nomor Telepon</label>
+                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" required
+                        class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-sm font-bold text-slate-300 mb-2 ml-1 text-opacity-60">Role Akun</label>
+                    <div class="w-full bg-slate-900/80 border border-slate-700/50 rounded-2xl p-3.5 text-emerald-500 font-bold flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        {{ strtoupper($user->role) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-slate-700/50">
+                <h3 class="text-xs font-black text-emerald-500 mb-6 uppercase tracking-[0.2em]">Keamanan (Opsional)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Password Baru</label>
+                        <input type="password" name="password" placeholder="Isi jika ingin ganti"
+                            class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
+                        @error('password') <p class="mt-2 text-xs text-rose-400 ml-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" placeholder="Ulangi password baru"
+                            class="w-full bg-slate-900/50 border border-slate-600 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-white p-3.5 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-end">
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-400 text-slate-900 font-black py-4 px-10 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95 cursor-pointer">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
         <div class="bg-rose-500/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-rose-500/20 overflow-hidden">
             <div class="p-8">

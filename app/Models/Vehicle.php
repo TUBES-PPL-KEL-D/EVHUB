@@ -73,52 +73,8 @@ class Vehicle extends Model
         return $connectors[$this->connector_type] ?? 'Unknown';
     }
 
-    public function isBatteryServiceDue(): bool
+    public function transactions()
     {
-        if (! $this->battery_service_date) {
-            return false;
-        }
-
-        return $this->battery_service_date->isPast() || $this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30));
-    }
-
-    public function batteryServiceStatus(): string
-    {
-        if (! $this->battery_service_date) {
-            return 'Jadwal servis belum diatur';
-        }
-
-        if ($this->battery_service_date->isPast()) {
-            return 'Lewat jatuh tempo';
-        }
-
-        if ($this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30))) {
-            return 'Segera servis';
-        }
-
-        return 'Akan datang';
-    }
-
-    public function calculateRemainingRange(): ?int
-    {
-        if ($this->battery_percentage === null || $this->estimated_full_range_km === null) {
-            return null;
-        }
-
-        return (int) round($this->estimated_full_range_km * ($this->battery_percentage / 100));
-    }
-
-    public function getRemainingRangeAttribute(): ?int
-    {
-        return $this->calculateRemainingRange();
-    }
-
-    public function batteryServiceDueInDays(): ?int
-    {
-        if (! $this->battery_service_date) {
-            return null;
-        }
-
-        return $this->battery_service_date->diffInDays(Carbon::now(), false);
+        return $this->hasMany(Transaction::class, 'vehicle_id');
     }
 }

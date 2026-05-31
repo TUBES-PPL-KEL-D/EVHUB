@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('role')->default('rider'); // rider, vendor, admin
             $table->string('phone')->nullable();
             $table->string('status')->default('aktif');
+            $table->decimal('balance', 12, 2)->default(0.00);
             $table->rememberToken();
             $table->timestamps();
         });

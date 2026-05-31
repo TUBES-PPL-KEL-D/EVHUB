@@ -2,6 +2,13 @@
 
 @section('title', 'Edit Mesin Charger')
 
+@php
+    // Memecah string "08:00 - 17:00" menjadi array berdasarkan delimiter " - "
+    $hours = explode(' - ', $charger->operational_hours);
+    $openTime = isset($hours[0]) ? trim($hours[0]) : '';
+    $closeTime = isset($hours[1]) ? trim($hours[1]) : '';
+@endphp
+
 @section('content')
 <div class="vendor-scope">
     <div class="mx-auto max-w-4xl">
@@ -52,8 +59,18 @@
                         </div>
 
                         <div>
-                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor</label>
-                            <input type="text" name="connector_type" id="connector_type" value="{{ old('connector_type', $charger->connector_type) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                            <label for="connector_type" class="mb-2 block text-sm font-medium text-slate-700">Tipe Konektor (Standar Internasional) <span class="text-red-500">*</span></label>
+                            <select name="connector_type" id="connector_type" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <option value="" disabled>-- Pilih Standar Konektor --</option>
+                                @php $currentConnector = old('connector_type', $charger->connector_type); @endphp
+                                <option value="Type 1" {{ $currentConnector == 'Type 1' ? 'selected' : '' }}>Type 1 (J1772) - AC</option>
+                                <option value="Type 2" {{ $currentConnector == 'Type 2' ? 'selected' : '' }}>Type 2 (Mennekes) - AC</option>
+                                <option value="CCS1" {{ $currentConnector == 'CCS1' ? 'selected' : '' }}>CCS1 - DC Fast Charging</option>
+                                <option value="CCS2" {{ $currentConnector == 'CCS2' ? 'selected' : '' }}>CCS2 - DC Fast Charging</option>
+                                <option value="CHAdeMO" {{ $currentConnector == 'CHAdeMO' ? 'selected' : '' }}>CHAdeMO - DC Fast Charging</option>
+                                <option value="GB/T" {{ $currentConnector == 'GB/T' ? 'selected' : '' }}>GB/T - Standar China (AC/DC)</option>
+                                <option value="NACS" {{ $currentConnector == 'NACS' ? 'selected' : '' }}>NACS (Tesla) - AC/DC</option>
+                            </select>
                         </div>
 
                         <div>
@@ -67,8 +84,12 @@
                         </div>
 
                         <div>
-                            <label for="operational_hours" class="mb-2 block text-sm font-medium text-slate-700">Jam Operasional</label>
-                            <input type="text" name="operational_hours" id="operational_hours" value="{{ old('operational_hours', $charger->operational_hours) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                            <label class="mb-2 block text-sm font-medium text-slate-700">Jam Operasional <span class="text-red-500">*</span></label>
+                            <div class="flex items-center gap-2">
+                                <input type="time" name="open_time" id="open_time" value="{{ old('open_time', $openTime) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                                <span class="text-slate-500 font-medium">s/d</span>
+                                <input type="time" name="close_time" id="close_time" value="{{ old('close_time', $closeTime) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" required>
+                            </div>
                         </div>
 
                         <!-- Status Mesin (PBI 17) -->

@@ -73,10 +73,12 @@ class ChargerMachineController extends Controller
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            'operational_hours' => 'required|string|max:255',
+            // Perubahan pada validasi waktu
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -90,6 +92,9 @@ class ChargerMachineController extends Controller
 
         $path = $request->file('photo')->store('chargers', 'public');
 
+        // Menggabungkan waktu buka dan tutup
+        $operationalHours = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
+
         ChargerMachine::create([
             'vendor_id' => $vendor->id, 
             'spklu_id' => $spklu->id,
@@ -97,7 +102,7 @@ class ChargerMachineController extends Controller
             'connector_type' => $validatedData['connector_type'],
             'capacity_kw' => $validatedData['capacity_kw'],
             'price_per_kwh' => $validatedData['price_per_kwh'],
-            'operational_hours' => $validatedData['operational_hours'],
+            'operational_hours' => $operationalHours,
             'photo_path' => $path,
             'status' => 'available',
         ]);
@@ -124,13 +129,22 @@ class ChargerMachineController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            'operational_hours' => 'required|string|max:255',
+            // Perubahan pada validasi waktu
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
             'status' => 'required|in:available,unavailable,maintenance',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        // Menggabungkan waktu buka dan tutup
+        $validatedData['operational_hours'] = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
+        
+        // Membersihkan array dari key yang tidak ada di kolom database
+        unset($validatedData['open_time']);
+        unset($validatedData['close_time']);
 
         if ($request->hasFile('photo')) {
             if (Storage::disk('public')->exists($charger->photo_path)) {
@@ -163,6 +177,6 @@ class ChargerMachineController extends Controller
             Spklu::where('id', $spklu_id)->delete();
         }
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!'); // Pastikan untuk menghapus data terkait di database jika diperlukan
     }
 }

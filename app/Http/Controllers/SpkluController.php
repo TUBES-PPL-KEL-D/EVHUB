@@ -14,17 +14,21 @@ class SpkluController extends Controller
         // Mengambil data koordinat dan info SPKLU dari database
         $spklus = Spklu::select('name', 'address', 'latitude', 'longitude')->get();
 
-        // Mengirimkan data $spklus ke file resources/views/welcome.blade.php
+        // Mengirimkan data $spklus ke file resources/views/vendor/map.blade.php
         return view('vendor.map', compact('spklus'));
+    }
 
+    public function show(Spklu $spklu)
+    {
+        $spklu->load(['chargerMachines', 'vendor.profile']);
+        return view('rider.spklu.show', compact('spklu'));
     }
 
     public function getMarkers()
-{
-    $spklus = Spklu::with('chargerMachines')->get();
-
-    return response()->json($spklus);
-}
+    {
+        $spklus = Spklu::with('chargerMachines')->get();
+        return response()->json($spklus);
+    }
 
     public function getSpkluData()
     {
@@ -33,19 +37,38 @@ class SpkluController extends Controller
         return response()->json($spklus);
     }
 
-    public function getDynamicMarkers()
+    public function getDynamicMarkers(Request $request)
     {
-        $spklus = Spklu::with('chargers.machines')->get()->map(function ($spklu) {
+        // 1. Inisiasi Query
+        $query = Spklu::with('chargers.machines');
+
+        // 2. Filter Pencarian Teks (Nama atau Alamat)
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('address', 'LIKE', "%{$searchTerm}%");
+            });
+        }
+
+        // 3. Mapping data dan Kalkulasi Status
+        $spklus = $query->get()->map(function ($spklu) {
             $available = 0;
             $total = 0;
+            $charger_machines = []; // Menyimpan data mesin untuk frontend
 
             foreach ($spklu->chargers as $charger) {
                 foreach ($charger->machines as $machine) {
                     $total++;
-                    // Sesuaikan string 'available' dengan isi database kamu
                     if (strtolower($machine->status) === 'available') {
                         $available++;
                     }
+                    
+                    // Menyusun data port untuk popup peta
+                    $charger_machines[] = [
+                        'connector_type' => $machine->connector_type,
+                        'capacity_kw' => $machine->capacity_kw
+                    ];
                 }
             }
 
@@ -65,8 +88,14 @@ class SpkluController extends Controller
                 'status' => $status,
                 'available' => $available,
                 'total' => $total,
+                'charger_machines' => $charger_machines, // Ditambahkan agar data popup port muncul
             ];
         });
+
+        // 4. Filter berdasarkan Status setelah dikalkulasi
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $spklus = $spklus->where('status', $request->status)->values();
+        }
 
         return response()->json($spklus);
     }

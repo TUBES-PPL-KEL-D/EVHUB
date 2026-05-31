@@ -9,6 +9,9 @@ use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\WalletController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ChargingQueueController;
 
 // 1. HALAMAN UTAMA (LANDING PAGE)
 Route::get('/', function () {
@@ -40,19 +43,35 @@ Route::middleware('auth')->group(function () {
 Route::prefix('rider')->name('rider.')->group(function () {
     // Garasi Digital (Byan)
     Route::resource('vehicles', VehicleController::class);
+
     // Pemetaan SPKLU (Azka & Aimee)
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
     Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
-        // Additive matching route for PBI-55: includes user's active vehicle connector matching info
-        Route::get('/spklu/markers-matching', [SpkluController::class, 'getMarkersWithVehicleMatching'])->name('api.spklu.markers.match');
+    Route::get('/spklu/{spklu}', [SpkluController::class, 'show'])->name('spklu.show');
+
+    // Wallet (Wisnu)
+    Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');
+
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::get('/transactions/prepare/{machine_id}', [TransactionController::class, 'prepareCharging'])->name('transactions.prepare');
+    Route::post('/transactions/start', [TransactionController::class, 'startCharging'])->name('transactions.start');
+    Route::post('/transactions/{id}/stop', [TransactionController::class, 'stopCharging'])->name('transactions.stop');
+
+    //dangs
+    Route::post('/queues', [ChargingQueueController::class, 'store'])->name('queues.store');
+    Route::post('/queues/{id}/cancel', [ChargingQueueController::class, 'cancel'])->name('queues.cancel');
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)
 Route::prefix('vendor')->name('vendor.')->group(function () {
     // Pendaftaran Vendor (Fakhri)
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
+    Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+    
     // Manajemen Mesin (Riehand)
     Route::resource('chargers', ChargerMachineController::class);
 });
@@ -61,11 +80,14 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('stations');
+    
+    Route::get('/stations/export', [AdminDashboardController::class, 'exportSpklu'])->name('stations.export');
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
     Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
     Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
+    Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
 });
 
 // 6. AREA API (LAYANAN DATA FRONTEND)
