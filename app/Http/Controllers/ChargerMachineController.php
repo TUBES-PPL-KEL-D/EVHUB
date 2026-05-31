@@ -157,6 +157,38 @@ class ChargerMachineController extends Controller
 
         return redirect()->route('vendor.chargers.index')->with('success', 'Detail mesin charger berhasil diperbarui!');
     }
+    public function updateTariff(Request $request, ChargerMachine $charger)
+    {
+    $vendor = $this->checkVendorStatus();
+
+    if (!$vendor) {
+        return redirect()
+            ->route('vendor.status')
+            ->with('error', 'Akses ditolak!');
+    }
+
+    if ($charger->vendor_id !== $vendor->id) {
+        return redirect()
+            ->route('vendor.chargers.index')
+            ->with('error', 'Anda tidak memiliki akses untuk mengubah tarif mesin ini.');
+    }
+
+    $validatedData = $request->validate([
+        'price_per_kwh' => 'required|numeric|min:0',
+    ], [
+        'price_per_kwh.required' => 'Tarif per kWh wajib diisi.',
+        'price_per_kwh.numeric' => 'Tarif per kWh harus berupa angka.',
+        'price_per_kwh.min' => 'Tarif per kWh tidak boleh bernilai negatif.',
+    ]);
+
+    $charger->update([
+        'price_per_kwh' => $validatedData['price_per_kwh'],
+    ]);
+
+    return redirect()
+        ->route('vendor.chargers.index')
+        ->with('success', 'Tarif harga per kWh berhasil diperbarui.');
+    }
 
     public function destroy(ChargerMachine $charger)
     {
