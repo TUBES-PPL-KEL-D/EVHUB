@@ -8,6 +8,7 @@ use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Transaction;
 
 class ChargerMachineController extends Controller
 {
@@ -188,6 +189,41 @@ class ChargerMachineController extends Controller
     return redirect()
         ->route('vendor.chargers.index')
         ->with('success', 'Tarif harga per kWh berhasil diperbarui.');
+    }
+
+    public function usageHistory()
+    {
+        $vendor = $this->checkVendorStatus();
+
+        if (!$vendor) {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Akses ditolak!');
+        }
+
+        $transactions = Transaction::with([
+                'user',
+                'vehicle',
+                'chargerMachine.spklu'
+            ])
+            ->whereHas('chargerMachine', function ($query) use ($vendor) {
+                $query->where('vendor_id', $vendor->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalUsage = $transactions->sum('energy_consumed');
+        $totalRevenue = $transactions->where('status', 'success')->sum('total_price');
+        $totalTransactions = $transactions->count();
+        $successTransactions = $transactions->where('status', 'success')->count();
+
+        return view('vendor.chargers.usage-history', compact(
+            'transactions',
+            'totalUsage',
+            'totalRevenue',
+            'totalTransactions',
+            'successTransactions'
+        ));
     }
 
     public function destroy(ChargerMachine $charger)
