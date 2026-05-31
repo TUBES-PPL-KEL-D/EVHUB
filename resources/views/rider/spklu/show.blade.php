@@ -124,18 +124,37 @@
                                     <span class="text-sm font-bold text-slate-800">Rp {{ number_format($machine->price_per_kwh, 0, ',', '.') }} <span class="text-xs text-slate-500 font-normal">/ kWh</span></span>
                                 </div>
 
+                                @php
+                                    $queueCount = \App\Models\ChargingQueue::where('charger_machine_id', $machine->id)
+                                        ->where('status', 'waiting')
+                                        ->count();
+                                @endphp
+
+                                <p class="text-sm text-slate-400">
+                                    Antrean saat ini: 
+                                    <span class="font-semibold text-amber-400">{{ $queueCount }} pengendara</span>
+                                </p>
+
                                 <div class="pt-2">
                                     @if(strtolower($machine->status) === 'available')
-                                        <a href="{{ route('rider.transactions.prepare', $machine->id) }}" 
-                                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center gap-2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                                </svg>
+                                        <a href="{{ route('rider.transactions.prepare', $machine->id) }}"
+                                        class="block w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
                                             Pilih & Mulai Pengisian
                                         </a>
+                                    @elseif(strtolower($machine->status) === 'unavailable')
+                                        <form action="{{ route('rider.queues.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="charger_machine_id" value="{{ $machine->id }}">
+
+                                            <button type="submit"
+                                                class="block w-full text-center bg-amber-500 hover:bg-amber-400 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
+                                                Masuk Antrean Digital
+                                            </button>
+                                        </form>
                                     @else
-                                        <button disabled class="w-full bg-slate-100 text-slate-400 font-semibold py-2.5 px-4 rounded-xl text-sm cursor-not-allowed border border-slate-200">
-                                            Mesin Tidak Tersedia
+                                        <button disabled
+                                            class="block w-full text-center bg-slate-700 text-slate-400 font-semibold py-2.5 rounded-xl text-sm cursor-not-allowed">
+                                            Mesin Sedang Perbaikan
                                         </button>
                                     @endif
                                 </div>

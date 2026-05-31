@@ -11,6 +11,7 @@ use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ChargingQueueController;
 
 // 1. HALAMAN UTAMA (LANDING PAGE)
 Route::get('/', function () {
@@ -57,6 +58,10 @@ Route::prefix('rider')->name('rider.')->group(function () {
     Route::get('/transactions/prepare/{machine_id}', [TransactionController::class, 'prepareCharging'])->name('transactions.prepare');
     Route::post('/transactions/start', [TransactionController::class, 'startCharging'])->name('transactions.start');
     Route::post('/transactions/{id}/stop', [TransactionController::class, 'stopCharging'])->name('transactions.stop');
+
+    //dangs
+    Route::post('/queues', [ChargingQueueController::class, 'store'])->name('queues.store');
+    Route::post('/queues/{id}/cancel', [ChargingQueueController::class, 'cancel'])->name('queues.cancel');
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)

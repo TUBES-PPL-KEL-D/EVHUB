@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\ChargingQueue;
 
 class ChargerMachine extends Model
 {
@@ -32,4 +33,9 @@ class ChargerMachine extends Model
     {
         return $this->belongsTo(Spklu::class, 'spklu_id');
     }
+
+    public function queues()
+{
+    return $this->hasMany(ChargingQueue::class);
+}
 }
