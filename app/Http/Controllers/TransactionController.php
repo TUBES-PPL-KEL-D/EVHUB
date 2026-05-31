@@ -176,6 +176,10 @@ class TransactionController extends Controller
         $pricePerKwh = $machine->price_per_kwh ?? 2500;
         $estimatedPrice = $request->energy_target * $pricePerKwh;
 
+        // Hitung estimasi durasi berdasarkan daya mesin
+        $estimatedDurationHours = $request->energy_target / $machine->capacity_kw;
+        $estimatedDurationMinutes = ceil($estimatedDurationHours * 60);
+
         // VALIDASI 2: Cek kecukupan saldo awal sebelum charge dimulai
         if ($user->balance < $estimatedPrice) {
             return redirect()->back()->with('error', 'Saldo EV-Pay Anda tidak mencukupi. Estimasi biaya: Rp ' . number_format($estimatedPrice, 0, ',', '.') . ' (Saldo Anda: Rp ' . number_format($user->balance, 0, ',', '.') . ').');
