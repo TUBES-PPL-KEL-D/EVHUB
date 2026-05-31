@@ -14,7 +14,11 @@ class VehicleController extends Controller
         $userId = Auth::id() ?? 1;
         
         $vehicles = Vehicle::where('user_id', $userId)->latest()->get();
-        return view('rider.vehicles.index', compact('vehicles'));
+        $serviceDueVehicles = $vehicles->filter(function ($vehicle) {
+            return $vehicle->isBatteryServiceDue();
+        })->values();
+
+        return view('rider.vehicles.index', compact('vehicles', 'serviceDueVehicles'));
     }
 
     public function create()
@@ -29,6 +33,9 @@ class VehicleController extends Controller
             'model' => 'required|string|max:100',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate',
             'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
+            'battery_service_date' => 'nullable|date',
+            'battery_percentage' => 'nullable|integer|min:0|max:100',
+            'estimated_full_range_km' => 'nullable|integer|min:1',
         ]);
 
         // TESTER MODE BYPASS: Pastikan ada user ID 1
@@ -68,6 +75,9 @@ class VehicleController extends Controller
             'model' => 'required|string|max:100',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate,' . $vehicle->id,
             'connector_type' => 'nullable|string|in:CCS,CHAdeMO,Type2,GB/T,Tesla',
+            'battery_service_date' => 'nullable|date',
+            'battery_percentage' => 'nullable|integer|min:0|max:100',
+            'estimated_full_range_km' => 'nullable|integer|min:1',
         ]);
 
         $vehicle->update($validated);

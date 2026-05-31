@@ -105,6 +105,8 @@
 
                             let machines = spklu.charger_machines || []; 
                             let portContent = '';
+                            // Build a set of connector types for matched chargers for quick lookup
+                            const matchedIds = new Set((spklu.matched_chargers || []).map(m => m.id));
 
                             if (machines.length > 0) {
                                 machines.forEach(machine => {
@@ -117,6 +119,15 @@
                                 });
                             } else {
                                 portContent = '<p class="text-[11px] text-slate-400 italic">Informasi port belum tersedia</p>';
+                            }
+
+                            let compatibilityBadge = '';
+                            if (activeConnector) {
+                                compatibilityBadge = spklu.compatible
+                                    ? `<span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-2 py-1 text-[11px] font-semibold">✓ Kompatibel dengan ${activeConnector}</span>`
+                                    : `<span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 px-2 py-1 text-[11px] font-semibold">✗ Tidak Kompatibel dengan ${activeConnector}</span>`;
+                            } else {
+                                compatibilityBadge = `<span class="inline-flex items-center rounded-full bg-slate-100 text-slate-600 px-2 py-1 text-[11px] font-semibold">Pilih kendaraan di garasi</span>`;
                             }
 
                             let popupContent = `

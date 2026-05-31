@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ConnectorMatchingService;
@@ -14,6 +15,15 @@ class Vehicle extends Model
         'model',
         'license_plate',
         'connector_type',
+        'battery_service_date',
+        'battery_percentage',
+        'estimated_full_range_km',
+    ];
+
+    protected $casts = [
+        'battery_service_date' => 'date',
+        'battery_percentage' => 'integer',
+        'estimated_full_range_km' => 'integer',
     ];
 
     // Relasi ke User (Pemilik Kendaraan)
