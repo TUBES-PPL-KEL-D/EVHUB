@@ -74,6 +74,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::get('status', [VendorController::class, 'status'])->name('status');
     Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff']) ->name('chargers.updateTariff');
     // Manajemen Mesin (Riehand)
+    Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory']) ->name('chargers.usageHistory');
     Route::resource('chargers', ChargerMachineController::class);
 });
 
