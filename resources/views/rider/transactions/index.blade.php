@@ -77,7 +77,7 @@
                                     <form action="{{ route('rider.transactions.stop', $tx->id) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-1.5 px-4 rounded-lg text-xs transition-all shadow-md">
-                                            Selesai & Potong Saldo
+                                            Selesai
                                         </button>
                                     </form>
                                 @else

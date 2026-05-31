@@ -9,7 +9,7 @@
             <p class="text-slate-400 text-sm mt-1">Kelola saldo simulasi untuk kemudahan pengisian daya kendaraan listrik Anda.</p>
         </div>
         <div class="flex-shrink-0">
-            <a href="javascript:history.back()" class="flex py-2.5 px-6 rounded-xl items-center text-sm font-bold bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 hover:border-emerald-500/50 transition-all duration-300 shadow-lg">
+            <a href="{{ route('profile') }}" class="flex py-2.5 px-6 rounded-xl items-center text-sm font-bold bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 hover:border-emerald-500/50 transition-all duration-300 shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -127,7 +127,6 @@
 </div>
 
 <script>
-    // Fungsi pembantu tombol cepat nominal
     function setAmount(value) {
         document.getElementById('amount').value = value;
     }
