@@ -296,7 +296,7 @@
                             class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4"
                             value="{{ old('estimated_full_range_km', $vehicle->estimated_full_range_km) }}"
                             placeholder="Contoh: 320">
-                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak penuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
+                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak maksimum tempuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
 
                         <label class="block text-sm font-semibold text-slate-200 mb-2" for="vehicle_photo">Foto Kendaraan (opsional)</label>
                         <input type="file" name="vehicle_photo" id="vehicle_photo"
