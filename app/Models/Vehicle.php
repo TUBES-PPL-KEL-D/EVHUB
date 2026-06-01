@@ -75,8 +75,9 @@ class Vehicle extends Model
         return $connectors[$this->connector_type] ?? 'Unknown';
     }
 
-    public function isBatteryServiceDue(): bool
+    public function transactions()
     {
+<<<<<<< HEAD
         if (! $this->battery_service_date) {
             return false;
         }
@@ -135,5 +136,8 @@ class Vehicle extends Model
         }
 
         return $this->battery_service_date->diffInDays(Carbon::now(), false);
+=======
+        return $this->hasMany(Transaction::class, 'vehicle_id');
+>>>>>>> 89575638015ab5532f605eaaa1fc37522bf3a1f1
     }
 }

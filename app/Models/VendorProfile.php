@@ -16,6 +16,10 @@ class VendorProfile extends Model
         'company_phone',
         'company_address',
         'company_description',
+        'latitude',
+        'longitude',
+        'opens_at',
+        'closes_at',
     ];
 
     public function user()

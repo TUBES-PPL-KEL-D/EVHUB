@@ -62,7 +62,10 @@
 					<div>
 						<label for="company_phone" class="mb-2 block text-sm font-medium text-slate-700">Nomor Telepon</label>
 						<input
-							type="text"
+							type="tel"
+							inputmode="numeric"
+							pattern="\d{6,20}"
+							title="Hanya angka, 6-20 digit"
 							name="company_phone"
 							id="company_phone"
 							value="{{ old('company_phone', $profile?->company_phone) }}"
@@ -84,6 +87,14 @@
 					</div>
 
 					<div class="md:col-span-2">
+						<label class="mb-2 block text-sm font-medium text-slate-700">Lokasi (Map Picker)</label>
+						<div id="map" class="w-full h-64 rounded-2xl border border-slate-300"></div>
+						<p class="mt-2 text-sm text-slate-500">Klik pada peta untuk memilih lokasi perusahaan. Koordinat akan otomatis diisi.</p>
+						<input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $profile?->latitude) }}">
+						<input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $profile?->longitude) }}">
+					</div>
+
+					<div class="md:col-span-2">
 						<label for="company_description" class="mb-2 block text-sm font-medium text-slate-700">Deskripsi Perusahaan</label>
 						<textarea
 							name="company_description"
@@ -93,6 +104,16 @@
 							placeholder="Jelaskan singkat bidang usaha atau layanan perusahaan"
 						>{{ old('company_description', $profile?->company_description) }}</textarea>
 					</div>
+				<div class="md:col-span-2 grid gap-4 md:grid-cols-2">
+					<div>
+						<label for="opens_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Buka</label>
+						<input type="time" name="opens_at" id="opens_at" value="{{ old('opens_at', $profile?->opens_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+					</div>
+					<div>
+						<label for="closes_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Tutup</label>
+						<input type="time" name="closes_at" id="closes_at" value="{{ old('closes_at', $profile?->closes_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+					</div>
+				</div>
 
 				</div>
 
@@ -107,4 +128,53 @@
 		</div>
 		</div>
 	</div>
+<!-- Leaflet CSS & JS untuk Map Picker (lokal pada view ini) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	var latInput = document.getElementById('latitude');
+	var lngInput = document.getElementById('longitude');
+	var initialLat = parseFloat(latInput.value) || -6.200000;
+	var initialLng = parseFloat(lngInput.value) || 106.816666;
+
+	var map = L.map('map').setView([initialLat, initialLng], 12);
+
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '© OpenStreetMap'
+	}).addTo(map);
+
+	var marker = null;
+	if (latInput.value && lngInput.value) {
+		marker = L.marker([initialLat, initialLng]).addTo(map);
+	}
+
+	map.on('click', function (e) {
+		var lat = e.latlng.lat.toFixed(7);
+		var lng = e.latlng.lng.toFixed(7);
+
+		if (marker) { map.removeLayer(marker); }
+		marker = L.marker([lat, lng]).addTo(map);
+
+		latInput.value = lat;
+		lngInput.value = lng;
+	});
+
+	// simple client-side phone validation on submit
+	var form = document.querySelector('form[action="{{ route('vendor.profile.store') }}"]');
+	if (form) {
+		form.addEventListener('submit', function (ev) {
+			var phone = document.getElementById('company_phone').value.trim();
+			var phoneRe = /^\d{6,20}$/;
+			if (phone && !phoneRe.test(phone)) {
+				ev.preventDefault();
+				alert('Nomor telepon harus berupa angka (6-20 digit).');
+				return false;
+			}
+		});
+	}
+});
+</script>
+
 @endsection

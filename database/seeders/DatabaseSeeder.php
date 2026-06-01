@@ -5,9 +5,10 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Vendor;
 use App\Models\Spklu;
+use App\Models\Ticket; // Tambahan model Ticket untuk PBI 9
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Storage; // Tambahan untuk memanipulasi file
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // --- 1. MENYIAPKAN DOKUMEN DUMMY ---
+        // Memastikan folder penyimpanan tersedia
+        Storage::disk('public')->makeDirectory('vendor_documents');
+
+        // Membuat file PDF dummy secara otomatis
+        $dummyPdfPath = 'vendor_documents/dummy_legalitas.pdf';
+        Storage::disk('public')->put($dummyPdfPath, 'Ini adalah isi dari dokumen legalitas dummy. Dalam file aslinya, ini akan berupa format PDF yang valid dari vendor.');
+
+
+        // --- 2. SEEDING VENDOR & SPKLU ---
         // 1. Membuat akun User pertama (sebagai vendor)
         $user1 = User::create([
             'name' => 'Budi Pengusaha',
@@ -26,14 +37,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Membuat data pendaftaran Vendor untuk User pertama
-        Vendor::create([
+        $vendor1 = Vendor::create([
             'user_id' => $user1->id,
             'company_name' => 'PT Energi Nusantara Raya',
-            'legality_document_path' => 'dummy/legalitas_pt_energi.pdf',
+            'legality_document_path' => $dummyPdfPath, // Path diganti ke file dummy yang baru saja di-generate
             'status' => 'Pending',
         ]);
-        // Ambil data vendor pertama (PT Energi Nusantara Raya) yang baru saja dibuat di atasnya
-        $vendor1 = Vendor::first();
 
         // Memasukkan data dummy SPKLU
         $spklus = [
@@ -64,7 +73,6 @@ class DatabaseSeeder extends Seeder
             Spklu::create($spklu);
         }
 
-
         // 2. Membuat akun User kedua (sebagai vendor)
         $user2 = User::create([
             'name' => 'Siti Strum',
@@ -74,7 +82,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '089876543210',
         ]);
 
-        // Membuat data pendaftaran Vendor untuk User kedua (contoh tanpa file dokumen)
+        // Membuat data pendaftaran Vendor untuk User kedua (tanpa file dokumen)
         Vendor::create([
             'user_id' => $user2->id,
             'company_name' => 'CV Maju Pengisian Cepat',
@@ -82,9 +90,43 @@ class DatabaseSeeder extends Seeder
             'status' => 'Pending',
         ]);
 
+
+        // --- 3. SEEDING TIKET LAPORAN (UNTUK PBI 9) ---
+        // Buat user dummy sebagai pengendara pelapor
+        $userPelapor = User::create([
+            'name' => 'Agus Pengendara EV',
+            'email' => 'agus.ev@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'user', 
+            'phone' => '085555555555',
+        ]);
+
+        // Buat data tiket laporan
+        Ticket::create([
+            'user_id' => $userPelapor->id,
+            'subject' => 'Mesin Charger di Braga CityWalk Mati',
+            'description' => 'Saya mencoba mengisi daya tapi layarnya blank hitam.',
+            'status' => 'pending'
+        ]);
+
+        Ticket::create([
+            'user_id' => $userPelapor->id,
+            'subject' => 'Lokasi SPKLU Gedung Sate Kurang Akurat',
+            'description' => 'Marker di peta agak melenceng sekitar 50 meter dari lokasi aslinya.',
+            'status' => 'pending'
+        ]);
+
+
+        // --- 4. CALL OTHER SEEDERS ---
         // manggil vehicle seeder
         $this->call([
             VehicleSeeder::class,
         ]);
+
+        $this->call([
+            // Pastikan VendorSeeder & SpkluSeeder dipanggil lebih dulu sebelum ChargerMachineSeeder
+            ChargerMachineSeeder::class,
+        ]);
+
     }
 }

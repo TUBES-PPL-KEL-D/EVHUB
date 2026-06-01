@@ -75,7 +75,7 @@
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500">Mobilitas Elektrik</span>
             </h1>
             <p class="text-lg md:text-xl text-slate-400 mb-10 font-medium leading-relaxed max-w-2xl mx-auto">
-                Platform terpadu untuk pencarian stasiun pengisian daya (SPKLU), manajemen garasi digital, dan kemitraan ekosistem EV di seluruh Indonesia.
+                Platform terpadu untuk pencarian stasiun pengisian daya (SPKLU), manajemen garasi digital, dan kemitraan ekosistem EV di Bandung.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="{{ route('register') }}" class="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-full text-base font-bold transition-all hover:-translate-y-1">
@@ -170,7 +170,7 @@
                 <span class="text-xl font-bold text-white">EV-HUB</span>
             </div>
             <div class="text-slate-400 text-sm font-medium">
-                &copy; 2026 EV-HUB. Kelompok D - S1 Sistem Informasi. All rights reserved.
+                &copy; 2026 EV-HUB. All rights reserved.
             </div>
             <div class="flex space-x-4">
                 <a href="#" class="text-slate-400 hover:text-emerald-400 transition-colors">Kebijakan Privasi</a>

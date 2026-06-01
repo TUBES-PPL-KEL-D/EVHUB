@@ -36,7 +36,7 @@ class Vendor extends Model
      */
     public function profile()
     {
-        return $this->hasOne(VendorProfile::class);
+        return $this->hasOne(VendorProfile::class, 'user_id', 'user_id');
     }
 
     /**
@@ -46,5 +46,10 @@ class Vendor extends Model
     public function chargers()
     {
         return $this->hasMany(ChargerMachine::class);
+    }
+
+    public function warnings()
+    {
+        return $this->hasMany(VendorWarning::class);
     }
 }

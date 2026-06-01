@@ -34,10 +34,32 @@
 					<p class="mt-1 text-lg font-semibold text-slate-900">{{ $vendorProfile->company_phone ?? '-' }}</p>
 				</div>
 
+				<div class="rounded-2xl bg-slate-50 p-5">
+					<p class="text-sm font-semibold text-slate-700">Jam Operasional</p>
+					<p class="mt-1 text-lg font-semibold text-slate-900">
+						@if ($vendorProfile->opens_at || $vendorProfile->closes_at)
+							{{ $vendorProfile->opens_at ?? '-' }} — {{ $vendorProfile->closes_at ?? '-' }}
+						@else
+							Belum diatur
+						@endif
+					</p>
+				</div>
+
 				<div class="rounded-2xl bg-slate-50 p-5 md:col-span-2">
 					<p class="text-sm font-semibold text-slate-700">Alamat Perusahaan</p>
 					<p class="mt-1 whitespace-pre-line text-lg font-semibold text-slate-900">{{ $vendorProfile->company_address }}</p>
 				</div>
+
+				@if ($vendorProfile->latitude && $vendorProfile->longitude)
+					<div class="rounded-2xl bg-slate-50 p-5 md:col-span-2">
+						<p class="text-sm font-semibold text-slate-700">Lokasi Geografis</p>
+						<p class="mt-2 text-sm text-slate-600">
+							<strong>Latitude:</strong> {{ $vendorProfile->latitude }} | 
+							<strong>Longitude:</strong> {{ $vendorProfile->longitude }}
+						</p>
+						<div id="map" class="mt-3 h-64 w-full rounded-xl border border-slate-200"></div>
+					</div>
+				@endif
 
 				<div class="rounded-2xl bg-slate-50 p-5 md:col-span-2">
 					<p class="text-sm font-semibold text-slate-700">Deskripsi Perusahaan</p>
@@ -55,4 +77,26 @@
 		</div>
 		</div>
 	</div>
+
+<!-- Leaflet CSS & JS untuk tampilkan map lokasi vendor -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		@if ($vendorProfile->latitude && $vendorProfile->longitude)
+			var lat = {{ $vendorProfile->latitude }};
+			var lng = {{ $vendorProfile->longitude }};
+			var mapElement = document.getElementById('map');
+			if (mapElement) {
+				var map = L.map('map').setView([lat, lng], 14);
+				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					maxZoom: 19,
+					attribution: '© OpenStreetMap'
+				}).addTo(map);
+				L.marker([lat, lng]).addTo(map).bindPopup('<strong>{{ $vendorProfile->company_name }}</strong><br>{{ $vendorProfile->company_address }}');
+			}
+		@endif
+	});
+</script>
+
 @endsection

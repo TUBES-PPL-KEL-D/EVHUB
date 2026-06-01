@@ -8,6 +8,7 @@ use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Transaction;
 
 class ChargerMachineController extends Controller
 {
@@ -73,10 +74,12 @@ class ChargerMachineController extends Controller
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            'operational_hours' => 'required|string|max:255',
+            // Perubahan pada validasi waktu
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -90,6 +93,9 @@ class ChargerMachineController extends Controller
 
         $path = $request->file('photo')->store('chargers', 'public');
 
+        // Menggabungkan waktu buka dan tutup
+        $operationalHours = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
+
         ChargerMachine::create([
             'vendor_id' => $vendor->id, 
             'spklu_id' => $spklu->id,
@@ -97,7 +103,7 @@ class ChargerMachineController extends Controller
             'connector_type' => $validatedData['connector_type'],
             'capacity_kw' => $validatedData['capacity_kw'],
             'price_per_kwh' => $validatedData['price_per_kwh'],
-            'operational_hours' => $validatedData['operational_hours'],
+            'operational_hours' => $operationalHours,
             'photo_path' => $path,
             'status' => 'available',
         ]);
@@ -124,13 +130,22 @@ class ChargerMachineController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'connector_type' => 'required|string|max:100',
+            'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            'operational_hours' => 'required|string|max:255',
+            // Perubahan pada validasi waktu
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i',
             'status' => 'required|in:available,unavailable,maintenance',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        // Menggabungkan waktu buka dan tutup
+        $validatedData['operational_hours'] = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
+        
+        // Membersihkan array dari key yang tidak ada di kolom database
+        unset($validatedData['open_time']);
+        unset($validatedData['close_time']);
 
         if ($request->hasFile('photo')) {
             if (Storage::disk('public')->exists($charger->photo_path)) {
@@ -142,6 +157,73 @@ class ChargerMachineController extends Controller
         $charger->update($validatedData);
 
         return redirect()->route('vendor.chargers.index')->with('success', 'Detail mesin charger berhasil diperbarui!');
+    }
+    public function updateTariff(Request $request, ChargerMachine $charger)
+    {
+    $vendor = $this->checkVendorStatus();
+
+    if (!$vendor) {
+        return redirect()
+            ->route('vendor.status')
+            ->with('error', 'Akses ditolak!');
+    }
+
+    if ($charger->vendor_id !== $vendor->id) {
+        return redirect()
+            ->route('vendor.chargers.index')
+            ->with('error', 'Anda tidak memiliki akses untuk mengubah tarif mesin ini.');
+    }
+
+    $validatedData = $request->validate([
+        'price_per_kwh' => 'required|numeric|min:0',
+    ], [
+        'price_per_kwh.required' => 'Tarif per kWh wajib diisi.',
+        'price_per_kwh.numeric' => 'Tarif per kWh harus berupa angka.',
+        'price_per_kwh.min' => 'Tarif per kWh tidak boleh bernilai negatif.',
+    ]);
+
+    $charger->update([
+        'price_per_kwh' => $validatedData['price_per_kwh'],
+    ]);
+
+    return redirect()
+        ->route('vendor.chargers.index')
+        ->with('success', 'Tarif harga per kWh berhasil diperbarui.');
+    }
+
+    public function usageHistory()
+    {
+        $vendor = $this->checkVendorStatus();
+
+        if (!$vendor) {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Akses ditolak!');
+        }
+
+        $transactions = Transaction::with([
+                'user',
+                'vehicle',
+                'chargerMachine.spklu'
+            ])
+            ->whereHas('chargerMachine', function ($query) use ($vendor) {
+                $query->where('vendor_id', $vendor->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalUsage = $transactions->sum('energy_consumed');
+        $totalRevenue = $transactions->where('status', 'success')->sum('total_price');
+        $totalTransactions = $transactions->count();
+        $successTransactions = $transactions->where('status', 'success')->count();
+
+        return view('vendor.chargers.usage-history', compact(
+            'transactions',
+            'totalUsage',
+            'totalRevenue',
+            'totalTransactions',
+            'successTransactions'
+        ));
     }
 
     public function destroy(ChargerMachine $charger)
@@ -163,6 +245,6 @@ class ChargerMachineController extends Controller
             Spklu::where('id', $spklu_id)->delete();
         }
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!');
+        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!'); // Pastikan untuk menghapus data terkait di database jika diperlukan
     }
 }

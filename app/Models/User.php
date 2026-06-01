@@ -24,7 +24,8 @@ class User extends Authenticatable
         'phone',
         'role',
         'password',
-        'status'
+        'status',
+        'balance'
     ];
 
     /**
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function vendor()
     {
         return $this->hasOne(Vendor::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }
