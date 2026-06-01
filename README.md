@@ -6,18 +6,19 @@
 
 ### Langkah Pengerjaan Harian:
 
-**1. Sinkronisasi Kode Utama (Wajib Awal Pengerjaan)**
-Pastikan kode selalu *up-to-date* dengan pekerjaan teman-teman yang lain.
-`git checkout main`
-`git pull origin main`
 
-**2. Pindah/Buat Branch Perorangan**
+
+**1. Pindah/Buat Branch Perorangan**
 Gunakan branch dengan nama masing-masing. Jika branch belum ada, gunakan perintah ini:
 `git checkout -b NamaKamu_TubesPPL`
 *(Contoh: Langgeng_TubesPPL, Wisnu_TubesPPL)*
 
 Jika branch sudah pernah dibuat sebelumnya, cukup ketik:
 `git checkout NamaKamu_TubesPPL`
+
+**2. Sinkronisasi Kode Utama (Wajib Awal Pengerjaan)**
+Pastikan kode selalu *up-to-date* dengan pekerjaan teman-teman yang lain.
+`git pull origin main`
 
 **3. Kerjakan Kode (Laravel)**
 Kerjakan fitur (Controller, Model, View, Migration) sesuai dengan pembagian PBI di Jira.
