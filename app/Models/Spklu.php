@@ -34,4 +34,9 @@ class Spklu extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function galleryPhotos()
+    {
+        return $this->hasMany(SpkluGalleryPhoto::class)->orderBy('sort_order')->latest();
+    }
 }

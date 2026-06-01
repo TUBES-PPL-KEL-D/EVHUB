@@ -6,6 +6,7 @@ use App\Models\Spklu;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class SpkluController extends Controller
 {
@@ -21,6 +22,13 @@ class SpkluController extends Controller
     public function show(Spklu $spklu)
     {
         $spklu->load(['chargerMachines', 'vendor.profile']);
+
+        if (Schema::hasTable('spklu_gallery_photos')) {
+            $spklu->load('galleryPhotos');
+        } else {
+            $spklu->setRelation('galleryPhotos', collect());
+        }
+
         $reviews = $spklu->reviews()->with('user')->latest()->paginate(5);
         return view('rider.spklu.show', compact('spklu', 'reviews'));
     }
