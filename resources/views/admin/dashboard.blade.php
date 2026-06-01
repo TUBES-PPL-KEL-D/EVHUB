@@ -117,11 +117,16 @@
     <div id="panel-manajemen" class="main-panel-content space-y-8 hidden">
         
         <div class="flex justify-between items-center bg-slate-900/30 p-4 border border-slate-700/30 rounded-2xl">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider hidden sm:block">Aksi Peninjauan Komparatif:</p>
-            <a href="{{ route('admin.export.spklu') }}" class="inline-flex items-center bg-emerald-500 text-slate-900 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 w-full sm:w-auto justify-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
-                Download Berkas Excel
-            </a>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Aksi Audit & Ekspor Operasional:</p>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('admin.withdrawals.index') }}" class="inline-flex items-center bg-blue-500/10 text-blue-400 border border-blue-500/20 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all">
+                    Withdrawal Vendor
+                </a>
+                <a href="{{ route('admin.export.spklu') }}" class="inline-flex items-center bg-emerald-500 text-slate-900 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-lg">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
+                    Download Berkas Excel
+                </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

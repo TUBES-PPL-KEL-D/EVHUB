@@ -139,6 +139,7 @@
                     <p class="mt-1 text-sm text-slate-500">Navigasi ke fitur vendor yang terkait langsung dengan dashboard ini.</p>
                 </div>
                 <div class="flex flex-wrap gap-3">
+                    <a href="{{ route('vendor.withdrawals.index') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Withdrawal Dana</a>
                     <a href="{{ route('vendor.chargers.usageHistory') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-600">Lihat Riwayat Penggunaan</a>
                     <a href="{{ route('vendor.chargers.index') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Kelola Mesin</a>
                     <a href="{{ route('vendor.status') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300/80 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Status Vendor</a>
