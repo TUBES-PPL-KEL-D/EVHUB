@@ -64,7 +64,7 @@
         }, 300);
     }
 
-    // 3. MODAL PREVIEW VERIFIKASI DOKUMEN VENDOR
+    // 3. MODAL PREVIEW VERIFIKASI DOKUMEN VENDOR (DENGAN ADAPTIVE STATUS CONDITION)
     function openReviewModal(btn) {
         const id = btn.getAttribute('data-id');
         const name = btn.getAttribute('data-name');
@@ -72,6 +72,7 @@
         const email = btn.getAttribute('data-email');
         const address = btn.getAttribute('data-address');
         const pdfUrl = btn.getAttribute('data-pdf');
+        const status = btn.getAttribute('data-status'); // Menangkap flag status berkas
 
         document.getElementById('modalCompanyName').innerText = name;
         document.getElementById('modalNpwp').innerText = npwp;
@@ -83,8 +84,25 @@
             ? `<iframe src="${pdfUrl}" class="w-full h-full border-0 absolute inset-0"></iframe>` 
             : `<div class="absolute inset-0 flex items-center justify-center text-slate-500 font-bold text-sm uppercase">Dokumen Kosong</div>`;
 
-        document.getElementById('formApprove').action = `/admin/vendors/${id}/approve`;
-        document.getElementById('formReject').action = `/admin/vendors/${id}/reject`;
+        // Atur visibilitas tombol footer berdasarkan status audit vendor
+        const formApprove = document.getElementById('formApprove');
+        const formReject = document.getElementById('formReject');
+        const btnModalCloseNeutral = document.getElementById('btnModalCloseNeutral');
+
+        if (status === 'Approved') {
+            // Sembunyikan tombol verifikasi, ganti dengan tombol tutup murni
+            formApprove.classList.add('hidden');
+            formReject.classList.add('hidden');
+            btnModalCloseNeutral.classList.remove('hidden');
+        } else {
+            // Munculkan kembali tombol aksi terima/tolak untuk berkas antrean baru
+            formApprove.classList.remove('hidden');
+            formReject.classList.remove('hidden');
+            btnModalCloseNeutral.classList.add('hidden');
+            
+            document.getElementById('formApprove').action = `/admin/vendors/${id}/approve`;
+            document.getElementById('formReject').action = `/admin/vendors/${id}/reject`;
+        }
 
         const modal = document.getElementById('reviewModal');
         modal.classList.remove('hidden'); 

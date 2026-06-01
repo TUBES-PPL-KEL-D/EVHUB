@@ -3,7 +3,6 @@
 @section('content') 
 <div class="space-y-6 animate-fade-in-up pb-10">
     
-    <!-- HEADER UTAMA DASHBOARD -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-2">
         <div>
             <h1 class="text-4xl font-black text-white tracking-tighter">Pusat Kendali Admin</h1>
@@ -15,7 +14,6 @@
         </div>
     </div>
 
-    <!-- NOTIFIKASI AKSI BERHASIL -->
     @if(session('success')) 
     <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm"> 
         <div class="bg-emerald-500 p-1.5 rounded-full text-white"> 
@@ -25,7 +23,6 @@
     </div> 
     @endif 
 
-    <!-- SUB-NAVIGASI UTAMA (TABS SYSTEM) -->
     <div class="flex border-b border-slate-700/60 gap-2 mb-6 overflow-x-auto">
         <button id="tabBtn-overview" onclick="switchMainTab('overview')" class="main-tab-btn px-6 py-3.5 font-black text-xs tracking-widest uppercase border-b-2 transition-all duration-200 text-emerald-400 border-emerald-500 shrink-0">
             Overview & Analytics
@@ -38,9 +35,6 @@
         </button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- PANEL CONTENT 1: OVERVIEW & ANALYTICS      -->
-    <!-- ========================================== -->
     <div id="panel-overview" class="main-panel-content space-y-6 block">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
@@ -93,9 +87,6 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- PANEL CONTENT 2: ANTREAN VERIFIKASI        -->
-    <!-- ========================================== -->
     <div id="panel-verifikasi" class="main-panel-content space-y-6 hidden">
         <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-xl">
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
@@ -115,7 +106,7 @@
                             <h4 class="text-white font-bold text-base">{{ $vendor->company_name }}</h4>
                             <p class="text-slate-400 text-xs mt-1">NPWP: <span class="font-mono tracking-wider">{{ $vendor->npwp }}</span></p>
                         </div>
-                        <button type="button" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-blue-500/20" data-id="{{ $vendor->id }}" data-name="{{ $vendor->company_name }}" data-npwp="{{ $vendor->npwp }}" data-email="{{ $vendor->user->email ?? 'Tidak ada email' }}" data-address="{{ $vendor->address ?? 'Alamat belum diisi' }}" data-pdf="{{ $vendor->legality_document_path ? asset('storage/' . $vendor->legality_document_path) : '' }}" onclick="openReviewModal(this)"> TINJAU </button> 
+                        <button type="button" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-blue-500/20" data-id="{{ $vendor->id }}" data-name="{{ $vendor->company_name }}" data-npwp="{{ $vendor->npwp }}" data-email="{{ $vendor->user->email ?? 'Tidak ada email' }}" data-address="{{ $vendor->address ?? 'Alamat belum diisi' }}" data-pdf="{{ $vendor->legality_document_path ? asset('storage/' . $vendor->legality_document_path) : '' }}" data-status="Pending" onclick="openReviewModal(this)"> TINJAU </button> 
                     </div>
                     @endforeach
                 </div>
@@ -123,9 +114,6 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- PANEL CONTENT 3: MANAJEMEN VENDOR & STASIUN-->
-    <!-- ========================================== -->
     <div id="panel-manajemen" class="main-panel-content space-y-8 hidden">
         
         <div class="flex justify-between items-center bg-slate-900/30 p-4 border border-slate-700/30 rounded-2xl">
@@ -138,7 +126,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             
-            <!-- BLOK KIRI: ADUAN KENDALA OPERASIONAL -->
             <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-xl lg:col-span-1">
                 <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-6">
                     <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
@@ -163,10 +150,8 @@
                 @endif
             </div>
 
-            <!-- BLOK KANAN: KONTROL OPERASIONAL PENUH -->
             <div class="lg:col-span-2 space-y-6">
                 
-                <!-- 1: VENDOR AKTIF -->
                 <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl">
                     <div class="flex items-center space-x-3 mb-6"> 
                         <div class="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400"> 
@@ -196,8 +181,12 @@
                                     </div> 
                                 </div> 
 
-                                <!-- Form Penindakan -->
-                                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full xl:w-auto"> 
+                                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full xl:w-auto items-center"> 
+                                    <button type="button" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-blue-500/20 w-full sm:w-auto text-center"
+                                        data-id="{{ $vendor->id }}" data-name="{{ $vendor->company_name }}" data-npwp="{{ $vendor->npwp }}" data-email="{{ $vendor->user->email ?? 'Tidak ada email' }}" data-address="{{ $vendor->address ?? 'Alamat belum diisi' }}" data-pdf="{{ $vendor->legality_document_path ? asset('storage/' . $vendor->legality_document_path) : '' }}" data-status="Approved" onclick="openReviewModal(this)">
+                                        BERKAS
+                                    </button>
+
                                     <form action="{{ route('admin.vendors.warning', $vendor->id) }}" method="POST" class="flex w-full sm:w-auto shadow-sm"> 
                                         @csrf 
                                         <input type="text" name="message" placeholder="Alasan peringatan..." required class="text-xs px-3 py-2 border border-slate-600 rounded-l-xl focus:outline-none focus:border-amber-500 w-full sm:w-44 bg-slate-950/40 text-white placeholder-slate-500"> 
@@ -229,7 +218,6 @@
                     </div> 
                 </div>
 
-                <!-- 2: DAFTAR BLOKIR/SUSPEND -->
                 <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl"> 
                     <div class="flex items-center space-x-3 mb-6"> 
                         <div class="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-400"> 
@@ -264,7 +252,6 @@
                     </div> 
                 </div>
 
-                <!-- 3: RIWAYAT PENOLAKAN -->
                 <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl"> 
                     <div class="flex items-center space-x-3 mb-6"> 
                         <div class="w-9 h-9 bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-400"> 
@@ -295,9 +282,6 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL POPUP PREVIEW VERIFIKASI VENDOR      -->
-<!-- ========================================== -->
 <div id="reviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/90 backdrop-blur-md opacity-0 transition-opacity duration-300">
     <div id="reviewModalContent" class="bg-slate-900 border border-slate-700/80 w-11/12 max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300 max-h-[90vh]">
         <div class="flex justify-between items-center p-6 border-b border-slate-800">
@@ -341,11 +325,14 @@
             </div>
         </div>
         <div class="p-6 border-t border-slate-800 bg-slate-900/90 flex justify-end gap-4">
-            <form id="formReject" action="#" method="POST">
+            <button id="btnModalCloseNeutral" type="button" onclick="closeReviewModal()" class="hidden bg-slate-800 text-slate-300 border border-slate-700 hover:text-white px-8 py-3 rounded-2xl font-black tracking-widest uppercase text-sm">
+                Tutup Tinjauan
+            </button>
+            <form id="formReject" action="#" method="POST" class="inline-block">
                 @csrf @method('PATCH')
                 <button type="submit" class="bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white px-8 py-3 rounded-2xl font-black tracking-widest uppercase text-sm"> Tolak Vendor </button>
             </form>
-            <form id="formApprove" action="#" method="POST">
+            <form id="formApprove" action="#" method="POST" class="inline-block">
                 @csrf @method('PATCH')
                 <button type="submit" class="bg-emerald-500 text-slate-900 hover:bg-emerald-400 px-8 py-3 rounded-2xl font-black tracking-widest uppercase text-sm"> Setujui Kemitraan </button>
             </form>
@@ -353,9 +340,6 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL POPUP DETAIL TIKET KENDALA ADUAN     -->
-<!-- ========================================== -->
 <div id="ticketModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/90 backdrop-blur-md opacity-0 transition-opacity duration-300">
     <div id="ticketModalContent" class="bg-slate-900 border border-slate-700/80 w-11/12 max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300">
         <div class="flex justify-between items-center p-6 border-b border-slate-800">
@@ -369,37 +353,44 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
-        <div class="p-6 space-y-4 overflow-y-auto">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                    <p class="text-xs text-slate-400 mb-1">Nama Pelapor</p>
-                    <p id="ticketModalName" class="text-white font-bold text-sm">-</p>
+        
+        <form id="formResolveTicket" action="#" method="POST" class="w-full flex flex-col">
+            @csrf 
+            @method('PATCH')
+            <div class="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <p class="text-xs text-slate-400 mb-1">Nama Pelapor</p>
+                        <p id="ticketModalName" class="text-white font-bold text-sm">-</p>
+                    </div>
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                        <p class="text-xs text-slate-400 mb-1">Email Akun</p>
+                        <p id="ticketModalEmail" class="text-rose-400 font-mono text-sm">-</p>
+                    </div>
                 </div>
                 <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                    <p class="text-xs text-slate-400 mb-1">Email Akun</p>
-                    <p id="ticketModalEmail" class="text-rose-400 font-mono text-sm">-</p>
+                    <p class="text-xs text-slate-400 mb-1">Subjek Masalah</p>
+                    <p id="ticketModalSubject" class="text-white font-extrabold text-base">-</p>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                    <p class="text-xs text-slate-400 mb-1">Isi Laporan / Deskripsi Kendala</p>
+                    <p id="ticketModalDescription" class="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">-</p>
+                </div>
+                
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 flex flex-col">
+                    <label class="text-xs text-emerald-400 mb-1 font-black uppercase tracking-wider">Feedback / Tanggapan Balasan Admin</label>
+                    <textarea name="feedback" placeholder="Tulis instruksi perbaikan, tanggapan, atau solusi sistem di sini untuk dikirimkan kepada pengendara..." required class="w-full h-24 text-sm p-3 border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 mt-1"></textarea>
                 </div>
             </div>
-            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                <p class="text-xs text-slate-400 mb-1">Subjek Masalah</p>
-                <p id="ticketModalSubject" class="text-white font-extrabold text-base">-</p>
+            
+            <div class="p-6 border-t border-slate-800 bg-slate-900/90 flex justify-end gap-3">
+                <button type="button" onclick="closeTicketModal()" class="bg-slate-800 text-slate-400 border border-slate-700 hover:text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors">Kembali</button>
+                <button type="submit" class="bg-rose-500 text-white hover:bg-rose-400 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-sm">Tandai Selesai & Kirim</button>
             </div>
-            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
-                <p class="text-xs text-slate-400 mb-1">Isi Laporan / Deskripsi Kendala</p>
-                <p id="ticketModalDescription" class="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">-</p>
-            </div>
-        </div>
-        <div class="p-6 border-t border-slate-800 bg-slate-900/90 flex justify-end gap-3">
-            <button type="button" onclick="closeTicketModal()" class="bg-slate-800 text-slate-400 border border-slate-700 hover:text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors">Kembali</button>
-            <form id="formResolveTicket" action="#" method="POST">
-                @csrf @method('PATCH')
-                <button type="submit" class="bg-rose-500 text-white hover:bg-rose-400 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-sm">Tandai Selesai</button>
-            </form>
-        </div>
+        </form>
     </div>
 </div>
 
-<!-- PEMANGGILAN SCRIPT -->
 @include('admin.partials.scripts')
 
 @endsection
