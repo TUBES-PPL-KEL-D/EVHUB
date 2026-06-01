@@ -64,7 +64,7 @@
                 <p class="text-sm font-medium text-slate-600">Terakhir diperbarui: {{ $vendor->updated_at->format('d M Y H:i') }}</p>
                 <div class="flex gap-3">
                     @if ($isApproved)
-                        <a href="{{ route('vendor.dashboard') }}" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">Buka Dashboard Pendapatan</a>
+                        <a href="{{ route('vendor.dashboard') }}" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">Buka Dashboard Vendor</a>
                     @endif
                     @if ($isRejected)
                         <a href="{{ route('vendor.documents.edit', $vendor) }}" class="inline-flex items-center justify-center rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700">Perbaiki & Upload Ulang</a>

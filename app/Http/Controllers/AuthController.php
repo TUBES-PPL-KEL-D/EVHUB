@@ -9,6 +9,17 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    protected function redirectVendor(User $user)
+    {
+        $vendor = $user->vendor;
+
+        if ($vendor && $vendor->status === 'Approved') {
+            return redirect()->route('vendor.dashboard')->with('success', 'Selamat datang di konsol manajemen vendor.');
+        }
+
+        return redirect()->route('vendor.status')->with('success', 'Silakan cek status pendaftaran vendor Anda terlebih dahulu.');
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -31,7 +42,7 @@ class AuthController extends Controller
             if ($role === 'admin') {
                 return redirect()->route('admin.dashboard')->with('success', 'Pusat kendali admin berhasil diakses.');
             } elseif ($role === 'vendor') {
-                return redirect()->route('vendor.dashboard')->with('success', 'Selamat datang di konsol manajemen vendor.');
+                return $this->redirectVendor(Auth::user());
             }
 
             // Jalur default untuk pengendara umum (Rider)
@@ -71,7 +82,7 @@ class AuthController extends Controller
 
         // Jalur pengalihan instan pasca-registrasi
         if ($user->role === 'vendor') {
-            return redirect()->route('vendor.dashboard')->with('success', 'Akun vendor berhasil dibuat.');
+            return $this->redirectVendor($user);
         }
 
         return redirect()->route('rider.map')->with('success', 'Akun pengendara berhasil dibuat.');
