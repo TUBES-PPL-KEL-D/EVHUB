@@ -26,6 +26,13 @@
             <div class="flex items-center gap-3 mb-2">
                 <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-full uppercase tracking-wider">Stasiun Aktif</span>
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $spklu->name }}</h1>
+                @if($spklu->reviews->count() > 0)
+                    <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
+                        <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <span class="text-sm font-bold text-yellow-700">{{ number_format($spklu->reviews->avg('rating'), 1) }}</span>
+                        <span class="text-xs text-yellow-600 ml-1">({{ $spklu->reviews->count() }} ulasan)</span>
+                    </div>
+                @endif
             </div>
             <div class="flex items-start gap-2 mt-3 text-slate-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,5 +182,85 @@
         </div>
     </div>
     @endif
+
+    <!-- Reviews Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8 mt-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Ulasan Pengendara</h2>
+            @if(Auth::check())
+                <button onclick="document.getElementById('review-form').classList.toggle('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors">
+                    + Beri Ulasan
+                </button>
+            @endif
+        </div>
+
+        @if(session('success'))
+            <div class="bg-emerald-50 text-emerald-600 p-4 rounded-xl mb-6 font-medium text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(Auth::check())
+            <div id="review-form" class="hidden bg-slate-50 p-6 rounded-xl border border-slate-100 mb-8">
+                <h3 class="font-bold text-slate-800 mb-4">Tulis Ulasan Anda</h3>
+                <form action="{{ route('rider.reviews.store', $spklu->id) }}" method="POST">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Rating</label>
+                        <div class="flex items-center gap-4">
+                            @for($i=1; $i<=5; $i++)
+                                <label class="cursor-pointer flex items-center gap-1">
+                                    <input type="radio" name="rating" value="{{ $i }}" class="text-blue-600 focus:ring-blue-500" {{ $i==5 ? 'checked' : '' }} required>
+                                    <span class="text-sm font-medium">{{ $i }} Bintang</span>
+                                </label>
+                            @endfor
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Komentar (Opsional)</label>
+                        <textarea name="comment" rows="3" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="Bagaimana pengalaman Anda mengisi daya di sini?"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-6 rounded-lg text-sm transition-colors">Kirim Ulasan</button>
+                    </div>
+                </form>
+            </div>
+        @else
+            <div class="bg-blue-50 text-blue-600 p-4 rounded-xl mb-6 font-medium text-sm">
+                Silakan login untuk memberikan ulasan.
+            </div>
+        @endif
+
+        @if($spklu->reviews->isEmpty())
+            <div class="text-center py-8 text-slate-500 text-sm">
+                Belum ada ulasan untuk SPKLU ini.
+            </div>
+        @else
+            <div class="space-y-6">
+                @foreach($spklu->reviews()->latest()->get() as $review)
+                    <div class="border-b border-slate-100 pb-6 last:border-0 last:pb-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold uppercase">
+                                    {{ substr($review->user->name ?? 'User', 0, 1) }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800 text-sm">{{ $review->user->name ?? 'Pengguna' }}</p>
+                                    <p class="text-xs text-slate-500">{{ $review->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-md">
+                                <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <span class="text-sm font-bold text-yellow-700">{{ $review->rating }}</span>
+                            </div>
+                        </div>
+                        @if($review->comment)
+                            <p class="text-slate-600 text-sm mt-3 ml-13">{{ $review->comment }}</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
 </div>
 @endsection

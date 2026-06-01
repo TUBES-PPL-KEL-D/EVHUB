@@ -48,7 +48,7 @@ Route::prefix('rider')->name('rider.')->group(function () {
     Route::get('/peta', [SpkluController::class, 'index'])->name('map');
     Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
     Route::get('/spklu/{spklu}', [SpkluController::class, 'show'])->name('spklu.show');
-
+    Route::post('/spklu/{spklu}/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
     // Wallet (Wisnu)
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');

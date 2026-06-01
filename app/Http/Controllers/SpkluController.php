@@ -20,7 +20,7 @@ class SpkluController extends Controller
 
     public function show(Spklu $spklu)
     {
-        $spklu->load(['chargerMachines', 'vendor.profile']);
+        $spklu->load(['chargerMachines', 'vendor.profile', 'reviews.user']);
         return view('rider.spklu.show', compact('spklu'));
     }
 
