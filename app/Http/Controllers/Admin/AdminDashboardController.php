@@ -5,19 +5,53 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Ticket;
-use App\Models\VendorWarning; 
+use App\Models\VendorWarning;
+use App\Models\Spklu; // Tambahan model Spklu
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel; // Tambahan library Excel
-use App\Exports\SpkluExport;         // Tambahan file export
+use Illuminate\Support\Facades\DB; // Untuk query agregasi bulanan
+use Carbon\Carbon; // Untuk format nama bulan
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SpkluExport;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
+        // 1. Data untuk Tabel Antrean & Laporan
         $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
         $recentTickets = Ticket::with('user')->where('status', 'pending')->latest()->take(5)->get();
-        return view('admin.dashboard', compact('pendingVendors', 'recentTickets'));
+
+        // 2. Data untuk Grafik Pertumbuhan SPKLU (PBI 37)
+        // Mengambil jumlah SPKLU yang terdaftar per bulan pada tahun berjalan
+        $spkluGrowth = Spklu::select(
+            DB::raw('count(id) as total'),
+            DB::raw('MONTH(created_at) as month')
+        )
+        ->whereYear('created_at', date('Y'))
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+        // Menyiapkan array kosong untuk 12 bulan
+        $chartLabels = [];
+        $chartData = [];
+
+        // Menginisialisasi nilai 0 untuk setiap bulan (Januari - Desember)
+        for ($i = 1; $i <= 12; $i++) {
+            $chartLabels[] = Carbon::create()->month($i)->translatedFormat('F');
+            $chartData[$i] = 0;
+        }
+
+        // Mengisi array dengan data asli dari database jika ada
+        foreach ($spkluGrowth as $growth) {
+            $chartData[$growth->month] = $growth->total;
+        }
+
+        // Mereset index array agar berurutan saat di-encode ke JSON
+        $chartData = array_values($chartData);
+
+        return view('admin.dashboard', compact('pendingVendors', 'recentTickets', 'chartLabels', 'chartData'));
     }
 
     public function approve($id)

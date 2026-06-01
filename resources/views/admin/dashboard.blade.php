@@ -1,126 +1,206 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 
-@section('content')
-<div class="mb-8">
-    <h1 class="text-3xl font-extrabold text-white tracking-tight">Dashboard Admin</h1>
-    <p class="text-slate-400 mt-2">Manajemen dan Verifikasi Ekosistem SPKLU serta Laporan Kendala.</p>
+@section('content') 
+<div class="mb-8"> 
+    <h1 class="text-3xl font-extrabold text-white tracking-tight">Dashboard Admin</h1> 
+    <p class="text-slate-400 mt-2">Manajemen dan Verifikasi Ekosistem SPKLU serta Laporan Kendala.</p> 
+</div> 
+
+<div class="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl mb-8 w-full">
+    <div class="flex items-center justify-between mb-6"> 
+        <h2 class="text-xl font-bold text-white flex items-center"> 
+            <svg class="w-5 h-5 mr-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+            Tren Pertumbuhan SPKLU (Tahun Ini)
+        </h2> 
+    </div>
+    <div class="relative h-72 w-full">
+        <canvas id="spkluGrowthChart"></canvas>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8"> 
+    <div class="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl flex flex-col h-full"> 
+        <div class="flex items-center justify-between mb-6"> 
+            <h2 class="text-xl font-bold text-white flex items-center"> 
+                <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse mr-3"></span> 
+                Antrean Dokumen Vendor 
+            </h2> 
+        </div> 
+        
+        @php $dataAntrean = $pendingVendors ?? collect(); @endphp 
+        @if(count($dataAntrean) == 0) 
+        <div class="flex flex-col items-center justify-center py-16 text-center flex-grow"> 
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mb-4"> 
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 
+            </div> 
+            <h3 class="text-xl font-bold text-white mb-2">Semua Selesai!</h3> 
+            <p class="text-slate-400">Tidak ada vendor yang menunggu verifikasi saat ini.</p> 
+        </div> 
+        @else 
+        <div class="overflow-x-auto"> 
+            <table class="w-full text-left border-collapse"> 
+                <thead> 
+                    <tr class="border-b border-slate-700/50 text-slate-400 text-sm uppercase tracking-wider"> 
+                        <th class="py-4 px-4 font-semibold">Nama Perusahaan</th> 
+                        <th class="py-4 px-4 font-semibold">NPWP</th> 
+                        <th class="py-4 px-4 font-semibold text-center">Dokumen</th> 
+                        <th class="py-4 px-4 font-semibold text-right">Aksi</th> 
+                    </tr> 
+                </thead> 
+                <tbody class="divide-y divide-slate-700/50"> 
+                    @foreach($dataAntrean as $vendor) 
+                    <tr class="hover:bg-slate-700/20 transition-colors"> 
+                        <td class="py-4 px-4 text-white font-medium">{{ $vendor->company_name ?? '-' }}</td> 
+                        <td class="py-4 px-4 text-slate-300 font-mono text-sm">{{ $vendor->npwp ?? '-' }}</td> 
+                        <td class="py-4 px-4 text-center"> 
+                            @if($vendor->legality_document_path) 
+                            <a href="{{ asset('storage/' . $vendor->legality_document_path) }}" target="_blank" class="inline-flex items-center text-blue-400 hover:text-blue-300 hover:underline text-sm font-medium transition-all"> 
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> 
+                                Lihat File 
+                            </a> 
+                            @else 
+                            <span class="text-slate-500 text-xs italic">Tidak ada file</span> 
+                            @endif 
+                        </td> 
+                        <td class="py-4 px-4 text-right space-x-2"> 
+                            <form action="{{ route('admin.vendors.approve', $vendor->id) }}" method="POST" class="inline"> 
+                                @csrf @method('PATCH') 
+                                <button type="submit" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white px-3 py-2 rounded-lg text-xs font-bold transition-all border border-emerald-500/20"> TERIMA </button> 
+                            </form> 
+                            <form action="{{ route('admin.vendors.reject', $vendor->id) }}" method="POST" class="inline"> 
+                                @csrf @method('PATCH') 
+                                <button type="submit" class="bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white px-3 py-2 rounded-lg text-xs font-bold transition-all border border-rose-500/20"> TOLAK </button> 
+                            </form> 
+                        </td> 
+                    </tr> 
+                    @endforeach 
+                </tbody> 
+            </table> 
+        </div> 
+        @endif 
+    </div> 
 
-    <div class="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl flex flex-col h-full">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center">
-                <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse mr-3"></span>
-                Antrean Dokumen Vendor
-            </h2>
-        </div>
+    <div class="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl flex flex-col h-full"> 
+        <div class="flex items-center justify-between mb-6"> 
+            <h2 class="text-xl font-bold text-white flex items-center"> 
+                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse mr-3"></span> 
+                Tiket Laporan Kendala 
+            </h2> 
+        </div> 
+        
+        @if(!isset($recentTickets) || count($recentTickets) == 0) 
+        <div class="flex flex-col items-center justify-center py-16 text-center flex-grow"> 
+            <div class="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mb-4"> 
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+            </div> 
+            <h3 class="text-xl font-bold text-white mb-2">Aman Terkendali!</h3> 
+            <p class="text-slate-400">Tidak ada laporan kendala dari pengendara saat ini.</p> 
+        </div> 
+        @else 
+        <div class="overflow-x-auto"> 
+            <table class="w-full text-left border-collapse"> 
+                <thead> 
+                    <tr class="border-b border-slate-700/50 text-slate-400 text-sm uppercase tracking-wider"> 
+                        <th class="py-4 px-4 font-semibold">Pelapor</th> 
+                        <th class="py-4 px-4 font-semibold">Subjek</th> 
+                        <th class="py-4 px-4 font-semibold text-right">Aksi</th> 
+                    </tr> 
+                </thead> 
+                <tbody class="divide-y divide-slate-700/50"> 
+                    @foreach($recentTickets as $ticket) 
+                    <tr class="hover:bg-slate-700/20 transition-colors"> 
+                        <td class="py-4 px-4 text-white font-medium">{{ $ticket->user->name ?? 'Pengguna' }}</td> 
+                        <td class="py-4 px-4 text-slate-300 text-sm max-w-[150px] truncate">{{ $ticket->subject ?? '-' }}</td> 
+                        <td class="py-4 px-4 text-right"> 
+                            <a href="#" class="inline-block bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-blue-500/20"> TINJAU </a> 
+                        </td> 
+                    </tr> 
+                    @endforeach 
+                </tbody> 
+            </table> 
+        </div> 
+        @endif 
+    </div> 
+</div> 
 
-        @php
-            $dataAntrean = $vendors ?? $pendingVendors ?? $pending_vendors ?? $data ?? collect();
-        @endphp
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('spkluGrowthChart').getContext('2d');
+        
+        // Menerima data JSON dari Controller
+        const labels = {!! json_encode($chartLabels) !!};
+        const dataPoints = {!! json_encode($chartData) !!};
 
-        @if(count($dataAntrean) == 0)
-            <div class="flex flex-col items-center justify-center py-16 text-center flex-grow">
-                <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">Semua Selesai!</h3>
-                <p class="text-slate-400">Tidak ada vendor yang menunggu verifikasi saat ini.</p>
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-700/50 text-slate-400 text-sm uppercase tracking-wider">
-                            <th class="py-4 px-4 font-semibold">Nama Perusahaan</th>
-                            <th class="py-4 px-4 font-semibold">NPWP</th>
-                            <th class="py-4 px-4 font-semibold text-center">Dokumen</th>
-                            <th class="py-4 px-4 font-semibold text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700/50">
-                        @foreach($dataAntrean as $vendor)
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="py-4 px-4 text-white font-medium">{{ $vendor->company_name ?? '-' }}</td>
-                            <td class="py-4 px-4 text-slate-300 font-mono text-sm">{{ $vendor->npwp ?? '-' }}</td>
-                            
-                            <td class="py-4 px-4 text-center">
-                                @if($vendor->legality_document_path)
-                                    <a href="{{ asset('storage/' . $vendor->legality_document_path) }}" target="_blank" class="inline-flex items-center text-blue-400 hover:text-blue-300 hover:underline text-sm font-medium transition-all">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                        Lihat File
-                                    </a>
-                                @else
-                                    <span class="text-slate-500 text-xs italic">Tidak ada file</span>
-                                @endif
-                            </td>
+        // Konfigurasi Gradien Warna (Emerald to transparent)
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)'); // Emerald-500
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-                            <td class="py-4 px-4 text-right space-x-2">
-                                <form action="{{ route('admin.vendors.approve', $vendor->id) }}" method="POST" class="inline">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white px-3 py-2 rounded-lg text-xs font-bold transition-all border border-emerald-500/20">
-                                        TERIMA
-                                    </button>
-                                </form>
-                                <form action="{{ route('admin.vendors.reject', $vendor->id) }}" method="POST" class="inline">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white px-3 py-2 rounded-lg text-xs font-bold transition-all border border-rose-500/20">
-                                        TOLAK
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </div>
-
-    <div class="bg-slate-800/40 border border-slate-700/50 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl flex flex-col h-full">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center">
-                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse mr-3"></span>
-                Tiket Laporan Kendala
-            </h2>
-        </div>
-
-        @if(!isset($recentTickets) || count($recentTickets) == 0)
-            <div class="flex flex-col items-center justify-center py-16 text-center flex-grow">
-                <div class="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">Aman Terkendali!</h3>
-                <p class="text-slate-400">Tidak ada laporan kendala dari pengendara saat ini.</p>
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-700/50 text-slate-400 text-sm uppercase tracking-wider">
-                            <th class="py-4 px-4 font-semibold">Pelapor</th>
-                            <th class="py-4 px-4 font-semibold">Subjek</th>
-                            <th class="py-4 px-4 font-semibold text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700/50">
-                        @foreach($recentTickets as $ticket)
-                        <tr class="hover:bg-slate-700/20 transition-colors">
-                            <td class="py-4 px-4 text-white font-medium">{{ $ticket->user->name ?? 'Pengguna' }}</td>
-                            <td class="py-4 px-4 text-slate-300 text-sm max-w-[150px] truncate">{{ $ticket->subject ?? '-' }}</td>
-                            <td class="py-4 px-4 text-right">
-                                <a href="#" class="inline-block bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-blue-500/20">
-                                    TINJAU
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </div>
-
-</div>
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'SPKLU Baru',
+                    data: dataPoints,
+                    borderColor: '#10b981', // Emerald-500
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4 // Membuat garis sedikit melengkung (smooth)
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Sembunyikan legenda agar lebih bersih
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b', // slate-800
+                        titleColor: '#94a3b8', // slate-400
+                        bodyColor: '#ffffff',
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' Stasiun Terdaftar';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b' // slate-500
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(51, 65, 85, 0.5)', // slate-700
+                            drawBorder: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 @endsection
