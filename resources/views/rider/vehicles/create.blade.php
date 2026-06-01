@@ -237,7 +237,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('rider.vehicles.store') }}" method="POST" id="vehicle-form">
+            <form action="{{ route('rider.vehicles.store') }}" method="POST" enctype="multipart/form-data" id="vehicle-form">
                 @csrf
 
                 @if ($errors->any())
@@ -385,7 +385,17 @@
                             class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 mb-4"
                             value="{{ old('estimated_full_range_km') }}"
                             placeholder="Contoh: 320">
-                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak penuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
+                        <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak maksimum tempuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
+
+                        <label class="block text-sm font-semibold text-slate-200 mb-2" for="vehicle_photo">Foto Kendaraan (opsional)</label>
+                        <input type="file" name="vehicle_photo" id="vehicle_photo"
+                            accept="image/*"
+                            class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 mb-4">
+                        <p class="text-center text-slate-500 text-sm mb-8">Unggah foto kendaraan Anda untuk mempercantik profil garasi.</p>
+
+                        @error('vehicle_photo')
+                            <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>
+                        @enderror
 
                         @error('battery_service_date')
                             <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>

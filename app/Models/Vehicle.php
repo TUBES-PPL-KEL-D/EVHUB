@@ -18,6 +18,7 @@ class Vehicle extends Model
         'battery_service_date',
         'battery_percentage',
         'estimated_full_range_km',
+        'vehicle_photo_path',
     ];
 
     protected $casts = [
@@ -76,5 +77,67 @@ class Vehicle extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'vehicle_id');
+    }
+
+    public function isBatteryServiceDue(): bool
+    {
+        if (! $this->battery_service_date) {
+            return false;
+        }
+
+        return $this->battery_service_date->isPast() || $this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30));
+    }
+
+    public function batteryServiceStatus(): string
+    {
+        if (! $this->battery_service_date) {
+            return 'Jadwal servis belum diatur';
+        }
+
+        if ($this->battery_service_date->isPast()) {
+            return 'Lewat jatuh tempo';
+        }
+
+        if ($this->battery_service_date->lessThanOrEqualTo(Carbon::now()->addDays(30))) {
+            return 'Segera servis';
+        }
+
+        return 'Akan datang';
+    }
+
+    public function calculateRemainingRange(): ?int
+    {
+        if ($this->battery_percentage === null || $this->estimated_full_range_km === null) {
+            return null;
+        }
+
+        return (int) round($this->estimated_full_range_km * ($this->battery_percentage / 100));
+    }
+
+    public function getRemainingRangeAttribute(): ?int
+    {
+        return $this->calculateRemainingRange();
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (! $this->vehicle_photo_path) {
+            return null;
+        }
+
+        if (! \Illuminate\Support\Facades\Storage::disk('public')->exists($this->vehicle_photo_path)) {
+            return null;
+        }
+
+        return '/storage/' . ltrim($this->vehicle_photo_path, '/');
+    }
+
+    public function batteryServiceDueInDays(): ?int
+    {
+        if (! $this->battery_service_date) {
+            return null;
+        }
+
+        return $this->battery_service_date->diffInDays(Carbon::now(), false);
     }
 }
