@@ -6,8 +6,11 @@ use App\Models\Spklu;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize; // Tambahan interface auto-size
+use Maatwebsite\Excel\Concerns\WithStyles;    // Tambahan interface style
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class SpkluExport implements FromCollection, WithHeadings, WithMapping
+class SpkluExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     /**
     * Mengambil data SPKLU beserta relasi vendornya
@@ -46,6 +49,16 @@ class SpkluExport implements FromCollection, WithHeadings, WithMapping
             $spklu->latitude,
             $spklu->longitude,
             $spklu->created_at ? $spklu->created_at->format('d M Y H:i') : '-',
+        ];
+    }
+
+    /**
+    * Mengatur dekorasi baris judul kolom (Header) menjadi tebal
+    */
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true]],
         ];
     }
 }
