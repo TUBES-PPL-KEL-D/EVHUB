@@ -8,6 +8,7 @@ use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Transaction;
 
 class ChargerMachineController extends Controller
@@ -201,6 +202,16 @@ class ChargerMachineController extends Controller
                 ->with('error', 'Akses ditolak!');
         }
 
+        if (! Schema::hasTable('transactions')) {
+            return view('vendor.chargers.usage-history', [
+                'transactions' => collect(),
+                'totalUsage' => 0,
+                'totalRevenue' => 0,
+                'totalTransactions' => 0,
+                'successTransactions' => 0,
+            ])->with('error', 'Tabel transaksi belum tersedia di database aktif. Jalankan migrasi database terlebih dahulu.');
+        }
+
         $transactions = Transaction::with([
                 'user',
                 'vehicle',
@@ -223,6 +234,90 @@ class ChargerMachineController extends Controller
             'totalRevenue',
             'totalTransactions',
             'successTransactions'
+        ));
+    }
+
+    public function dashboard()
+    {
+        $vendor = $this->checkVendorStatus();
+
+        if (!$vendor) {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Akses ditolak!');
+        }
+
+        $chargers = ChargerMachine::with('spklu')
+            ->where('vendor_id', $vendor->id)
+            ->get();
+
+        if (! Schema::hasTable('transactions')) {
+            return view('vendor.dashboard', [
+                'vendor' => $vendor,
+                'chargers' => $chargers,
+                'transactions' => collect(),
+                'recentTransactions' => collect(),
+                'revenueByMachine' => collect(),
+                'totalRevenue' => 0,
+                'totalTransactions' => 0,
+                'successTransactions' => 0,
+                'failedTransactions' => 0,
+                'pendingTransactions' => 0,
+                'totalEnergy' => 0,
+                'averageRevenue' => 0,
+            ])->with('error', 'Tabel transaksi belum tersedia di database aktif. Jalankan migrasi database terlebih dahulu.');
+        }
+
+        $transactions = Transaction::with([
+                'user',
+                'vehicle',
+                'chargerMachine.spklu'
+            ])
+            ->whereHas('chargerMachine', function ($query) use ($vendor) {
+                $query->where('vendor_id', $vendor->id);
+            })
+            ->orderBy('finished_at', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $successfulTransactions = $transactions->where('status', 'success');
+        $totalRevenue = $successfulTransactions->sum('total_price');
+        $totalTransactions = $transactions->count();
+        $successTransactions = $successfulTransactions->count();
+        $failedTransactions = $transactions->where('status', 'failed')->count();
+        $pendingTransactions = $transactions->where('status', 'pending')->count();
+        $totalEnergy = $successfulTransactions->sum('energy_consumed');
+        $averageRevenue = $successTransactions > 0 ? $totalRevenue / $successTransactions : 0;
+        $recentTransactions = $transactions->take(5);
+
+        $revenueByMachine = $successfulTransactions
+            ->groupBy('charger_machine_id')
+            ->map(function ($items) {
+                $firstTransaction = $items->first();
+
+                return [
+                    'machine_name' => $firstTransaction?->chargerMachine?->name ?? 'Mesin Tidak Diketahui',
+                    'spklu_name' => $firstTransaction?->chargerMachine?->spklu?->name ?? '-',
+                    'transactions_count' => $items->count(),
+                    'revenue' => $items->sum('total_price'),
+                    'energy' => $items->sum('energy_consumed'),
+                ];
+            })
+            ->values();
+
+        return view('vendor.dashboard', compact(
+            'vendor',
+            'chargers',
+            'transactions',
+            'recentTransactions',
+            'revenueByMachine',
+            'totalRevenue',
+            'totalTransactions',
+            'successTransactions',
+            'failedTransactions',
+            'pendingTransactions',
+            'totalEnergy',
+            'averageRevenue'
         ));
     }
 

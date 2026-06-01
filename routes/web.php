@@ -8,6 +8,7 @@ use App\Http\Controllers\SpkluController;
 use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ChargerMachineController;
+use App\Http\Controllers\SpkluGalleryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TransactionController;
@@ -70,7 +71,11 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
+    Route::get('dashboard', [ChargerMachineController::class, 'dashboard'])->name('dashboard');
     Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff'])->name('chargers.updateTariff');
+    Route::get('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'index'])->name('spklu.gallery.index');
+    Route::post('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'store'])->name('spklu.gallery.store');
+    Route::delete('spklu/{spklu}/gallery/{photo}', [SpkluGalleryController::class, 'destroy'])->name('spklu.gallery.destroy');
     
     // Manajemen Mesin (Riehand)
     Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory'])->name('chargers.usageHistory');
