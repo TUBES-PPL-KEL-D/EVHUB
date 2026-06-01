@@ -137,4 +137,12 @@ class AdminDashboardController extends Controller
     {
         return Excel::download(new SpkluExport, 'Rekap_Audit_SPKLU_EVHUB.xlsx');
     }
+
+    // Fungsi Baru Penanganan Resolusi Tiket Aduan
+    public function resolveTicket($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $ticket->update(['status' => 'resolved']); 
+        return redirect()->route('admin.dashboard')->with('success', "Tiket laporan dari {$ticket->user->name} berhasil diselesaikan.");
+    }
 }

@@ -123,111 +123,65 @@
             </a>
         </div>
 
-        <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl">
-            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                Daftar Vendor Aktif & Beroperasi
-            </h3>
-            <div class="space-y-4">
-                @forelse($approvedVendors as $vendor)
-                <div class="bg-slate-800/40 border border-slate-700/40 p-5 rounded-2xl flex flex-col xl:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-4 w-full xl:w-auto">
-                        <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center font-black text-emerald-400 text-base">
-                            {{ substr($vendor->company_name, 0, 1) }}
-                        </div>
-                        <div>
-                            <div class="font-bold text-white text-base">{{ $vendor->company_name }}</div>
-                            <div class="flex items-center space-x-3 mt-1">
-                                <span class="text-xs text-slate-400 font-mono">{{ $vendor->user->email ?? '-' }}</span>
-                                @if(isset($vendor->warnings) && count($vendor->warnings) > 0)
-                                    <button onclick="toggleWarningLog('log-{{ $vendor->id }}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors cursor-pointer">
-                                        {{ count($vendor->warnings) }}/3 WARNING (LIHAT LOG)
-                                    </button>
-                                @endif
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-xl">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-6">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    Laporan Kendala Aktif
+                </h2>
+
+                @if(!isset($recentTickets) || count($recentTickets) == 0)
+                    <div class="py-8 text-center border border-dashed border-slate-700/50 rounded-2xl">
+                        <p class="text-slate-500 font-medium text-sm">Tidak ada laporan kendala aktif.</p>
+                    </div>
+                @else
+                    <div class="space-y-3">
+                        @foreach($recentTickets as $ticket)
+                        <div class="flex items-center justify-between p-4 bg-slate-800/40 rounded-2xl border border-slate-700/30">
+                            <div class="pr-4">
+                                <h4 class="text-white font-bold text-sm truncate max-w-[200px]">{{ $ticket->subject }}</h4>
+                                <p class="text-slate-400 text-xs mt-0.5">{{ $ticket->user->name ?? 'Pengguna' }}</p>
                             </div>
+                            <button type="button" 
+                                class="bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white px-4 py-2 rounded-xl text-xs font-black transition-colors shrink-0 border border-slate-600/50 uppercase tracking-widest"
+                                data-id="{{ $ticket->id }}"
+                                data-name="{{ $ticket->user->name ?? 'Pengguna' }}"
+                                data-email="{{ $ticket->user->email ?? '-' }}"
+                                data-subject="{{ $ticket->subject }}"
+                                data-description="{{ $ticket->description ?? 'Tidak ada rincian deskripsi tertulis.' }}"
+                                onclick="openTicketModal(this)">
+                                TINJAU
+                            </button>
                         </div>
+                        @endforeach
                     </div>
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full xl:w-auto">
-                        <form action="{{ route('admin.vendors.warning', $vendor->id) }}" method="POST" class="flex w-full sm:w-auto shadow-sm">
-                            @csrf
-                            <input type="text" name="message" placeholder="Alasan peringatan..." required class="text-xs px-3 py-2 border border-slate-600 rounded-l-xl bg-slate-900/50 text-white placeholder-slate-500 focus:outline-none">
-                            <button type="submit" class="bg-amber-500 text-slate-900 px-4 py-2 rounded-r-xl text-xs font-black uppercase tracking-widest hover:bg-amber-400">WARN</button>
-                        </form>
-                        <form action="{{ route('admin.vendors.suspend', $vendor->id) }}" method="POST" class="w-full sm:w-auto">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-colors w-full h-full" onclick="return confirm('Bekukan akun secara paksa?')">SUSPEND</button>
-                        </form>
-                    </div>
-                </div>
-                
-                @if(isset($vendor->warnings) && count($vendor->warnings) > 0)
-                <div id="log-{{ $vendor->id }}" class="hidden border border-slate-700/50 bg-slate-950/40 p-4 rounded-xl space-y-2">
-                    @foreach($vendor->warnings as $index => $warning)
-                    <div class="text-xs text-slate-400 flex justify-between pb-2 border-b border-slate-800/80 last:border-none last:pb-0">
-                        <p><span class="text-slate-600 mr-1">#{{ $index + 1 }}</span> {{ $warning->message }}</p>
-                        <span class="font-mono text-[10px] text-slate-500">{{ $warning->created_at->format('d/m/Y H:i') }}</span>
-                    </div>
-                    @endforeach
-                </div>
                 @endif
-                @empty
-                <div class="text-center py-8 bg-slate-800/20 rounded-2xl text-slate-500 text-xs font-bold uppercase tracking-wider border border-dashed border-slate-800">Belum ada vendor aktif</div>
-                @endforelse
             </div>
-        </div>
 
-        <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl">
-            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                Daftar Akun Dibekukan (Suspended)
-            </h3>
-            <div class="space-y-4">
-                @forelse($suspendedVendors as $vendor)
-                <div class="bg-rose-950/10 border border-rose-500/20 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-xl flex items-center justify-center font-black">!</div>
-                        <div>
-                            <div class="font-bold text-white text-base italic">{{ $vendor->company_name }}</div>
-                            <div class="text-xs text-rose-400 font-black uppercase tracking-widest">Akses Platform Blokir</div>
+            <div class="space-y-6">
+                <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl">
+                    <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Daftar Vendor Aktif
+                    </h3>
+                    <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        @forelse($approvedVendors as $vendor)
+                        <div class="bg-slate-800/40 border border-slate-700/40 p-4 rounded-xl flex items-center justify-between gap-2">
+                            <div>
+                                <div class="font-bold text-white text-sm">{{ $vendor->company_name }}</div>
+                                <span class="text-[10px] text-slate-400 font-mono block mt-0.5">{{ $vendor->user->email ?? '-' }}</span>
+                            </div>
+                            @if(isset($vendor->warnings) && count($vendor->warnings) > 0)
+                                <button onclick="toggleWarningLog('log-{{ $vendor->id }}')" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] px-2 py-0.5 rounded-full font-bold">
+                                    {{ count($vendor->warnings) }}/3 WARN
+                                </button>
+                            @endif
                         </div>
-                    </div>
-                    <div class="flex space-x-2 w-full sm:w-auto">
-                        <form action="{{ route('admin.vendors.activate', $vendor->id) }}" method="POST" class="w-full sm:w-auto">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-colors w-full">AKTIFKAN KEMBALI</button>
-                        </form>
-                        <form action="{{ route('admin.vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Hapus permanen seluruh riwayat?')" class="w-full sm:w-auto">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="bg-slate-800 text-slate-400 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-colors w-full">HAPUS</button>
-                        </form>
+                        @empty
+                        <p class="text-slate-500 text-xs italic text-center py-4">Belum ada vendor aktif</p>
+                        @endforelse
                     </div>
                 </div>
-                @empty
-                <div class="text-center py-8 bg-slate-800/20 rounded-2xl text-slate-500 text-xs font-bold uppercase tracking-wider border border-dashed border-slate-800">Tidak ada akun yang dibekukan</div>
-                @endforelse
-            </div>
-        </div>
-
-        <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl">
-            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                Riwayat Berkas yang Ditolak (Rejected)
-            </h3>
-            <div class="space-y-4">
-                @forelse($rejectedVendors as $vendor)
-                <div class="bg-slate-800/30 border border-slate-700/50 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
-                    <div>
-                        <div class="font-bold text-white text-base">{{ $vendor->company_name }}</div>
-                        <div class="text-xs text-slate-400 font-mono mt-1">{{ $vendor->user->email ?? '-' }}</div>
-                    </div>
-                    <form action="{{ route('admin.vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Bersihkan rekam data?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-colors">BERSIHKAN RIWAYAT</button>
-                    </form>
-                </div>
-                @empty
-                <div class="text-center py-8 bg-slate-800/20 rounded-2xl text-slate-500 text-xs font-bold uppercase tracking-wider border border-dashed border-slate-800">Belum ada riwayat penolakan</div>
-                @endforelse
             </div>
         </div>
 
@@ -289,25 +243,62 @@
     </div>
 </div>
 
+<div id="ticketModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/90 backdrop-blur-md opacity-0 transition-opacity duration-300">
+    <div id="ticketModalContent" class="bg-slate-900 border border-slate-700/80 w-11/12 max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300">
+        <div class="flex justify-between items-center p-6 border-b border-slate-800">
+            <h2 class="text-2xl font-black text-white flex items-center gap-3">
+                <div class="p-2 bg-rose-500/10 text-rose-400 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                Rincian Laporan Kendala
+            </h2>
+            <button onclick="closeTicketModal()" class="text-slate-500 hover:text-white bg-slate-800 hover:bg-rose-500 p-2 rounded-full transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-4 overflow-y-auto">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                    <p class="text-xs text-slate-400 mb-1">Nama Pelapor</p>
+                    <p id="ticketModalName" class="text-white font-bold text-sm">-</p>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                    <p class="text-xs text-slate-400 mb-1">Email Akun</p>
+                    <p id="ticketModalEmail" class="text-rose-400 font-mono text-sm">-</p>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                <p class="text-xs text-slate-400 mb-1">Subjek Masalah</p>
+                <p id="ticketModalSubject" class="text-white font-extrabold text-base">-</p>
+            </div>
+            <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                <p class="text-xs text-slate-400 mb-1">Isi Laporan / Deskripsi Kendala</p>
+                <p id="ticketModalDescription" class="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">-</p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-slate-800 bg-slate-900/90 flex justify-end gap-3">
+            <button type="button" onclick="closeTicketModal()" class="bg-slate-800 text-slate-400 border border-slate-700 hover:text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors">Kembali</button>
+            <form id="formResolveTicket" action="#" method="POST">
+                @csrf @method('PATCH')
+                <button type="submit" class="bg-rose-500 text-white hover:bg-rose-400 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-sm">Tandai Selesai</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function switchMainTab(tabId) {
         document.querySelectorAll('.main-panel-content').forEach(panel => {
-            panel.classList.remove('block');
-            panel.classList.add('hidden');
+            panel.classList.remove('block'); panel.classList.add('hidden');
         });
-
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
-            btn.classList.remove('text-emerald-400', 'border-emerald-500');
-            btn.classList.add('text-slate-500', 'border-transparent');
+            btn.classList.remove('text-emerald-400', 'border-emerald-500'); btn.classList.add('text-slate-500', 'border-transparent');
         });
-
         document.getElementById('panel-' + tabId).classList.remove('hidden');
         document.getElementById('panel-' + tabId).classList.add('block');
-
         document.getElementById('tabBtn-' + tabId).classList.remove('text-slate-500', 'border-transparent');
         document.getElementById('tabBtn-' + tabId).classList.add('text-emerald-400', 'border-emerald-500');
-        
         sessionStorage.setItem('activeAdminTab', tabId);
     }
 
@@ -317,6 +308,33 @@
             switchMainTab(savedTab);
         }
     });
+
+    // LOGIKA MODAL ADUAN KENDALA (BARU)
+    function openTicketModal(btn) {
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        const email = btn.getAttribute('data-email');
+        const subject = btn.getAttribute('data-subject');
+        const description = btn.getAttribute('data-description');
+
+        document.getElementById('ticketModalName').innerText = name;
+        document.getElementById('ticketModalEmail').innerText = email;
+        document.getElementById('ticketModalSubject').innerText = subject;
+        document.getElementById('ticketModalDescription').innerText = description;
+
+        // Pasang Aksi Route Update Form Dinamis
+        document.getElementById('formResolveTicket').action = `/admin/tickets/${id}/resolve`;
+
+        const modal = document.getElementById('ticketModal');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('ticketModalContent').classList.remove('scale-95'); }, 10);
+    }
+
+    function closeTicketModal() {
+        const modal = document.getElementById('ticketModal');
+        modal.classList.add('opacity-0'); document.getElementById('ticketModalContent').classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+    }
 
     function toggleWarningLog(id) {
         const log = document.getElementById(id);
@@ -350,7 +368,7 @@
     function closeReviewModal() {
         const modal = document.getElementById('reviewModal');
         modal.classList.add('opacity-0'); document.getElementById('reviewModalContent').classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.getElementById('pdfContainer').innerHTML = ''; }, 300);
+        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); container.innerHTML = ''; }, 300);
     }
 
     document.addEventListener('DOMContentLoaded', function() {

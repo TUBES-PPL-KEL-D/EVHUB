@@ -80,8 +80,6 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 // 5. AREA PANEL ADMIN & VERIFIKASI (Langgeng)
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
-    // Rute Unduhan Excel yang Diperbarui
     Route::get('/export-spklu', [AdminDashboardController::class, 'exportSpklu'])->name('export.spklu');
     
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
@@ -90,6 +88,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
     Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
+    
+    // Rute Baru untuk Penyelesaian Laporan Kendala
+    Route::patch('/tickets/{id}/resolve', [AdminDashboardController::class, 'resolveTicket'])->name('tickets.resolve');
 });
 
 // 6. AREA API (LAYANAN DATA FRONTEND)
