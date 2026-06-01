@@ -231,13 +231,13 @@
             </div>
         @endif
 
-        @if($spklu->reviews->isEmpty())
+        @if($reviews->isEmpty())
             <div class="text-center py-8 text-slate-500 text-sm">
                 Belum ada ulasan untuk SPKLU ini.
             </div>
         @else
             <div class="space-y-6">
-                @foreach($spklu->reviews()->latest()->get() as $review)
+                @foreach($reviews as $review)
                     <div class="border-b border-slate-100 pb-6 last:border-0 last:pb-0">
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-3">
@@ -259,6 +259,10 @@
                         @endif
                     </div>
                 @endforeach
+            </div>
+            
+            <div class="mt-6">
+                {{ $reviews->links() }}
             </div>
         @endif
     </div>

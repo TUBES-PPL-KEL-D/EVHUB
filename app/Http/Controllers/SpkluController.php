@@ -20,8 +20,9 @@ class SpkluController extends Controller
 
     public function show(Spklu $spklu)
     {
-        $spklu->load(['chargerMachines', 'vendor.profile', 'reviews.user']);
-        return view('rider.spklu.show', compact('spklu'));
+        $spklu->load(['chargerMachines', 'vendor.profile']);
+        $reviews = $spklu->reviews()->with('user')->latest()->paginate(5);
+        return view('rider.spklu.show', compact('spklu', 'reviews'));
     }
 
     public function getMarkers()
@@ -40,7 +41,7 @@ class SpkluController extends Controller
     public function getDynamicMarkers(Request $request)
     {
         // 1. Inisiasi Query
-        $query = Spklu::with('chargers.machines');
+        $query = Spklu::with(['chargerMachines', 'reviews']);
 
         // 2. Filter Pencarian Teks (Nama atau Alamat)
         if ($request->filled('search')) {
@@ -57,19 +58,17 @@ class SpkluController extends Controller
             $total = 0;
             $charger_machines = []; // Menyimpan data mesin untuk frontend
 
-            foreach ($spklu->chargers as $charger) {
-                foreach ($charger->machines as $machine) {
-                    $total++;
-                    if (strtolower($machine->status) === 'available') {
-                        $available++;
-                    }
-                    
-                    // Menyusun data port untuk popup peta
-                    $charger_machines[] = [
-                        'connector_type' => $machine->connector_type,
-                        'capacity_kw' => $machine->capacity_kw
-                    ];
+            foreach ($spklu->chargerMachines as $machine) {
+                $total++;
+                if (strtolower($machine->status) === 'available') {
+                    $available++;
                 }
+                
+                // Menyusun data port untuk popup peta
+                $charger_machines[] = [
+                    'connector_type' => $machine->connector_type,
+                    'capacity_kw' => $machine->capacity_kw
+                ];
             }
 
             if ($total === 0) {
@@ -80,6 +79,9 @@ class SpkluController extends Controller
                 $status = 'penuh';
             }
 
+            $avg_rating = $spklu->reviews->avg('rating') ?? 0;
+            $review_count = $spklu->reviews->count();
+
             return [
                 'id' => $spklu->id,
                 'name' => $spklu->name,
@@ -88,6 +90,8 @@ class SpkluController extends Controller
                 'status' => $status,
                 'available' => $available,
                 'total' => $total,
+                'avg_rating' => round($avg_rating, 1),
+                'review_count' => $review_count,
                 'charger_machines' => $charger_machines, // Ditambahkan agar data popup port muncul
             ];
         });
@@ -115,18 +119,16 @@ class SpkluController extends Controller
             $activeConnector = $activeVehicle?->connector_type;
         }
 
-        $spklus = Spklu::with('chargers.machines')->get()->map(function ($spklu) use ($activeConnector) {
+        $spklus = Spklu::with('chargerMachines')->get()->map(function ($spklu) use ($activeConnector) {
             $available = 0;
             $total = 0;
             $allMachines = collect();
 
-            foreach ($spklu->chargers as $charger) {
-                foreach ($charger->machines as $machine) {
-                    $total++;
-                    $allMachines->push($machine);
-                    if (isset($machine->status) && strtolower($machine->status) === 'available') {
-                        $available++;
-                    }
+            foreach ($spklu->chargerMachines as $machine) {
+                $total++;
+                $allMachines->push($machine);
+                if (isset($machine->status) && strtolower($machine->status) === 'available') {
+                    $available++;
                 }
             }
 
