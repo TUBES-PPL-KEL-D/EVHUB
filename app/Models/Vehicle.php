@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ConnectorMatchingService;
-use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
 {
@@ -77,7 +76,11 @@ class Vehicle extends Model
 
     public function transactions()
     {
-<<<<<<< HEAD
+        return $this->hasMany(Transaction::class, 'vehicle_id');
+    }
+
+    public function isBatteryServiceDue(): bool
+    {
         if (! $this->battery_service_date) {
             return false;
         }
@@ -122,7 +125,7 @@ class Vehicle extends Model
             return null;
         }
 
-        if (! Storage::disk('public')->exists($this->vehicle_photo_path)) {
+        if (! \Illuminate\Support\Facades\Storage::disk('public')->exists($this->vehicle_photo_path)) {
             return null;
         }
 
@@ -136,8 +139,5 @@ class Vehicle extends Model
         }
 
         return $this->battery_service_date->diffInDays(Carbon::now(), false);
-=======
-        return $this->hasMany(Transaction::class, 'vehicle_id');
->>>>>>> 89575638015ab5532f605eaaa1fc37522bf3a1f1
     }
 }
