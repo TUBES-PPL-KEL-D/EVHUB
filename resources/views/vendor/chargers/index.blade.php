@@ -174,6 +174,9 @@
 
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
+                                        <a href="{{ route('vendor.spklu.gallery.index', $charger->spklu_id) }}" class="font-medium text-emerald-600 hover:text-emerald-800 transition">
+                                            Galeri
+                                        </a>
                                         <a href="{{ route('vendor.chargers.edit', $charger->id) }}" class="font-medium text-amber-600 hover:text-amber-800 transition">
                                             Edit
                                         </a>
