@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Services\ConnectorMatchingService;
+use Illuminate\Support\Facades\Storage;
 
 class Vehicle extends Model
 {
@@ -18,6 +19,7 @@ class Vehicle extends Model
         'battery_service_date',
         'battery_percentage',
         'estimated_full_range_km',
+        'vehicle_photo_path',
     ];
 
     protected $casts = [
@@ -111,6 +113,19 @@ class Vehicle extends Model
     public function getRemainingRangeAttribute(): ?int
     {
         return $this->calculateRemainingRange();
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (! $this->vehicle_photo_path) {
+            return null;
+        }
+
+        if (! Storage::disk('public')->exists($this->vehicle_photo_path)) {
+            return null;
+        }
+
+        return '/storage/' . ltrim($this->vehicle_photo_path, '/');
     }
 
     public function batteryServiceDueInDays(): ?int

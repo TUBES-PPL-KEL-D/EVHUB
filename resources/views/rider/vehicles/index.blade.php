@@ -21,6 +21,7 @@
         box-shadow: 0 12px 24px rgba(16,185,129,0.15), inset 0 1px 0 rgba(16,185,129,0.2);
     }
     .vehicle-img {
+        display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -120,6 +121,7 @@
                     $brandKey  = strtolower(trim($vehicle->merk));
                     $imageName = $brandImageMap[$brandKey] ?? null;
                     $imageSrc  = $imageName ? asset('images/cars/' . $imageName) : null;
+                    $photoSrc  = $vehicle->photo_url;
                 @endphp
 
                 <!-- Glassmorphism Card -->
@@ -127,7 +129,13 @@
 
                     {{-- Car Illustration --}}
                     <div class="h-44 flex items-center justify-center bg-slate-900/60 p-6 border-b border-slate-700/50 group-hover:bg-slate-900/80 transition-colors">
-                        @if($imageSrc)
+                        @if($photoSrc)
+                            <div class="vehicle-img-container">
+                                <img src="{{ $photoSrc }}"
+                                     alt="Foto {{ $vehicle->merk }}"
+                                     class="vehicle-img object-cover">
+                            </div>
+                        @elseif($imageSrc)
                             <div class="vehicle-img-container">
                                 <img src="{{ $imageSrc }}"
                                      alt="{{ $vehicle->merk }}"

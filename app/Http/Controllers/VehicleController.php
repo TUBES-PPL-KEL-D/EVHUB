@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
@@ -36,6 +37,7 @@ class VehicleController extends Controller
             'battery_service_date' => 'nullable|date',
             'battery_percentage' => 'nullable|integer|min:0|max:100',
             'estimated_full_range_km' => 'nullable|integer|min:1',
+            'vehicle_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // TESTER MODE BYPASS: Pastikan ada user ID 1
@@ -47,6 +49,10 @@ class VehicleController extends Controller
         }
 
         $validated['user_id'] = $userId;
+
+        if ($request->hasFile('vehicle_photo')) {
+            $validated['vehicle_photo_path'] = $request->file('vehicle_photo')->store('vehicle_photos', 'public');
+        }
 
         \App\Models\Vehicle::create($validated);
 
@@ -78,7 +84,15 @@ class VehicleController extends Controller
             'battery_service_date' => 'nullable|date',
             'battery_percentage' => 'nullable|integer|min:0|max:100',
             'estimated_full_range_km' => 'nullable|integer|min:1',
+            'vehicle_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        if ($request->hasFile('vehicle_photo')) {
+            if ($vehicle->vehicle_photo_path) {
+                Storage::disk('public')->delete($vehicle->vehicle_photo_path);
+            }
+            $validated['vehicle_photo_path'] = $request->file('vehicle_photo')->store('vehicle_photos', 'public');
+        }
 
         $vehicle->update($validated);
 

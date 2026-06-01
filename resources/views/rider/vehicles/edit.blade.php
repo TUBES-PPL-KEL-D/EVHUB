@@ -163,7 +163,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('rider.vehicles.update', $vehicle->id) }}" method="POST" id="vehicle-form">
+            <form action="{{ route('rider.vehicles.update', $vehicle->id) }}" method="POST" enctype="multipart/form-data" id="vehicle-form">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="merk" id="merk-hidden" value="{{ $vehicle->merk }}">
@@ -297,6 +297,21 @@
                             value="{{ old('estimated_full_range_km', $vehicle->estimated_full_range_km) }}"
                             placeholder="Contoh: 320">
                         <p class="text-center text-slate-500 text-sm mb-8">Masukkan estimasi jarak penuh kendaraan untuk menghitung sisa jarak berdasarkan baterai.</p>
+
+                        <label class="block text-sm font-semibold text-slate-200 mb-2" for="vehicle_photo">Foto Kendaraan (opsional)</label>
+                        <input type="file" name="vehicle_photo" id="vehicle_photo"
+                            accept="image/*"
+                            class="w-full rounded-2xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 mb-4">
+                        @if($vehicle->vehicle_photo_path)
+                            <div class="mb-4 rounded-2xl overflow-hidden border border-slate-700/70 bg-slate-900/70">
+                                <img src="{{ $vehicle->photo_url }}" alt="Foto {{ $vehicle->merk }}" class="w-full h-44 object-cover">
+                            </div>
+                        @endif
+                        <p class="text-center text-slate-500 text-sm mb-8">Unggah foto kendaraan Anda untuk menyesuaikan tampilan garasi.</p>
+
+                        @error('vehicle_photo')
+                            <p class="mt-2 text-sm text-rose-500 text-center bg-rose-500/10 py-2 rounded-lg">{{ $message }}</p>
+                        @enderror
 
                         @error('battery_percentage')
                             <p class="mt-4 text-sm text-rose-500 bg-rose-500/10 py-2 px-3 rounded-lg">{{ $message }}</p>
