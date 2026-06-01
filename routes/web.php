@@ -49,41 +49,41 @@ Route::prefix('rider')->name('rider.')->group(function () {
     Route::get('/spklu/markers', [SpkluController::class, 'getDynamicMarkers'])->name('api.spklu.markers');
     Route::get('/spklu/{spklu}', [SpkluController::class, 'show'])->name('spklu.show');
     Route::post('/spklu/{spklu}/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
     // Wallet (Wisnu)
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::post('/wallet/topup', [WalletController::class, 'topUp'])->name('wallet.topup');
-
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
     Route::get('/transactions/prepare/{machine_id}', [TransactionController::class, 'prepareCharging'])->name('transactions.prepare');
     Route::post('/transactions/start', [TransactionController::class, 'startCharging'])->name('transactions.start');
     Route::post('/transactions/{id}/stop', [TransactionController::class, 'stopCharging'])->name('transactions.stop');
-
-    //dangs
+    
     Route::post('/queues', [ChargingQueueController::class, 'store'])->name('queues.store');
     Route::post('/queues/{id}/cancel', [ChargingQueueController::class, 'cancel'])->name('queues.cancel');
 });
 
 // 4. AREA VENDOR (MITRA SPKLU)
-
 Route::prefix('vendor')->name('vendor.')->group(function () {
     // Pendaftaran Vendor (Fakhri)
     Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
     Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
     Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
     Route::get('status', [VendorController::class, 'status'])->name('status');
-    Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff']) ->name('chargers.updateTariff');
+    Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff'])->name('chargers.updateTariff');
+    
     // Manajemen Mesin (Riehand)
-    Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory']) ->name('chargers.usageHistory');
+    Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory'])->name('chargers.usageHistory');
     Route::resource('chargers', ChargerMachineController::class);
 });
 
 // 5. AREA PANEL ADMIN & VERIFIKASI (Langgeng)
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/stations', [AdminDashboardController::class, 'stations'])->name('stations');
     
-    Route::get('/stations/export', [AdminDashboardController::class, 'exportSpklu'])->name('stations.export');
+    // Rute Unduhan Excel yang Diperbarui
+    Route::get('/export-spklu', [AdminDashboardController::class, 'exportSpklu'])->name('export.spklu');
+    
     Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
     Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
     Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
