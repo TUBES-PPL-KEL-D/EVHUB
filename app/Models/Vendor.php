@@ -52,4 +52,9 @@ class Vendor extends Model
     {
         return $this->hasMany(VendorWarning::class);
     }
+
+    public function withdrawals()
+    {
+        return $this->hasMany(VendorWithdrawal::class);
+    }
 }

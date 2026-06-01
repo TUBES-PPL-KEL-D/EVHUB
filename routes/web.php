@@ -9,7 +9,9 @@ use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ChargerMachineController;
 use App\Http\Controllers\SpkluGalleryController;
+use App\Http\Controllers\VendorWithdrawalController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\VendorWithdrawalController as AdminVendorWithdrawalController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ChargingQueueController;
@@ -62,36 +64,45 @@ Route::middleware('auth')->group(function () {
         Route::post('/queues/{id}/cancel', [ChargingQueueController::class, 'cancel'])->name('queues.cancel');
     });
 
-    // 4. AREA VENDOR (MITRA SPKLU)
-    Route::prefix('vendor')->name('vendor.')->group(function () {
-        // Pendaftaran Vendor (Fakhri)
-        Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
-        Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
-        Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
-        Route::get('status', [VendorController::class, 'status'])->name('status');
-        Route::get('dashboard', [ChargerMachineController::class, 'dashboard'])->name('dashboard');
-        Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff'])->name('chargers.updateTariff');
-        Route::get('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'index'])->name('spklu.gallery.index');
-        Route::post('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'store'])->name('spklu.gallery.store');
-        Route::delete('spklu/{spklu}/gallery/{photo}', [SpkluGalleryController::class, 'destroy'])->name('spklu.gallery.destroy');
-        
-        // Manajemen Mesin (Riehand)
-        Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory'])->name('chargers.usageHistory');
-        Route::resource('chargers', ChargerMachineController::class);
-    });
+// 4. AREA VENDOR (MITRA SPKLU)
+Route::prefix('vendor')->name('vendor.')->group(function () {
+    // Pendaftaran Vendor (Fakhri)
+    Route::resource('profile', VendorProfileController::class)->only(['create', 'store', 'show']);
+    Route::patch('profile/{vendor_profile}/hours', [VendorProfileController::class, 'updateHours'])->name('profile.updateHours');
+    Route::resource('documents', VendorController::class)->only(['create', 'store', 'show', 'edit', 'update']);
+    Route::get('status', [VendorController::class, 'status'])->name('status');
+    Route::get('dashboard', [ChargerMachineController::class, 'dashboard'])->name('dashboard');
+    Route::get('withdrawals', [VendorWithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::post('withdrawals', [VendorWithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::patch('chargers/{charger}/tariff', [ChargerMachineController::class, 'updateTariff'])->name('chargers.updateTariff');
+    Route::get('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'index'])->name('spklu.gallery.index');
+    Route::post('spklu/{spklu}/gallery', [SpkluGalleryController::class, 'store'])->name('spklu.gallery.store');
+    Route::delete('spklu/{spklu}/gallery/{photo}', [SpkluGalleryController::class, 'destroy'])->name('spklu.gallery.destroy');
+    
+    // Manajemen Mesin (Riehand)
+    Route::get('chargers/usage-history', [ChargerMachineController::class, 'usageHistory'])->name('chargers.usageHistory');
+    Route::resource('chargers', ChargerMachineController::class);
+});
 
-    // 5. AREA PANEL ADMIN & VERIFIKASI (Langgeng)
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/export-spklu', [AdminDashboardController::class, 'exportSpklu'])->name('export.spklu');
-        Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
-        Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
-        Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
-        Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
-        Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
-        Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
-        Route::patch('/tickets/{id}/resolve', [AdminDashboardController::class, 'resolveTicket'])->name('tickets.resolve');
-    });
+// 5. AREA PANEL ADMIN & VERIFIKASI (Langgeng)
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/export-spklu', [AdminDashboardController::class, 'exportSpklu'])->name('export.spklu');
+    Route::get('/withdrawals', [AdminVendorWithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::patch('/withdrawals/{withdrawal}/approve', [AdminVendorWithdrawalController::class, 'approve'])->name('withdrawals.approve');
+    Route::patch('/withdrawals/{withdrawal}/reject', [AdminVendorWithdrawalController::class, 'reject'])->name('withdrawals.reject');
+    Route::patch('/withdrawals/{withdrawal}/paid', [AdminVendorWithdrawalController::class, 'markPaid'])->name('withdrawals.paid');
+    
+    Route::patch('/vendors/{id}/approve', [AdminDashboardController::class, 'approve'])->name('vendors.approve');
+    Route::patch('/vendors/{id}/reject', [AdminDashboardController::class, 'reject'])->name('vendors.reject');
+    Route::patch('/vendors/{id}/suspend', [AdminDashboardController::class, 'suspend'])->name('vendors.suspend');
+    Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
+    Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
+    Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
+    
+    // Rute Baru untuk Penyelesaian Laporan Kendala
+    Route::patch('/tickets/{id}/resolve', [AdminDashboardController::class, 'resolveTicket'])->name('tickets.resolve');
+});
 
 });
 
