@@ -2,41 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showRegister()
-    {
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:15',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password), // Password akan otomatis di-hash karena cast di model
-            'role' => 'rider', 
-            'status' => 'aktif'
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->intended('/rider/vehicles')->with('success', 'Akun berhasil dibuat dan Anda telah login.');
-    }
-
     public function showLogin()
     {
         return view('auth.login');
@@ -44,37 +16,65 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || $user->status !== 'aktif') {
-            return back()->withErrors([
-                'email' => 'Akun tidak ditemukan atau sudah tidak aktif.',
-            ])->onlyInput('email');
-        }
-
-        if (Hash::check($request->password, $user->password)) {
-            // Jika benar, lakukan login manual
-            Auth::login($user, $request->remember);
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            
+            // Ambil data peran user yang berhasil login
+            $role = strtolower(Auth::user()->role ?? 'rider');
 
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'vendor') {
-                return redirect('/vendor/chargers');
-            } elseif ($user->role === 'rider') {
-                return redirect('/rider/vehicles');
+            // Logika Otomatis Pengalihan Rute Berdasarkan Peran
+            if ($role === 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Pusat kendali admin berhasil diakses.');
+            } elseif ($role === 'vendor') {
+                return redirect()->route('vendor.dashboard')->with('success', 'Selamat datang di konsol manajemen vendor.');
             }
 
+            // Jalur default untuk pengendara umum (Rider)
+            return redirect()->route('rider.map')->with('success', 'Sesi masuk berhasil dibuat.');
         }
 
         return back()->withErrors([
-            'email' => 'Password yang Anda masukkan salah.',
+            'email' => 'Kredensial yang dimasukkan tidak cocok dengan data kami.',
         ])->onlyInput('email');
+    }
+
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        // Validasi ketat: Hanya mengizinkan pilihan input 'rider' atau 'vendor' dari luar
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:rider,vendor' 
+        ]);
+
+        // Pembuatan entitas user baru ke database
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role, 
+        ]);
+
+        // Otomatis login setelah pendaftaran sukses
+        Auth::login($user);
+
+        // Jalur pengalihan instan pasca-registrasi
+        if ($user->role === 'vendor') {
+            return redirect()->route('vendor.dashboard')->with('success', 'Akun vendor berhasil dibuat.');
+        }
+
+        return redirect()->route('rider.map')->with('success', 'Akun pengendara berhasil dibuat.');
     }
 
     public function logout(Request $request)
@@ -82,6 +82,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect('/');
     }
 }

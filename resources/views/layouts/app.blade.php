@@ -34,21 +34,23 @@
     </div>
 
     @php
-        // Logika Deteksi Peran Multi-User (Sistem Otomatis & Fallback Testing)
+        // Perbaikan Logika Deteksi Peran Multi-User agar Halaman Login/Register Terbaca Guest
         $user = auth()->user();
         $currentRole = 'guest';
 
         if (auth()->check()) {
-            // Jika user beneran login, ambil role dari database (admin, vendor, rider)
+            // Jika user benar-benar login, ambil role dari database
             $currentRole = strtolower($user->role ?? 'rider'); 
         } else {
-            // Fallback Pintar: Deteksi via prefix URL rute untuk mempermudah testing tanpa login
+            // Fallback Testing: Hanya aktif jika URL mendeteksi prefix segmen rute secara spesifik
             if (request()->is('admin*')) {
                 $currentRole = 'admin';
             } elseif (request()->is('vendor*')) {
                 $currentRole = 'vendor';
-            } elseif (request()->is('rider*') || !request()->is('/')) {
+            } elseif (request()->is('rider*')) {
                 $currentRole = 'rider';
+            } else {
+                $currentRole = 'guest';
             }
         }
     @endphp
@@ -83,11 +85,11 @@
         </div>
 
         <div class="flex items-center space-x-4 z-20">
-            @if(auth()->check() || $currentRole !== 'guest')
+            @if(auth()->check())
                 <a href="{{ url('profile') }}" class="text-slate-300 hover:text-emerald-400 font-semibold px-4 py-2 transition-colors text-sm">Profil</a>
                 <form method="POST" action="{{ route('logout') }}" class="m-0 p-0 inline">
                     @csrf
-                    <button type="button" onclick="window.location.href='/'" class="bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white px-5 py-2 rounded-full text-sm font-bold transition-all border border-rose-500/20 shadow-lg hover:shadow-rose-500/20">
+                    <button type="submit" class="bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white px-5 py-2 rounded-full text-sm font-bold transition-all border border-rose-500/20 shadow-lg hover:shadow-rose-500/20">
                         Keluar
                     </button>
                 </form>

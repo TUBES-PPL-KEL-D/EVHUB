@@ -128,5 +128,7 @@ class DatabaseSeeder extends Seeder
             ChargerMachineSeeder::class,
         ]);
 
+        $this->call(UserSeeder::class);
+
     }
 }
