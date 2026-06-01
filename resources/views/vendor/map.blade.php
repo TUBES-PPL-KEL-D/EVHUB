@@ -3,7 +3,7 @@
 @section('title', 'Peta SPKLU')
 
 @section('content')
-<div class="max-w-[1400px] mx-auto relative z-10 px-4">
+<div class="max-w-[1400px] mx-auto relative z-10 px-4 overflow-hidden">
     <div class="mb-4">
         <h1 class="text-3xl font-bold text-white tracking-tight">Jaringan <span class="text-emerald-400">SPKLU</span></h1>
         <p class="text-slate-300 font-normal mt-1 text-sm">Pantau lokasi dan ketersediaan stasiun pengisian daya EV secara real-time.</p>
@@ -30,7 +30,7 @@
                 <button id="btn-toggle-layer" class="bg-slate-900/95 backdrop-blur p-3 rounded-full shadow-lg border border-slate-700 hover:border-emerald-400 transition-all group focus:outline-none flex items-center justify-center text-slate-300 hover:text-emerald-400" title="Ubah Tampilan Peta">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
                 </button>
-                <button id="btn-locate-me" class="bg-slate-900/95 backdrop-blur p-3 rounded-full shadow-lg border border-slate-700 hover:border-emerald-400 transition-all group focus:outline-none flex items-center justify-center text-slate-300 hover:text-emerald-400" title="Temukan Lokasi Saya">
+                <button id="btn-locate-me" class="bg-slate-900/95 backdrop-blur p-3 rounded-full shadow-lg border border-slate-700 hover:border-emerald-400 transition-all group focus:outline-none flex items-center justify-center text-slate-300 hover:text-emerald-400" title="Temukan Lokasi Saya (Reset)">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M2 12h2m16 0h2" /></svg>
                 </button>
             </div>
@@ -47,13 +47,13 @@
                 </div>
             </div>
 
-            <div id="route-info" class="hidden absolute bottom-6 right-6 z-[1000] bg-slate-900/95 backdrop-blur pl-6 pr-4 py-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center gap-5 transition-all">
-                <div class="flex items-center gap-2 text-emerald-400 bg-emerald-900/30 p-2 rounded-full">
+            <div id="route-info" class="hidden absolute bottom-6 right-6 z-[1000] bg-slate-900/95 backdrop-blur pl-6 pr-4 py-3 rounded-2xl shadow-2xl border border-blue-500/50 flex items-center gap-5 transition-all">
+                <div class="flex items-center gap-2 text-blue-400 bg-blue-900/30 p-2 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
                 </div>
                 <div class="flex flex-col">
                     <span id="route-time" class="text-lg font-extrabold text-white leading-tight">-- Menit</span>
-                    <span class="text-xs text-slate-300 font-medium">Jarak: <span id="route-distance" class="text-emerald-400 font-bold">-- km</span> • <span id="route-dest">Tujuan</span></span>
+                    <span class="text-xs text-slate-300 font-medium">Jarak: <span id="route-distance" class="text-blue-400 font-bold">-- km</span> • <span id="route-dest">Tujuan</span></span>
                 </div>
                 <div class="h-8 w-px bg-slate-700 mx-1"></div>
                 <button onclick="clearRoute()" class="p-2 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 rounded-full transition-colors" title="Tutup Rute">
@@ -90,7 +90,6 @@
     document.addEventListener("DOMContentLoaded", function() {
         
         var map = L.map('map', { zoomControl: false }).setView([-6.914744, 107.609810], 13);
-        // Pindahkan kontrol zoom ke kiri atas agar tidak tertumpuk info rute di kanan bawah
         L.control.zoom({ position: 'topleft' }).addTo(map);
 
         var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
@@ -126,7 +125,7 @@
         const stationListDiv = document.getElementById('station-list');
         const listCountSpan = document.getElementById('list-count');
 
-        // Kalkulasi Jarak Haversine (Garis Lurus)
+        // Kalkulasi Jarak Haversine
         function calculateDistance(lat1, lon1, lat2, lon2) {
             var R = 6371; 
             var dLat = (lat2 - lat1) * Math.PI / 180;
@@ -136,20 +135,99 @@
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         }
 
+        // --- PEMBUATAN IKON LOKASI MODERN PENGGUNA ---
+        const createModernUserIcon = () => L.divIcon({
+            className: 'user-gps-marker',
+            html: `
+                <div class="relative flex items-center justify-center w-12 h-12">
+                    <div class="absolute w-full h-full bg-blue-500 rounded-full opacity-20 animate-ping"></div>
+                    <div class="absolute w-7 h-7 bg-blue-500/40 rounded-full animate-pulse"></div>
+                    <div class="w-4 h-4 bg-blue-600 border-[3px] border-white rounded-full shadow-[0_0_12px_rgba(59,130,246,0.9)] z-10"></div>
+                </div>
+            `,
+            iconSize: [48, 48],
+            iconAnchor: [24, 24]
+        });
+
+        // --- FUNGSI RENDER LOKASI PENGGUNA & POPUP 5 DETIK ---
+        function renderUserLocation(lat, lng, panTo = false, showPopup = false) {
+            if (userMarker) {
+                userMarker.setLatLng([lat, lng]);
+            } else {
+                userMarker = L.marker([lat, lng], {icon: createModernUserIcon()}).addTo(map);
+                userMarker.bindPopup('<div class="text-center font-bold text-blue-600 px-3 py-1">Lokasi Anda Saat Ini</div>', {
+                    closeButton: false,
+                    className: 'modern-user-popup',
+                    offset: [0, -10]
+                });
+            }
+
+            if (panTo) {
+                map.flyTo([lat, lng], 15, { animate: true, duration: 1.5 });
+            }
+
+            if (showPopup) {
+                userMarker.openPopup();
+                // Pop-up hilang otomatis setelah 5 detik
+                setTimeout(() => {
+                    if (userMarker && userMarker.isPopupOpen()) {
+                        userMarker.closePopup();
+                    }
+                }, 5000);
+            }
+        }
+
+        // --- INIT LOKASI OTOMATIS SAAT HALAMAN DIBUKA ---
         function initUserLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         currentUserLat = position.coords.latitude;
                         currentUserLng = position.coords.longitude;
-                        fetchAndRenderMarkers(); // Render ulang daftar agar jarak langsung muncul
+                        // Langsung muncul dan pan ke pengguna otomatis saat load
+                        renderUserLocation(currentUserLat, currentUserLng, true, true);
+                        fetchAndRenderMarkers(); 
                     },
-                    (error) => { console.log("Lokasi gagal ditarik otomatis."); }
+                    (error) => { console.log("Lokasi gagal ditarik otomatis."); },
+                    { enableHighAccuracy: true }
+                );
+
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        currentUserLat = position.coords.latitude;
+                        currentUserLng = position.coords.longitude;
+                        // Render pergerakan tanpa auto-pan agar tidak mengganggu jika pengguna sedang melihat area lain
+                        renderUserLocation(currentUserLat, currentUserLng, false, false);
+                    },
+                    (error) => { console.log("Gagal melacak lokasi."); },
+                    { enableHighAccuracy: true }
                 );
             }
         }
         initUserLocation();
 
+        // --- TOMBOL LOKASI SAYA (FUNGSI RESET TITIK) ---
+        let locateBtn = document.getElementById('btn-locate-me');
+        locateBtn.addEventListener('click', function() {
+            if (currentUserLat && currentUserLng) {
+                renderUserLocation(currentUserLat, currentUserLng, true, true);
+            } else {
+                if (navigator.geolocation) {
+                    locateBtn.classList.add('animate-pulse', 'text-blue-500');
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        currentUserLat = position.coords.latitude;
+                        currentUserLng = position.coords.longitude;
+                        renderUserLocation(currentUserLat, currentUserLng, true, true);
+                        locateBtn.classList.remove('animate-pulse', 'text-blue-500');
+                    }, function(error) {
+                        alert('Gagal mendeteksi lokasi. Pastikan GPS perangkat Anda sudah aktif.');
+                        locateBtn.classList.remove('animate-pulse', 'text-blue-500');
+                    }, { enableHighAccuracy: true });
+                }
+            }
+        });
+
+        // --- FUNGSI MENGGAMBAR RUTE BIRU ---
         window.clearRoute = function() {
             if (routingControl) {
                 map.removeControl(routingControl);
@@ -160,7 +238,7 @@
 
         window.getRoute = function(destLat, destLng, destName) {
             if (!currentUserLat || !currentUserLng) {
-                alert("Sistem belum mendeteksi lokasi Anda. Harap izinkan akses lokasi atau klik tombol 'Temukan Lokasi Saya' terlebih dahulu.");
+                alert("Sistem belum mendeteksi lokasi Anda. Harap tunggu sebentar atau klik tombol 'Temukan Lokasi Saya'.");
                 return;
             }
             window.clearRoute();
@@ -172,8 +250,7 @@
                 ],
                 router: L.Routing.osrmv1({ language: 'id', profile: 'driving' }),
                 lineOptions: {
-                    // Warna diubah menjadi biru (#3b82f6) dengan transparansi 50%
-                    styles: [{color: '#3b82f6', opacity: 0.5, weight: 6}] 
+                    styles: [{color: '#3b82f6', opacity: 0.5, weight: 6}] // WARNA BIRU 50%
                 },
                 createMarker: function() { return null; },
                 show: false, 
@@ -236,11 +313,10 @@
                         let portsText = spklu.charger_machines && spklu.charger_machines.length > 0 
                             ? spklu.charger_machines.map(m => m.connector_type).join(', ') : 'Port tidak tersedia';
 
-                        // Kalkulasi Jarak & Waktu untuk Tampilan Awal di List
                         let distanceHTML = '';
                         if (currentUserLat && currentUserLng) {
                             let dist = calculateDistance(currentUserLat, currentUserLng, spklu.latitude, spklu.longitude);
-                            let estTime = Math.round(dist * 2); // Estimasi kasar 30km/jam di perkotaan
+                            let estTime = Math.round(dist * 2); 
                             distanceHTML = `
                                 <div class="flex items-center gap-2 mb-3 bg-slate-900/50 rounded-lg p-2 border border-slate-700/50 w-fit">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -305,7 +381,6 @@
                         if (activeMarkers[spklu.id]) {
                             activeMarkers[spklu.id].setPopupContent(popupContent);
                         } else {
-                            // MENGGUNAKAN RED ICON DI SINI
                             let marker = L.marker([spklu.latitude, spklu.longitude], { id: spklu.id, icon: redIcon }).addTo(map);
                             marker.bindPopup(popupContent, { className: 'custom-popup' });
                             activeMarkers[spklu.id] = marker;
@@ -326,54 +401,24 @@
         fetchAndRenderMarkers();
         searchInput.addEventListener('input', fetchAndRenderMarkers);
         filterStatus.addEventListener('change', fetchAndRenderMarkers);
-        setInterval(fetchAndRenderMarkers, 10000); // Diperpanjang ke 10 detik agar Haversine tidak terlalu sering tereksekusi
-
-        // --- TOMBOL LOKASI SAYA ---
-        let locateBtn = document.getElementById('btn-locate-me');
-        locateBtn.addEventListener('click', function() {
-            if (navigator.geolocation) {
-                locateBtn.classList.add('text-emerald-500', 'border-emerald-500');
-
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    currentUserLat = position.coords.latitude;
-                    currentUserLng = position.coords.longitude;
-                    
-                    fetchAndRenderMarkers(); // Update jarak di list otomatis saat lokasi di-refresh
-
-                    map.flyTo([currentUserLat, currentUserLng], 15, { animate: true, duration: 1.5 });
-
-                    let userLocationIcon = L.divIcon({
-                        className: 'user-gps-marker',
-                        html: `
-                            <div class="relative flex items-center justify-center">
-                                <div class="absolute w-8 h-8 bg-blue-400 rounded-full opacity-40 animate-ping"></div>
-                                <div class="w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-md"></div>
-                            </div>
-                        `,
-                        iconSize: [16, 16], iconAnchor: [8, 8]
-                    });
-
-                    if (userMarker) {
-                        userMarker.setLatLng([currentUserLat, currentUserLng]);
-                    } else {
-                        userMarker = L.marker([currentUserLat, currentUserLng], {icon: userLocationIcon}).addTo(map);
-                        userMarker.bindPopup('<b class="text-blue-600">Lokasi Anda Sekarang</b>').openPopup();
-                    }
-
-                    locateBtn.classList.remove('text-emerald-500', 'border-emerald-500');
-                }, function(error) {
-                    alert('Gagal mendeteksi lokasi. Pastikan GPS perangkat Anda sudah aktif.');
-                    locateBtn.classList.remove('text-emerald-500', 'border-emerald-500');
-                }, { enableHighAccuracy: true });
-            } else {
-                alert('Browser Anda tidak mendukung deteksi lokasi (Geolocation).');
-            }
-        });
+        setInterval(fetchAndRenderMarkers, 10000); 
     });
 </script>
 
 <style>
     .user-gps-marker { background: transparent; border: none; }
+    
+    .modern-user-popup .leaflet-popup-content-wrapper {
+        border-radius: 9999px; 
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #bfdbfe; 
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(4px);
+    }
+    .modern-user-popup .leaflet-popup-tip {
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
