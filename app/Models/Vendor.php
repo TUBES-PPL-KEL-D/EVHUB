@@ -16,23 +16,20 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'company_name',
-        // 'legality_document_path',
+        'legality_document_path', // Proteksi SUDAH DIBUKA agar tidak bernilai NULL lagi
         'status',
     ];
 
     /**
      * Relasi ke User (Pemilik akun vendor).
-     * Setiap vendor terhubung ke satu akun user.
      */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Opsional: Relasi ke tabel Chargers (Merging PBI Rehan)
     /**
-     * Relasi ke profil detail vendor (Pekerjaan Fakhri - PBI 5).
-     * Memungkinkan admin melihat detail profil tambahan perusahaan.
+     * Relasi ke profil detail vendor.
      */
     public function profile()
     {
@@ -40,8 +37,7 @@ class Vendor extends Model
     }
 
     /**
-     * Relasi ke mesin charger (Pekerjaan Riehand - PBI 15).
-     * Memungkinkan sistem melacak mesin mana saja yang dimiliki vendor ini.
+     * Relasi ke mesin charger.
      */
     public function chargers()
     {
@@ -55,6 +51,6 @@ class Vendor extends Model
 
     public function withdrawals()
     {
-        return $this->hasMany(VendorWithdrawal::class);
+        return $this->hasMany(VendorVendorWithdrawal::class);
     }
 }
