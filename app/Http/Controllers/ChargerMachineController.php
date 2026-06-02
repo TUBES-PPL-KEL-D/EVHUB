@@ -14,27 +14,23 @@ use App\Models\Transaction;
 class ChargerMachineController extends Controller
 {
     /**
-     * Cek status vendor. 
-     * [PRE-PRODUCTION BYPASS AKTIF]
+     * Cek status vendor.
+     * [TELAH DIPERBAIKI: HAPUS BYPASS, GUNAKAN AUTH ASLI]
      */
     private function checkVendorStatus()
     {
-        // --- BYPASS UNTUK TESTING / PRE-PRODUCTION ---
-        // Memaksa sistem selalu menggunakan Vendor dengan ID 1
-        $vendor = \App\Models\Vendor::find(1);
-        
-        return $vendor;
+        // Mengambil ID user yang sedang login dari sesi
+        $userId = Auth::id();
 
-        // --- KODE ASLI UNTUK PRODUCTION NANTI (Jangan dihapus) ---
-        /*
-        $userId = Auth::id(); 
+        // Menarik data vendor yang HANYA dimiliki oleh user tersebut
         $vendor = Vendor::where('user_id', $userId)->first();
 
+        // Tolak akses jika belum punya entitas vendor atau belum di-Approve Admin
         if (!$vendor || $vendor->status !== 'Approved') {
             return false;
         }
+
         return $vendor;
-        */
     }
 
     public function index()
@@ -42,7 +38,7 @@ class ChargerMachineController extends Controller
         $vendor = $this->checkVendorStatus();
         if (!$vendor) {
             return redirect()->route('vendor.status')
-                ->with('error', 'Akses ditolak! Vendor ID 1 tidak ditemukan di database.');
+                ->with('error', 'Akses ditolak! Akun vendor Anda belum disetujui atau tidak ditemukan.');
         }
 
         $chargers = ChargerMachine::with('spklu')
@@ -78,7 +74,6 @@ class ChargerMachineController extends Controller
             'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            // Perubahan pada validasi waktu
             'open_time' => 'required|date_format:H:i',
             'close_time' => 'required|date_format:H:i',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -93,12 +88,10 @@ class ChargerMachineController extends Controller
         ]);
 
         $path = $request->file('photo')->store('chargers', 'public');
-
-        // Menggabungkan waktu buka dan tutup
         $operationalHours = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
 
         ChargerMachine::create([
-            'vendor_id' => $vendor->id, 
+            'vendor_id' => $vendor->id,
             'spklu_id' => $spklu->id,
             'name' => $validatedData['name'],
             'connector_type' => $validatedData['connector_type'],
@@ -134,17 +127,13 @@ class ChargerMachineController extends Controller
             'connector_type' => 'required|string|in:Type 1,Type 2,CCS1,CCS2,CHAdeMO,GB/T,NACS',
             'capacity_kw' => 'required|numeric|min:1',
             'price_per_kwh' => 'required|numeric|min:0',
-            // Perubahan pada validasi waktu
             'open_time' => 'required|date_format:H:i',
             'close_time' => 'required|date_format:H:i',
             'status' => 'required|in:available,unavailable,maintenance',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Menggabungkan waktu buka dan tutup
         $validatedData['operational_hours'] = $validatedData['open_time'] . ' - ' . $validatedData['close_time'];
-        
-        // Membersihkan array dari key yang tidak ada di kolom database
         unset($validatedData['open_time']);
         unset($validatedData['close_time']);
 
@@ -159,50 +148,49 @@ class ChargerMachineController extends Controller
 
         return redirect()->route('vendor.chargers.index')->with('success', 'Detail mesin charger berhasil diperbarui!');
     }
+
     public function updateTariff(Request $request, ChargerMachine $charger)
     {
-    $vendor = $this->checkVendorStatus();
-
-    if (!$vendor) {
-        return redirect()
-            ->route('vendor.status')
-            ->with('error', 'Akses ditolak!');
-    }
-
-    if ($charger->vendor_id !== $vendor->id) {
-        return redirect()
-            ->route('vendor.chargers.index')
-            ->with('error', 'Anda tidak memiliki akses untuk mengubah tarif mesin ini.');
-    }
-
-    $validatedData = $request->validate([
-        'price_per_kwh' => 'required|numeric|min:0',
-    ], [
-        'price_per_kwh.required' => 'Tarif per kWh wajib diisi.',
-        'price_per_kwh.numeric' => 'Tarif per kWh harus berupa angka.',
-        'price_per_kwh.min' => 'Tarif per kWh tidak boleh bernilai negatif.',
-    ]);
-
-    $charger->update([
-        'price_per_kwh' => $validatedData['price_per_kwh'],
-    ]);
-
-    return redirect()
-        ->route('vendor.chargers.index')
-        ->with('success', 'Tarif harga per kWh berhasil diperbarui.');
-    }
-
-    public function usageHistory()
-    {
         $vendor = $this->checkVendorStatus();
-
         if (!$vendor) {
             return redirect()
                 ->route('vendor.status')
                 ->with('error', 'Akses ditolak!');
         }
 
-        if (! Schema::hasTable('transactions')) {
+        if ($charger->vendor_id !== $vendor->id) {
+            return redirect()
+                ->route('vendor.chargers.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengubah tarif mesin ini.');
+        }
+
+        $validatedData = $request->validate([
+            'price_per_kwh' => 'required|numeric|min:0',
+        ], [
+            'price_per_kwh.required' => 'Tarif per kWh wajib diisi.',
+            'price_per_kwh.numeric' => 'Tarif per kWh harus berupa angka.',
+            'price_per_kwh.min' => 'Tarif per kWh tidak boleh bernilai negatif.',
+        ]);
+
+        $charger->update([
+            'price_per_kwh' => $validatedData['price_per_kwh'],
+        ]);
+
+        return redirect()
+            ->route('vendor.chargers.index')
+            ->with('success', 'Tarif harga per kWh berhasil diperbarui.');
+    }
+
+    public function usageHistory()
+    {
+        $vendor = $this->checkVendorStatus();
+        if (!$vendor) {
+            return redirect()
+                ->route('vendor.status')
+                ->with('error', 'Akses ditolak!');
+        }
+
+        if (!Schema::hasTable('transactions')) {
             return view('vendor.chargers.usage-history', [
                 'transactions' => collect(),
                 'totalUsage' => 0,
@@ -212,11 +200,7 @@ class ChargerMachineController extends Controller
             ])->with('error', 'Tabel transaksi belum tersedia di database aktif. Jalankan migrasi database terlebih dahulu.');
         }
 
-        $transactions = Transaction::with([
-                'user',
-                'vehicle',
-                'chargerMachine.spklu'
-            ])
+        $transactions = Transaction::with(['user', 'vehicle', 'chargerMachine.spklu'])
             ->whereHas('chargerMachine', function ($query) use ($vendor) {
                 $query->where('vendor_id', $vendor->id);
             })
@@ -229,18 +213,13 @@ class ChargerMachineController extends Controller
         $successTransactions = $transactions->where('status', 'success')->count();
 
         return view('vendor.chargers.usage-history', compact(
-            'transactions',
-            'totalUsage',
-            'totalRevenue',
-            'totalTransactions',
-            'successTransactions'
+            'transactions', 'totalUsage', 'totalRevenue', 'totalTransactions', 'successTransactions'
         ));
     }
 
     public function dashboard()
     {
         $vendor = $this->checkVendorStatus();
-
         if (!$vendor) {
             return redirect()
                 ->route('vendor.status')
@@ -251,7 +230,7 @@ class ChargerMachineController extends Controller
             ->where('vendor_id', $vendor->id)
             ->get();
 
-        if (! Schema::hasTable('transactions')) {
+        if (!Schema::hasTable('transactions')) {
             return view('vendor.dashboard', [
                 'vendor' => $vendor,
                 'chargers' => $chargers,
@@ -268,11 +247,7 @@ class ChargerMachineController extends Controller
             ])->with('error', 'Tabel transaksi belum tersedia di database aktif. Jalankan migrasi database terlebih dahulu.');
         }
 
-        $transactions = Transaction::with([
-                'user',
-                'vehicle',
-                'chargerMachine.spklu'
-            ])
+        $transactions = Transaction::with(['user', 'vehicle', 'chargerMachine.spklu'])
             ->whereHas('chargerMachine', function ($query) use ($vendor) {
                 $query->where('vendor_id', $vendor->id);
             })
@@ -281,6 +256,7 @@ class ChargerMachineController extends Controller
             ->get();
 
         $successfulTransactions = $transactions->where('status', 'success');
+
         $totalRevenue = $successfulTransactions->sum('total_price');
         $totalTransactions = $transactions->count();
         $successTransactions = $successfulTransactions->count();
@@ -288,13 +264,13 @@ class ChargerMachineController extends Controller
         $pendingTransactions = $transactions->where('status', 'pending')->count();
         $totalEnergy = $successfulTransactions->sum('energy_consumed');
         $averageRevenue = $successTransactions > 0 ? $totalRevenue / $successTransactions : 0;
+
         $recentTransactions = $transactions->take(5);
 
         $revenueByMachine = $successfulTransactions
             ->groupBy('charger_machine_id')
             ->map(function ($items) {
                 $firstTransaction = $items->first();
-
                 return [
                     'machine_name' => $firstTransaction?->chargerMachine?->name ?? 'Mesin Tidak Diketahui',
                     'spklu_name' => $firstTransaction?->chargerMachine?->spklu?->name ?? '-',
@@ -306,18 +282,9 @@ class ChargerMachineController extends Controller
             ->values();
 
         return view('vendor.dashboard', compact(
-            'vendor',
-            'chargers',
-            'transactions',
-            'recentTransactions',
-            'revenueByMachine',
-            'totalRevenue',
-            'totalTransactions',
-            'successTransactions',
-            'failedTransactions',
-            'pendingTransactions',
-            'totalEnergy',
-            'averageRevenue'
+            'vendor', 'chargers', 'transactions', 'recentTransactions', 'revenueByMachine',
+            'totalRevenue', 'totalTransactions', 'successTransactions', 'failedTransactions',
+            'pendingTransactions', 'totalEnergy', 'averageRevenue'
         ));
     }
 
@@ -333,13 +300,13 @@ class ChargerMachineController extends Controller
         if (Storage::disk('public')->exists($charger->photo_path)) {
             Storage::disk('public')->delete($charger->photo_path);
         }
-        
+
         $charger->delete();
-        
+
         if ($spklu_id) {
             Spklu::where('id', $spklu_id)->delete();
         }
 
-        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!'); // Pastikan untuk menghapus data terkait di database jika diperlukan
+        return redirect()->route('vendor.chargers.index')->with('success', 'Aset mesin dan lokasi SPKLU berhasil dihapus permanen!');
     }
 }

@@ -14,7 +14,6 @@ class SpkluController extends Controller
     {
         // Mengambil data koordinat dan info SPKLU dari database
         $spklus = Spklu::select('name', 'address', 'latitude', 'longitude')->get();
-
         // Mengirimkan data $spklus ke file resources/views/vendor/map.blade.php
         return view('vendor.map', compact('spklus'));
     }
@@ -46,155 +45,75 @@ class SpkluController extends Controller
         return response()->json($spklus);
     }
 
+    /**
+     * Mengambil data marker secara dinamis dari database untuk merespons Peta Leaflet Rider.
+     * [TELAH DIPERBAIKI: MENGHAPUS HARDCODED DUMMY, SEKARANG MEMBACA DATABASE RIIL VENDOR]
+     */
     public function getDynamicMarkers(Request $request)
     {
-        // 1. Kumpulan Data Dummy SPKLU (diinjeksi agar peta langsung penuh tanpa query database)
-        $dummyData = collect([
-            [
-                'id' => 1,
-                'name' => 'SPKLU Gedung Sate',
-                'address' => 'Jl. Diponegoro No.22, Citarum, Bandung',
-                'latitude' => -6.902481,
-                'longitude' => 107.618810,
-                'status' => 'tersedia',
-                'available' => 2,
-                'total' => 4,
-                'avg_rating' => 4.8,
-                'review_count' => 15,
-                'charger_machines' => [
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 50],
-                    ['connector_type' => 'CHAdeMO', 'capacity_kw' => 50],
-                ]
-            ],
-            [
-                'id' => 2,
-                'name' => 'SPKLU Braga CityWalk',
-                'address' => 'Jl. Braga No.99-101, Braga, Sumur Bandung',
-                'latitude' => -6.917464,
-                'longitude' => 107.609559,
-                'status' => 'penuh',
-                'available' => 0,
-                'total' => 2,
-                'avg_rating' => 4.5,
-                'review_count' => 8,
-                'charger_machines' => [
-                    ['connector_type' => 'Type 2 AC', 'capacity_kw' => 22],
-                ]
-            ],
-            [
-                'id' => 3,
-                'name' => 'SPKLU Cihampelas Walk',
-                'address' => 'Jl. Cihampelas No.160, Cipaganti, Coblong',
-                'latitude' => -6.896483,
-                'longitude' => 107.604622,
-                'status' => 'tersedia',
-                'available' => 1,
-                'total' => 3,
-                'avg_rating' => 4.2,
-                'review_count' => 24,
-                'charger_machines' => [
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 200],
-                ]
-            ],
-            [
-                'id' => 4,
-                'name' => 'SPKLU Trans Studio Mall',
-                'address' => 'Jl. Gatot Subroto No.289, Cibangkong, Batununggal',
-                'latitude' => -6.925096,
-                'longitude' => 107.636494,
-                'status' => 'tersedia',
-                'available' => 3,
-                'total' => 5,
-                'avg_rating' => 4.9,
-                'review_count' => 56,
-                'charger_machines' => [
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 50],
-                    ['connector_type' => 'Type 2 AC', 'capacity_kw' => 22],
-                ]
-            ],
-            [
-                'id' => 5,
-                'name' => 'SPKLU Paris Van Java',
-                'address' => 'Jl. Sukajadi No.131-139, Cipedes, Sukajadi',
-                'latitude' => -6.889241,
-                'longitude' => 107.596007,
-                'status' => 'offline',
-                'available' => 0,
-                'total' => 4,
-                'avg_rating' => 3.8,
-                'review_count' => 12,
-                'charger_machines' => [
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 150],
-                ]
-            ],
-            [
-                'id' => 6,
-                'name' => 'SPKLU Alun-Alun Bandung',
-                'address' => 'Jl. Asia Afrika, Balonggede, Regol',
-                'latitude' => -6.921851,
-                'longitude' => 107.606226,
-                'status' => 'tersedia',
-                'available' => 1,
-                'total' => 2,
-                'avg_rating' => 4.6,
-                'review_count' => 30,
-                'charger_machines' => [
-                    ['connector_type' => 'CHAdeMO', 'capacity_kw' => 50],
-                ]
-            ],
-            [
-                'id' => 7,
-                'name' => 'SPKLU Pasteur Gateway',
-                'address' => 'Jl. Dr. Djunjunan No.143-149, Pajajaran, Cicendo',
-                'latitude' => -6.890662,
-                'longitude' => 107.588686,
-                'status' => 'penuh',
-                'available' => 0,
-                'total' => 3,
-                'avg_rating' => 4.1,
-                'review_count' => 19,
-                'charger_machines' => [
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 50],
-                ]
-            ],
-            [
-                'id' => 8,
-                'name' => 'SPKLU Buah Batu Square',
-                'address' => 'Jl. Buah Batu, Turangga, Lengkong',
-                'latitude' => -6.945890,
-                'longitude' => 107.625800,
-                'status' => 'tersedia',
-                'available' => 4,
-                'total' => 4,
-                'avg_rating' => 4.7,
-                'review_count' => 42,
-                'charger_machines' => [
-                    ['connector_type' => 'Type 2 AC', 'capacity_kw' => 22],
-                    ['connector_type' => 'CCS2', 'capacity_kw' => 200],
-                ]
-            ]
-        ]);
+        // 1. Tarik seluruh data SPKLU riil dari database beserta relasi mesin chargernya
+        $spkluRows = Spklu::with(['chargerMachines', 'reviews'])->get();
 
-        // 2. Filter Pencarian Teks (Nama atau Alamat)
+        // 2. Transformasikan data database menjadi format JSON bento-box yang dibutuhkan Leaflet
+        $formattedData = $spkluRows->map(function ($spklu) {
+            $totalMachines = $spklu->chargerMachines->count();
+            
+            // Hitung jumlah mesin yang statusnya 'available' (Tersedia)
+            $availableMachines = $spklu->chargerMachines->filter(function ($machine) {
+                return strtolower($machine->status ?? '') === 'available';
+            })->count();
+
+            // Hitung rata-rata rating ulasan dari pengendara
+            $avgRating = $spklu->reviews->count() > 0 ? round($spklu->reviews->avg('rating'), 1) : 0;
+
+            // Tentukan status visual stasiun berdasarkan kondisi mesin charger
+            $status = 'offline';
+            if ($totalMachines > 0) {
+                $status = $availableMachines > 0 ? 'tersedia' : 'penuh';
+            }
+
+            // Susun struktur array mesin di dalam stasiun terkait
+            $machinesArray = $spklu->chargerMachines->map(function ($machine) {
+                return [
+                    'connector_type' => $machine->connector_type ?? 'Unknown',
+                    'capacity_kw' => (int) ($machine->capacity_kw ?? 0),
+                ];
+            })->values()->all();
+
+            return [
+                'id' => $spklu->id,
+                'name' => $spklu->name,
+                'address' => $spklu->address ?? 'Alamat tidak tertera',
+                'latitude' => (float) $spklu->latitude,
+                'longitude' => (float) $spklu->longitude,
+                'status' => $status,
+                'available' => $availableMachines,
+                'total' => $totalMachines,
+                'avg_rating' => $avgRating ?: 5.0, // fallback visual rating jika belum ada ulasan
+                'review_count' => $spklu->reviews->count(),
+                'charger_machines' => $machinesArray,
+            ];
+        });
+
+        // 3. Masukkan filter pencarian teks (Nama atau Alamat) jika pengendara mengetik di search bar
         if ($request->filled('search')) {
             $searchTerm = strtolower($request->search);
-            $dummyData = $dummyData->filter(function ($item) use ($searchTerm) {
+            $formattedData = $formattedData->filter(function ($item) use ($searchTerm) {
                 return str_contains(strtolower($item['name']), $searchTerm) || 
                        str_contains(strtolower($item['address']), $searchTerm);
             });
         }
 
-        // 3. Filter berdasarkan Status
+        // 4. Masukkan filter dropdown berdasarkan Status ketersediaan mesin
         if ($request->filled('status') && $request->status !== 'semua') {
-            $dummyData = $dummyData->where('status', $request->status);
+            $formattedData = $formattedData->where('status', $request->status);
         }
 
-        return response()->json($dummyData->values()->all());
+        return response()->json($formattedData->values()->all());
     }
 
     /**
-     * Additive endpoint: return markers with user's active vehicle connector matching info.
-     * This method is added so existing functions are not modified and integrations can opt in.
+     * Endpoint tambahan untuk pencocokan tipe konektor kendaraan aktif milik pengendara.
      */
     public function getMarkersWithVehicleMatching()
     {
