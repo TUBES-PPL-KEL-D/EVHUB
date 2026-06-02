@@ -1,127 +1,148 @@
 @extends('layouts.app')
 
-@section('title', 'Withdrawal Vendor')
-
 @section('content')
-<div class="space-y-6">
-    @if (session('success'))
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {{ session('success') }}
+<div class="space-y-6 animate-fade-in-up pb-10">
+
+    @if(session('success'))
+    <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-emerald-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
         </div>
+        <p class="font-bold text-emerald-400 text-sm">{{ session('success') }}</p>
+    </div>
     @endif
 
-    @if (session('error'))
-        <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {{ session('error') }}
+    @if(session('error'))
+    <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-rose-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
         </div>
+        <p class="font-bold text-rose-400 text-sm">{{ session('error') }}</p>
+    </div>
     @endif
 
-    <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-700">Withdrawal Vendor</p>
-                <h1 class="mt-2 text-3xl font-bold text-slate-900">Penarikan Dana ke Rekening</h1>
-                <p class="mt-2 text-sm text-slate-500">Ajukan penarikan dari pendapatan mesin dan pantau status prosesnya.</p>
-            </div>
-            <a href="{{ route('vendor.dashboard') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Kembali ke Dashboard</a>
+    <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400">Withdrawal Sistem</p>
+            <h1 class="mt-2 text-3xl font-black text-white tracking-tight">Penarikan Dana Pendapatan</h1>
+            <p class="mt-1 text-sm text-slate-400">Ajukan pencairan hasil operasional mesin charger Anda langsung ke rekening bank.</p>
         </div>
+        <a href="{{ route('vendor.dashboard') }}" class="bg-slate-800 text-slate-200 border border-slate-700 rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-slate-700 transition-colors shrink-0">
+            Kembali ke Dashboard
+        </a>
+    </div>
 
-        <div class="mt-6 grid gap-4 md:grid-cols-4">
-            <div class="rounded-3xl bg-slate-900 p-5 text-white shadow-sm">
-                <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Pendapatan Masuk</p>
-                <p class="mt-3 text-2xl font-black">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</p>
-            </div>
-            <div class="rounded-3xl bg-emerald-500 p-5 text-white shadow-sm">
-                <p class="text-xs uppercase tracking-[0.3em] text-emerald-50/80">Saldo Tersedia</p>
-                <p class="mt-3 text-2xl font-black">Rp{{ number_format($availableBalance, 0, ',', '.') }}</p>
-            </div>
-            <div class="rounded-3xl bg-amber-100 p-5 text-slate-900 shadow-sm">
-                <p class="text-xs uppercase tracking-[0.3em] text-amber-800">Dalam Proses</p>
-                <p class="mt-3 text-2xl font-black">Rp{{ number_format($pendingAmount + $approvedAmount, 0, ',', '.') }}</p>
-            </div>
-            <div class="rounded-3xl bg-slate-100 p-5 text-slate-900 shadow-sm">
-                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Sudah Dibayar</p>
-                <p class="mt-3 text-2xl font-black">Rp{{ number_format($paidAmount, 0, ',', '.') }}</p>
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-950/40 border border-slate-800 rounded-3xl p-6 shadow-xl">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pendapatan Kotor</p>
+            <p class="text-2xl font-black text-white mt-2">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-6 shadow-xl">
+            <p class="text-xs font-bold text-emerald-500/80 uppercase tracking-wider">Saldo Tersedia</p>
+            <p class="text-2xl font-black text-emerald-400 mt-2">Rp{{ number_format($availableBalance, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6 shadow-xl">
+            <p class="text-xs font-bold text-amber-500/80 uppercase tracking-wider">Sedang Diproses</p>
+            <p class="text-2xl font-black text-amber-400 mt-2">Rp{{ number_format($pendingAmount + $approvedAmount, 0, ',', '.') }}</p>
+        </div>
+        <div class="bg-blue-500/10 border border-blue-500/20 rounded-3xl p-6 shadow-xl">
+            <p class="text-xs font-bold text-blue-500/80 uppercase tracking-wider">Berhasil Dicairkan</p>
+            <p class="text-2xl font-black text-blue-400 mt-2">Rp{{ number_format($paidAmount, 0, ',', '.') }}</p>
         </div>
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-2">
-        <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 class="text-xl font-bold text-slate-900">Ajukan Withdrawal</h2>
-            <p class="mt-1 text-sm text-slate-500">Pastikan nominal tidak melebihi saldo yang tersedia.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <div class="lg:col-span-1 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-1">Ajukan Pencairan</h2>
+            <p class="text-xs text-slate-400 mb-5">Batas penarikan dana minimum senilai Rp10.000.</p>
 
-            <form action="{{ route('vendor.withdrawals.store') }}" method="POST" class="mt-6 space-y-4">
+            <form action="{{ route('vendor.withdrawals.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700" for="amount">Nominal</label>
-                    <input type="number" name="amount" id="amount" min="10000" step="0.01" value="{{ old('amount') }}" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="50000">
-                    @error('amount') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nominal Withdrawal (Rp)</label>
+                    <input type="number" name="amount" min="10000" max="{{ $availableBalance }}" placeholder="Contoh: 50000" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
-                <div class="grid gap-4 md:grid-cols-2">
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700" for="bank_name">Nama Bank</label>
-                        <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name') }}" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="BCA">
-                        @error('bank_name') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700" for="bank_account_number">Nomor Rekening</label>
-                        <input type="text" name="bank_account_number" id="bank_account_number" value="{{ old('bank_account_number') }}" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="1234567890">
-                        @error('bank_account_number') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
-                    </div>
-                </div>
+
                 <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700" for="bank_account_name">Nama Pemilik Rekening</label>
-                    <input type="text" name="bank_account_name" id="bank_account_name" value="{{ old('bank_account_name') }}" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="Nama sesuai rekening">
-                    @error('bank_account_name') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Bank</label>
+                    <input type="text" name="bank_name" placeholder="Contoh: BCA, Mandiri, BNI" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
+
                 <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700" for="notes">Catatan</label>
-                    <textarea name="notes" id="notes" rows="4" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="Opsional">{{ old('notes') }}</textarea>
-                    @error('notes') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Pemilik Rekening</label>
+                    <input type="text" name="bank_account_name" placeholder="Nama sesuai pemilik rekening" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
-                <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Kirim Pengajuan</button>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nomor Rekening Bank</label>
+                    <input type="text" name="bank_account_number" placeholder="Masukkan nomor rekening" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Catatan (Opsional)</label>
+                    <textarea name="notes" placeholder="Pesan atau catatan tambahan untuk admin..." class="w-full h-20 px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white py-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all duration-300 font-bold text-xl mt-4 hover:-translate-y-1">
+                    Kirim Pengajuan
+                </button>
             </form>
         </div>
 
-        <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 class="text-xl font-bold text-slate-900">Riwayat Withdrawal</h2>
-            <p class="mt-1 text-sm text-slate-500">Pantau status pengajuan terbaru di sini.</p>
+        <div class="lg:col-span-2 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-1">Riwayat Pengajuan</h2>
+            <p class="text-xs text-slate-400 mb-5">Daftar rekam log pelacakan status pencairan dana Anda.</p>
 
-            <div class="mt-6 space-y-4">
-                @forelse ($withdrawals as $withdrawal)
+            <div class="space-y-4">
+                @forelse ($withdrawals as $wd)
                     @php
-                        $statusStyles = [
-                            'pending' => 'bg-amber-100 text-amber-800',
-                            'approved' => 'bg-blue-100 text-blue-800',
-                            'rejected' => 'bg-rose-100 text-rose-800',
-                            'paid' => 'bg-emerald-100 text-emerald-800',
+                        $badgeStyles = [
+                            'pending'  => 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+                            'approved' => 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+                            'rejected' => 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+                            'paid'     => 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
                         ];
-                        $statusClass = $statusStyles[$withdrawal->status] ?? 'bg-slate-100 text-slate-700';
+                        $badgeClass = $badgeStyles[$wd->status] ?? 'bg-slate-800 text-slate-400';
                     @endphp
-                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">{{ $withdrawal->reference_code }}</p>
-                                <p class="mt-1 text-lg font-bold text-slate-900">Rp{{ number_format($withdrawal->amount, 0, ',', '.') }}</p>
-                                <p class="mt-1 text-sm text-slate-500">{{ $withdrawal->bank_name }} · {{ $withdrawal->bank_account_name }} · {{ $withdrawal->bank_account_number }}</p>
-                                @if($withdrawal->admin_notes)
-                                    <p class="mt-2 text-sm text-slate-600">{{ $withdrawal->admin_notes }}</p>
-                                @endif
+
+                    <div class="p-5 bg-slate-800/30 rounded-2xl border border-slate-700/40 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition-colors hover:border-slate-600">
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex items-center gap-3">
+                                <span class="font-mono text-xs font-bold text-white tracking-wider">{{ $wd->reference_code }}</span>
+                                <span class="text-[10px] px-2.5 py-1 font-black uppercase tracking-widest rounded-full border {{ $badgeClass }}">{{ $wd->status }}</span>
                             </div>
-                            <div class="text-left sm:text-right">
-                                <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $statusClass }}">{{ strtoupper($withdrawal->status) }}</span>
-                                <p class="mt-2 text-xs text-slate-400">{{ $withdrawal->created_at->format('d M Y H:i') }}</p>
-                            </div>
+                            <p class="text-lg font-black text-white">Rp{{ number_format($wd->amount, 0, ',', '.') }}</p>
+                            <p class="text-[10px] text-slate-500 font-medium">Rekening: <span class="uppercase text-slate-400 font-bold">{{ $wd->bank_name }}</span> - {{ $wd->bank_account_number }} a/n {{ $wd->bank_account_name }}</p>
+                            
+                            @if($wd->notes)
+                                <p class="text-[10px] text-slate-600 leading-relaxed bg-slate-950/40 p-2 rounded-lg mt-1 border border-slate-800">Catatan: "{{ $wd->notes }}"</p>
+                            @endif
+                        </div>
+
+                        <div class="flex flex-col gap-2 shrink-0 sm:items-end">
+                            <span class="text-[10px] font-mono text-slate-500">{{ $wd->created_at->format('d/m/Y H:i') }}</span>
+                            
+                            @if ($wd->status === 'paid' && $wd->receipt_path)
+                                <a href="{{ asset('storage/' . $wd->receipt_path) }}" target="_blank" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-1.5 mt-1 whitespace-nowrap shadow-sm shadow-emerald-500/5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    Lihat Bukti
+                                </a>
+                            @elseif ($wd->status === 'rejected' && $wd->reject_reason)
+                                <div class="bg-rose-500/5 border border-rose-500/10 p-2 rounded-lg mt-1 max-w-[200px]">
+                                    <p class="text-[9px] text-rose-400/80 leading-relaxed">Alasan Penolakan Admin: "{{ $wd->reject_reason }}"</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @empty
-                    <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
-                        Belum ada pengajuan withdrawal.
+                    <div class="py-12 text-center border border-dashed border-slate-700/60 rounded-2xl">
+                        <p class="text-slate-500 font-medium text-xs uppercase tracking-wider">Belum ada aktivitas transaksi pencairan.</p>
                     </div>
                 @endforelse
             </div>
         </div>
+
     </div>
 </div>
 @endsection
