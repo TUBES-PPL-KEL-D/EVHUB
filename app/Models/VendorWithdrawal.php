@@ -9,6 +9,10 @@ class VendorWithdrawal extends Model
 {
     use HasFactory;
 
+    /**
+     * Kolom yang dapat diisi secara massal.
+     * [TELAH DIPERBAIKI: MENAMBAHKAN receipt_path KE DALAM FILLABLE]
+     */
     protected $fillable = [
         'vendor_id',
         'reference_code',
@@ -18,21 +22,22 @@ class VendorWithdrawal extends Model
         'bank_account_number',
         'notes',
         'status',
-        'processed_by',
-        'admin_notes',
         'processed_at',
+        'admin_notes',
+        'receipt_path', // BARIS INI WAJIB ADA AGAR BERKAS TIDAK BERNILAI NULL
     ];
 
-    protected $casts = [
-        'amount' => 'decimal:2',
-        'processed_at' => 'datetime',
-    ];
-
+    /**
+     * Relasi ke entitas Vendor.
+     */
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
     }
 
+    /**
+     * Relasi ke Admin yang memproses transaksi.
+     */
     public function processedBy()
     {
         return $this->belongsTo(User::class, 'processed_by');

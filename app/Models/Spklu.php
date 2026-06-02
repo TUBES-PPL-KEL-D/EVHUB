@@ -7,19 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Spklu extends Model
 {
     protected $fillable = [
-        'vendor_id',
-        'name',
-        'latitude',
-        'longitude',
+        'vendor_id', 
+        'name', 
+        'latitude', 
+        'longitude', 
         'address',
-    ];    
+    ];
 
     public function chargerMachines()
     {
         return $this->hasMany(ChargerMachine::class, 'spklu_id', 'id');
     }
 
-    // buat modal
     public function chargers()
     {
         return $this->hasMany(Charger::class, 'spklu_id');
@@ -35,8 +34,9 @@ class Spklu extends Model
         return $this->hasMany(Review::class);
     }
 
+    // TAMBAHKAN FUNGSI INI
     public function galleryPhotos()
     {
-        return $this->hasMany(SpkluGalleryPhoto::class)->orderBy('sort_order')->latest();
+        return $this->hasMany(SpkluGalleryPhoto::class);
     }
 }

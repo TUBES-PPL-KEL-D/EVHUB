@@ -1,100 +1,94 @@
 @extends('layouts.app')
-
-@section('title', 'Galeri Foto SPKLU')
+@section('title', 'Galeri SPKLU')
 
 @section('content')
-<div class="vendor-scope">
-    <div class="mx-auto max-w-7xl space-y-6">
-        @if(session('success'))
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {{ session('success') }}
-            </div>
-        @endif
+<div class="space-y-6 animate-fade-in-up pb-10">
 
-        @if(session('error'))
-            <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {{ session('error') }}
-            </div>
-        @endif
+    @if(session('success'))
+    <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-emerald-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <p class="font-bold text-emerald-400 text-sm">{{ session('success') }}</p>
+    </div>
+    @endif
 
-        @if($errors->any())
-            <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <p class="font-semibold mb-2">Terjadi kesalahan input:</p>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    @if($errors->any())
+    <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-rose-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+        <div class="text-sm text-rose-400 font-bold">
+            <ul class="list-disc pl-4">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+    @endif
 
-        <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400">Media Stasiun</p>
+            <h1 class="mt-2 text-3xl font-black text-white tracking-tight">Galeri Foto SPKLU</h1>
+            <p class="mt-1 text-sm text-slate-400">Kelola foto-foto stasiun <span class="font-bold text-slate-200">{{ $spklu->name }}</span> yang akan ditampilkan pada peta pengendara.</p>
+        </div>
+        <a href="{{ route('vendor.chargers.index') }}" class="bg-slate-800 text-slate-200 border border-slate-700 rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-slate-700 transition-colors shrink-0">
+            Kembali ke Daftar
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <div class="lg:col-span-1 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-1">Unggah Foto Baru</h2>
+            <p class="text-xs text-slate-400 mb-5">Tambahkan sudut foto baru untuk stasiun ini.</p>
+
+            <form action="{{ route('vendor.spklu.gallery.store', $spklu->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-700">Kelola Galeri SPKLU</p>
-                    <h1 class="mt-2 text-3xl font-bold text-slate-900">{{ $spklu->name }}</h1>
-                    <p class="mt-2 text-sm text-slate-500">Upload foto kondisi fisik stasiun agar pengendara dapat melihatnya sebelum datang.</p>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-0.5">Pilih Berkas Gambar</label>
+                    <input type="file" name="photo" accept="image/jpeg, image/png, image/jpg" required class="w-full px-4 py-2 text-sm border border-slate-700 rounded-xl bg-slate-950 text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 focus:outline-none transition-colors cursor-pointer">
+                    <p class="mt-2 text-[10px] text-slate-500 font-medium">Format: JPG, JPEG, PNG. Maks: 5MB.</p>
                 </div>
-                <a href="{{ route('vendor.chargers.index') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Kembali ke Daftar Mesin</a>
-            </div>
-
-            <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                <form action="{{ route('vendor.spklu.gallery.store', $spklu) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700">Pilih Foto</label>
-                        <input type="file" name="photos[]" multiple accept="image/*" class="block w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:border-emerald-500 focus:ring-emerald-500">
-                        <p class="mt-2 text-xs text-slate-500">Format yang didukung: JPG, JPEG, PNG, WEBP. Maksimal 5 MB per file.</p>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-slate-700">Keterangan Foto</label>
-                        <div class="space-y-3">
-                            <input type="text" name="captions[]" placeholder="Contoh: Tampak depan SPKLU" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:border-emerald-500 focus:ring-emerald-500">
-                            <input type="text" name="captions[]" placeholder="Contoh: Area parkir dan akses masuk" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:border-emerald-500 focus:ring-emerald-500">
-                            <input type="text" name="captions[]" placeholder="Tambahan keterangan foto lain jika perlu" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:border-emerald-500 focus:ring-emerald-500">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Unggah Foto</button>
-                </form>
-            </div>
+                
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10 mt-2">
+                    Unggah & Simpan
+                </button>
+            </form>
         </div>
 
-        <div class="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <div class="flex items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Daftar Foto</h2>
-                    <p class="mt-1 text-sm text-slate-500">Foto yang tampil di halaman detail SPKLU pengendara.</p>
-                </div>
-                <span class="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-600">{{ $photos->count() }} Foto</span>
-            </div>
+        <div class="lg:col-span-2 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-xl">
+            <h2 class="text-lg font-bold text-white mb-1">Etalase Galeri Saat Ini</h2>
+            <p class="text-xs text-slate-400 mb-5">Foto-foto ini dapat digeser (swipe) oleh pengendara saat membuka detail lokasi di peta.</p>
 
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 @forelse($photos as $photo)
-                    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm">
-                        <div class="h-52 bg-slate-100">
-                            <img src="{{ asset('storage/' . $photo->image_path) }}" alt="{{ $photo->caption ?? $spklu->name }}" class="h-full w-full object-cover">
-                        </div>
-                        <div class="space-y-3 p-4">
-                            <div>
-                                <p class="text-sm font-bold text-slate-900">{{ $photo->caption ?? 'Tanpa keterangan' }}</p>
-                                <p class="mt-1 text-xs text-slate-500">Urutan: {{ $photo->sort_order }}</p>
-                            </div>
-                            <form action="{{ route('vendor.spklu.gallery.destroy', [$spklu, $photo]) }}" method="POST" onsubmit="return confirm('Hapus foto ini dari galeri?')">
+                    <div class="group relative rounded-2xl border border-slate-700 bg-slate-950 overflow-hidden shadow-md aspect-square">
+                        <img src="{{ asset('storage/' . $photo->image_path) }}" alt="Foto Stasiun" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        
+                        <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-sm">
+                            <a href="{{ asset('storage/' . $photo->image_path) }}" target="_blank" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 transition-colors">
+                                Lihat Penuh
+                            </a>
+                            <form action="{{ route('vendor.spklu.gallery.destroy', [$spklu->id, $photo->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus foto ini secara permanen?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-500">Hapus</button>
+                                <button type="submit" class="bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors">
+                                    Hapus
+                                </button>
                             </form>
                         </div>
                     </div>
                 @empty
-                    <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500 sm:col-span-2 xl:col-span-3">
-                        Belum ada foto galeri untuk SPKLU ini.
+                    <div class="col-span-full py-12 text-center border border-dashed border-slate-700/60 rounded-2xl">
+                        <p class="text-slate-500 font-medium text-xs uppercase tracking-wider">Belum ada foto yang diunggah.</p>
                     </div>
                 @endforelse
             </div>
         </div>
+
     </div>
 </div>
 @endsection

@@ -1,220 +1,154 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Mesin Charger')
-
 @section('content')
-<div class="vendor-scope">
-    <div class="mx-auto max-w-7xl">
-        
-        <!-- Header Section -->
-        <div class="mb-6 flex flex-col justify-between sm:flex-row sm:items-center">
-            <div>
-                <h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
-                    Daftar Mesin Charger
-                </h1>
-                <p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">
-                    Kelola infrastruktur SPKLU, mesin pengisian daya, dan tarif per kWh.
-                </p>
-            </div>
+<div class="space-y-6 animate-fade-in-up pb-10">
 
-            <div class="mt-4 flex flex-wrap gap-2 sm:mt-0">
-                <a href="{{ route('vendor.chargers.usageHistory') }}"
-                class="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2">
-                    Riwayat Pemakaian
-                </a>
-
-                <a href="{{ route('vendor.chargers.create') }}" class="inline-flex items-center justify-center rounded-2xl bg-[#34CBDA] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    Tambah Mesin Baru
-                </a>
-            </div>
+    @if(session('success'))
+    <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-emerald-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
         </div>
+        <p class="font-bold text-emerald-400 text-sm">{{ session('success') }}</p>
+    </div>
+    @endif
 
-        <!-- Alert Success -->
-        @if(session('success'))
-            <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 shadow-sm">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                    {{ session('success') }}
-                </div>
-            </div>
-        @endif
+    @if(session('error'))
+    <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
+        <div class="bg-rose-500 p-1.5 rounded-full text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+        <p class="font-bold text-rose-400 text-sm">{{ session('error') }}</p>
+    </div>
+    @endif
 
-        <!-- Alert Error -->
-        @if(session('error'))
-            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 shadow-sm">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                    {{ session('error') }}
-                </div>
-            </div>
-        @endif
+    <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400">Infrastruktur Vendor</p>
+            <h1 class="mt-2 text-3xl font-black text-white tracking-tight">Daftar Mesin Charger</h1>
+            <p class="mt-1 text-sm text-slate-400">Kelola infrastruktur SPKLU, spesifikasi mesin pengisian daya, dan penyesuaian tarif aktif.</p>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+            <a href="{{ route('vendor.chargers.usageHistory') }}" class="flex-grow md:flex-grow-0 text-center bg-slate-800 text-slate-200 border border-slate-700 rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-slate-700 transition-colors">
+                Riwayat Pemakaian
+            </a>
+            <a href="{{ route('vendor.chargers.create') }}" class="flex-grow md:flex-grow-0 text-center bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                Tambah Mesin Baru
+            </a>
+        </div>
+    </div>
 
-        <!-- Alert Validation -->
-        @if($errors->any())
-            <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 shadow-sm">
-                <p class="font-semibold mb-2">Terjadi kesalahan input:</p>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    <div class="bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                    <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                        <th class="pb-4 pl-2 w-28">Foto Asset</th>
+                        <th class="pb-4">Identitas Mesin</th>
+                        <th class="pb-4">Lokasi SPKLU</th>
+                        <th class="pb-4 w-80">Spesifikasi & Manajemen Tarif</th>
+                        <th class="pb-4 text-center">Status</th>
+                        <th class="pb-4 text-right pr-2">Aksi Modifikasi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60">
+                    @forelse ($chargers as $charger)
+                        <tr class="text-sm text-slate-300 hover:bg-slate-800/20 transition-colors group">
+                            <td class="py-5 pl-2 vertical-align-middle">
+                                <div class="w-20 h-20 rounded-2xl border border-slate-700 bg-slate-950 overflow-hidden shadow-md group-hover:border-slate-600 transition-colors">
+                                    @if($charger->photo_path)
+                                        <img src="{{ asset('storage/' . $charger->photo_path) }}" alt="Foto Mesin" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-slate-900 text-slate-600">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
 
-        <!-- Table Container -->
-        <div class="overflow-hidden rounded-3xl bg-white shadow-md ring-1 ring-slate-200">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50 text-slate-800 border-b border-slate-200">
-                        <tr>
-                            <th scope="col" class="px-6 py-4 font-semibold">Foto</th>
-                            <th scope="col" class="px-6 py-4 font-semibold">Nama Mesin</th>
-                            <th scope="col" class="px-6 py-4 font-semibold">Lokasi SPKLU</th>
-                            <th scope="col" class="px-6 py-4 font-semibold">Spesifikasi & Tarif</th>
-                            <th scope="col" class="px-6 py-4 font-semibold">Status</th>
-                            <th scope="col" class="px-6 py-4 font-semibold">Aksi</th>
+                            <td class="py-5 pr-4 vertical-align-middle">
+                                <p class="text-base font-bold text-white tracking-tight">{{ $charger->name }}</p>
+                                <div class="flex items-center space-x-1.5 mt-1.5 text-xs text-slate-400 font-medium">
+                                    <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>Operasional: {{ $charger->operational_hours ?? '24 Jam' }}</span>
+                                </div>
+                            </td>
+
+                            <td class="py-5 pr-4 vertical-align-middle">
+                                <span class="bg-slate-800/60 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 tracking-wide uppercase inline-block">
+                                    {{ $charger->spklu->name ?? 'Stasiun Utama' }}
+                                </span>
+                            </td>
+
+                            <td class="py-5 pr-4 vertical-align-middle">
+                                <div class="space-y-3">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <span class="inline-flex rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 text-[10px] font-black tracking-wider uppercase">⚡ PORT: {{ $charger->connector_type }}</span>
+                                        <span class="inline-flex rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 text-[10px] font-black tracking-wider">{{ $charger->capacity_kw }} kW</span>
+                                    </div>
+                                    
+                                    <form action="{{ route('vendor.chargers.updateTariff', $charger) }}" method="POST" class="bg-slate-950/50 border border-slate-800 p-2.5 rounded-2xl flex items-center gap-2 max-w-sm">
+                                        @csrf
+                                        @method('PATCH')
+                                        <div class="relative flex-grow">
+                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">Rp</span>
+                                            <input type="number" name="price_per_kwh" value="{{ (int)$charger->price_per_kwh }}" min="0" required class="w-full pl-8 pr-2 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                                        </div>
+                                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shrink-0 shadow-md">
+                                            Simpan
+                                        </button>
+                                    </form>
+                                    <p class="text-[10px] text-slate-500 font-medium pl-1">Tarif Saat Ini: <span class="text-emerald-400 font-bold">Rp{{ number_format($charger->price_per_kwh, 0, ',', '.') }}/kWh</span></p>
+                                </div>
+                            </td>
+
+                            <td class="py-5 text-center vertical-align-middle">
+                                @php
+                                    $statusStyle = match(strtolower($charger->status ?? '')) {
+                                        'available'   => 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+                                        'maintenance' => 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+                                        default        => 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                    };
+                                @endphp
+                                <span class="inline-flex rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase {{ $statusStyle }}">
+                                    {{ $charger->status }}
+                                </span>
+                            </td>
+
+                            <td class="py-5 text-right pr-2 vertical-align-middle">
+                                <div class="inline-flex items-center gap-1">
+                                    <a href="{{ route('vendor.spklu.gallery.index', $charger->spklu_id) }}" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700/60" title="Kelola Galeri">
+                                        <span class="text-xs font-bold px-1">Galeri</span>
+                                    </a>
+                                    <a href="{{ route('vendor.chargers.edit', $charger) }}" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-amber-400 hover:text-amber-300 rounded-lg transition-colors border border-slate-700/60" title="Edit Detail">
+                                        <span class="text-xs font-bold px-1">Edit</span>
+                                    </a>
+                                    <form action="{{ route('vendor.chargers.destroy', $charger) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus infrastruktur mesin charger dan penanda lokasi SPKLU ini secara permanen?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-2 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white rounded-lg transition-all border border-rose-500/20" title="Hapus Permanen">
+                                            <span class="text-xs font-bold px-1">Hapus</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-
-                    <tbody class="divide-y divide-slate-200">
-                        @forelse($chargers as $charger)
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <img 
-                                        src="{{ asset('storage/' . $charger->photo_path) }}" 
-                                        alt="Foto Mesin" 
-                                        class="h-16 w-24 rounded-lg object-cover border border-slate-200 shadow-sm"
-                                    >
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <div class="font-bold text-slate-900">
-                                        {{ $charger->name }}
-                                    </div>
-                                    <div class="text-xs text-slate-500 mt-1">
-                                        Operasional: {{ $charger->operational_hours }}
-                                    </div>
-                                </td>
-
-                                <td class="px-6 py-4 font-medium text-slate-800">
-                                    {{ $charger->spklu->name ?? 'Tidak Terhubung' }}
-                                </td>
-
-                                <td class="px-6 py-4 text-slate-700">
-                                    <!-- PBI 30: Menampilkan Data Referensi Tipe Port -->
-                                    <div class="mb-2">
-                                        <span class="inline-flex items-center gap-1 rounded-md bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 ring-1 ring-inset ring-sky-200/50">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-                                            </svg>
-                                            PORT: {{ strtoupper($charger->connector_type) }}
-                                        </span>
-                                    </div>
-
-                                    <div class="mb-2">
-                                        Kapasitas:
-                                        <span class="font-semibold">
-                                            {{ $charger->capacity_kw }} kW
-                                        </span>
-                                    </div>
-
-                                    <!-- PBI 45: Vendor menetapkan tarif harga per kWh untuk masing-masing mesin charger -->
-                                    <div class="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3">
-                                        <p class="mb-2 text-xs text-slate-600">
-                                            Tarif Saat Ini:
-                                            <span class="font-bold text-emerald-700">
-                                                Rp {{ number_format($charger->price_per_kwh, 0, ',', '.') }}/kWh
-                                            </span>
-                                        </p>
-
-                                        <form action="{{ route('vendor.chargers.updateTariff', $charger->id) }}" method="POST" class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                                            @csrf
-                                            @method('PATCH')
-
-                                            <div class="relative flex-1">
-                                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
-                                                    Rp
-                                                </span>
-
-                                                <input
-                                                    type="number"
-                                                    name="price_per_kwh"
-                                                    min="0"
-                                                    step="100"
-                                                    value="{{ old('price_per_kwh', $charger->price_per_kwh) }}"
-                                                    class="w-full rounded-xl border border-slate-200 py-2 pl-9 pr-3 text-sm text-slate-700 focus:border-emerald-500 focus:ring-emerald-500"
-                                                    placeholder="Tarif per kWh"
-                                                    required
-                                                >
-                                            </div>
-
-                                            <button
-                                                type="submit"
-                                                class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500">
-                                                Simpan
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                        {{ $charger->status == 'available' ? 'bg-emerald-100 text-emerald-800' : 
-                                          ($charger->status == 'maintenance' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800') }}">
-                                        {{ strtoupper($charger->status) }}
-                                    </span>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <a href="{{ route('vendor.spklu.gallery.index', $charger->spklu_id) }}" class="font-medium text-emerald-600 hover:text-emerald-800 transition">
-                                            Galeri
-                                        </a>
-                                        <a href="{{ route('vendor.chargers.edit', $charger->id) }}" class="font-medium text-amber-600 hover:text-amber-800 transition">
-                                            Edit
-                                        </a>
-                                        
-                                        <form action="{{ route('vendor.chargers.destroy', $charger->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button 
-                                                type="submit" 
-                                                class="font-medium text-red-600 hover:text-red-800 transition" 
-                                                onclick="return confirm('Apakah Anda yakin ingin menghapus mesin ini secara permanen?')">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                    <p class="text-base font-medium text-slate-700">
-                                        Belum ada mesin charger
-                                    </p>
-                                    <p class="mt-1">
-                                        Anda belum mendaftarkan infrastruktur SPKLU apapun.
-                                    </p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-500 border-dashed border border-slate-800/60 rounded-3xl">
+                                Belum ada mesin charger yang didaftarkan. Klik tombol kanan atas untuk meletakkan SPKLU pada peta.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-        
     </div>
 </div>
+
+<style>
+    .vertical-align-middle {
+        vertical-align: middle;
+    }
+</style>
 @endsection
