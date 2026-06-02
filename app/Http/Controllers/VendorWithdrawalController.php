@@ -6,23 +6,28 @@ use App\Models\Transaction;
 use App\Models\Vendor;
 use App\Models\VendorWithdrawal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class VendorWithdrawalController extends Controller
 {
+    /**
+     * Cek status vendor berdasarkan user yang sedang login.
+     * [TELAH DIPERBAIKI: MENGHAPUS HARDCODED VENDOR FIND 1]
+     */
     private function checkVendorStatus()
     {
-        $vendor = Vendor::find(1);
-
-        return $vendor;
+        return Vendor::where('user_id', Auth::id())->first();
     }
 
+    /**
+     * Membangun ringkasan finansial riil milik vendor terkait.
+     */
     private function buildSummary(Vendor $vendor): array
     {
         $totalRevenue = 0;
-
         if (Schema::hasTable('transactions')) {
             $totalRevenue = Transaction::whereHas('chargerMachine', function ($query) use ($vendor) {
                 $query->where('vendor_id', $vendor->id);
@@ -30,6 +35,7 @@ class VendorWithdrawalController extends Controller
         }
 
         $withdrawalsQuery = VendorWithdrawal::where('vendor_id', $vendor->id);
+
         $reservedAmount = (clone $withdrawalsQuery)
             ->whereIn('status', ['pending', 'approved', 'paid'])
             ->sum('amount');
@@ -64,9 +70,8 @@ class VendorWithdrawalController extends Controller
     public function index()
     {
         $vendor = $this->checkVendorStatus();
-
         if (! $vendor) {
-            return redirect()->route('vendor.status')->with('error', 'Akses ditolak! Vendor ID 1 tidak ditemukan di database.');
+            return redirect()->route('vendor.status')->with('error', 'Akses ditolak! Akun vendor Anda tidak ditemukan.');
         }
 
         if (! Schema::hasTable('vendor_withdrawals')) {
@@ -80,24 +85,22 @@ class VendorWithdrawalController extends Controller
                 'paidAmount' => 0,
                 'rejectedCount' => 0,
                 'withdrawals' => collect(),
-            ])->with('error', 'Tabel withdrawal belum tersedia di database aktif. Jalankan migrasi database terlebih dahulu.');
+            ])->with('error', 'Tabel withdrawal belum tersedia di database aktif.');
         }
 
         $summary = $this->buildSummary($vendor);
-
         return view('vendor.withdrawals.index', array_merge(['vendor' => $vendor], $summary));
     }
 
     public function store(Request $request)
     {
         $vendor = $this->checkVendorStatus();
-
         if (! $vendor) {
             return redirect()->route('vendor.status')->with('error', 'Akses ditolak!');
         }
 
         if (! Schema::hasTable('transactions') || ! Schema::hasTable('vendor_withdrawals')) {
-            return redirect()->route('vendor.withdrawals.index')->with('error', 'Tabel pendukung withdrawal belum tersedia di database aktif.');
+            return redirect()->route('vendor.withdrawals.index')->with('error', 'Tabel pendukung belum tersedia.');
         }
 
         $validated = $request->validate([
@@ -116,13 +119,11 @@ class VendorWithdrawalController extends Controller
         ]);
 
         $summary = $this->buildSummary($vendor);
-
         if ((float) $validated['amount'] > $summary['availableBalance']) {
             return redirect()->route('vendor.withdrawals.index')->with('error', 'Nominal melebihi saldo yang tersedia untuk ditarik.');
         }
 
         DB::beginTransaction();
-
         try {
             VendorWithdrawal::create([
                 'vendor_id' => $vendor->id,
@@ -134,14 +135,11 @@ class VendorWithdrawalController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'pending',
             ]);
-
             DB::commit();
-
-            return redirect()->route('vendor.withdrawals.index')->with('success', 'Pengajuan withdrawal berhasil dikirim dan sedang menunggu proses verifikasi.');
+            return redirect()->route('vendor.withdrawals.index')->with('success', 'Pengajuan withdrawal berhasil dikirim.');
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return redirect()->route('vendor.withdrawals.index')->with('error', 'Gagal memproses pengajuan withdrawal. Silakan coba lagi.');
+            return redirect()->route('vendor.withdrawals.index')->with('error', 'Gagal memproses pengajuan withdrawal.');
         }
     }
 }
