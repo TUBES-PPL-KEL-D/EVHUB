@@ -80,6 +80,7 @@
                 <a href="{{ url('rider/vehicles') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Garasi Digital</a>
                 <a href="{{ url('rider/wallet') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Dompet Saya</a>
                 <a href="{{ url('rider/transactions') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Riwayat Transaksi</a>
+                <a href="{{ url('rider/tickets') }}" class="text-slate-300 hover:text-emerald-400 font-medium transition-colors text-sm">Pusat Bantuan</a>
             @endif
 
         </div>
