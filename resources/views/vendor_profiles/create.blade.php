@@ -1,180 +1,156 @@
-@extends('layouts.app')
+@extends('layouts.app') 
+@section('title', 'Pendaftaran Vendor') 
+@php $profile = $vendorProfile ?? null; @endphp 
 
-@section('title', 'Pendaftaran Vendor')
+@section('content') 
+<div class="vendor-scope"> 
+    <div class="mx-auto max-w-4xl"> 
+        <div class="mb-6"> 
+            <h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">Isi Profil Entitas Perusahaan Vendor</h1> 
+            <p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">Lengkapi data perusahaan untuk memulai pendaftaran vendor baru di EV-HUB.</p> 
+        </div> 
 
-@php
-	$profile = $vendorProfile ?? null;
-@endphp
+        @if ($errors->any()) 
+        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"> 
+            <p class="font-semibold">Ada kesalahan pada form:</p> 
+            <ul class="mt-2 list-disc space-y-1 pl-5"> 
+                @foreach ($errors->all() as $error) 
+                    <li>{{ $error }}</li> 
+                @endforeach 
+            </ul> 
+        </div> 
+        @endif 
 
-@section('content')
-	<div class="vendor-scope">
-		<div class="mx-auto max-w-4xl">
-		<div class="mb-6">
-			<h1 class="mt-2 text-3xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">Isi Profil Entitas Perusahaan Vendor</h1>
-			<p class="mt-2 text-slate-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">Lengkapi data perusahaan untuk memulai pendaftaran vendor baru di EV-HUB.</p>
-		</div>
+        <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200"> 
+            <div class="border-b border-slate-200 bg-slate-50 px-6 py-4"> 
+                <h2 class="text-lg font-semibold text-slate-900">{{ $profile ? 'Perbaiki Profil Vendor' : 'Form Profil Vendor' }}</h2> 
+            </div> 
+            
+            <form action="{{ route('vendor.profile.store') }}" method="POST" class="space-y-6 px-6 py-6"> 
+                @csrf 
+                <div class="grid gap-6 md:grid-cols-2"> 
+                    
+                    <div class="md:col-span-2"> 
+                        <label for="company_name" class="mb-2 block text-sm font-medium text-slate-700">Nama Perusahaan</label> 
+                        <input type="text" name="company_name" id="company_name" value="{{ old('company_name', $profile?->company_name) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Contoh: PT Energi Hijau Nusantara" required > 
+                    </div> 
+                    
+                    <div> 
+                        <label for="company_email" class="mb-2 block text-sm font-medium text-slate-700">Email Perusahaan</label> 
+                        <input type="email" name="company_email" id="company_email" value="{{ old('company_email', $profile?->company_email) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="vendor@perusahaan.com" > 
+                    </div> 
+                    
+                    <div> 
+                        <label for="company_phone" class="mb-2 block text-sm font-medium text-slate-700">Nomor Telepon</label> 
+                        <input type="tel" inputmode="numeric" pattern="\d{6,20}" title="Hanya angka, 6-20 digit" name="company_phone" id="company_phone" value="{{ old('company_phone', $profile?->company_phone) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="08xxxxxxxxxx" > 
+                    </div> 
+                    
+                    <div class="md:col-span-2"> 
+                        <label for="company_address" class="mb-2 block text-sm font-medium text-slate-700">Alamat Perusahaan</label> 
+                        <textarea name="company_address" id="company_address" rows="4" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Masukkan alamat lengkap perusahaan" required >{{ old('company_address', $profile?->company_address) }}</textarea> 
+                    </div> 
+                    
+                    <div class="md:col-span-2"> 
+                        <label class="mb-2 block text-sm font-medium text-slate-700">Lokasi (Map Picker)</label> 
+                        <div id="map" class="w-full h-64 rounded-2xl border border-slate-300"></div> 
+                        <p class="mt-2 text-sm text-slate-500">Klik pada peta untuk memilih lokasi perusahaan. Koordinat akan otomatis diisi.</p> 
+                        <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $profile?->latitude) }}"> 
+                        <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $profile?->longitude) }}"> 
+                    </div> 
+                    
+                    <div class="md:col-span-2"> 
+                        <label for="company_description" class="mb-2 block text-sm font-medium text-slate-700">Deskripsi Perusahaan</label> 
+                        <textarea name="company_description" id="company_description" rows="4" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Jelaskan singkat bidang usaha atau layanan perusahaan" >{{ old('company_description', $profile?->company_description) }}</textarea> 
+                    </div>
 
-		@if ($errors->any())
-			<div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-				<p class="font-semibold">Ada kesalahan pada form:</p>
-				<ul class="mt-2 list-disc space-y-1 pl-5">
-					@foreach ($errors->all() as $error)
-						<li>{{ $error }}</li>
-					@endforeach
-				</ul>
-			</div>
-		@endif
+                    <div class="md:col-span-2 mt-2 pt-6 border-t border-slate-200">
+                        <h3 class="text-base font-bold text-slate-800 mb-4">Informasi Finansial & Legalitas</h3>
+                        <div class="grid gap-6 md:grid-cols-2">
+                            <div>
+                                <label for="npwp" class="mb-2 block text-sm font-medium text-slate-700">Nomor Pokok Wajib Pajak (NPWP)</label>
+                                <input type="text" name="npwp" id="npwp" value="{{ old('npwp', $profile?->npwp) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Masukkan NPWP Perusahaan" required>
+                            </div>
+                            <div>
+                                <label for="bank_name" class="mb-2 block text-sm font-medium text-slate-700">Nama Bank Tujuan Withdrawal</label>
+                                <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name', $profile?->bank_name) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Contoh: BCA, Mandiri, BRI" required>
+                            </div>
+                            <div>
+                                <label for="bank_account_number" class="mb-2 block text-sm font-medium text-slate-700">Nomor Rekening</label>
+                                <input type="text" name="bank_account_number" id="bank_account_number" value="{{ old('bank_account_number', $profile?->bank_account_number) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Masukkan nomor rekening" required>
+                            </div>
+                            <div>
+                                <label for="bank_account_name" class="mb-2 block text-sm font-medium text-slate-700">Nama Pemilik Rekening</label>
+                                <input type="text" name="bank_account_name" id="bank_account_name" value="{{ old('bank_account_name', $profile?->bank_account_name) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100" placeholder="Nama sesuai di buku tabungan" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2 grid gap-4 md:grid-cols-2 mt-2 pt-6 border-t border-slate-200"> 
+                        <div> 
+                            <label for="opens_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Buka</label> 
+                            <input type="time" name="opens_at" id="opens_at" value="{{ old('opens_at', $profile?->opens_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"> 
+                        </div> 
+                        <div> 
+                            <label for="closes_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Tutup</label> 
+                            <input type="time" name="closes_at" id="closes_at" value="{{ old('closes_at', $profile?->closes_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"> 
+                        </div> 
+                    </div> 
+                </div> 
 
-		<div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
-			<div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
-				<h2 class="text-lg font-semibold text-slate-900">{{ $profile ? 'Perbaiki Profil Vendor' : 'Form Profil Vendor' }}</h2>
-			</div>
+                <div class="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between"> 
+                    <p class="text-sm text-slate-500">Data ini akan menjadi profil dasar vendor baru.</p> 
+                    <div class="flex gap-3"> 
+                        <a href="{{ url('/') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</a> 
+                        <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">{{ $profile ? 'Simpan Perbaikan Profil' : 'Simpan Profil' }}</button> 
+                    </div> 
+                </div> 
+            </form> 
+        </div> 
+    </div> 
+</div> 
 
-			<form action="{{ route('vendor.profile.store') }}" method="POST" class="space-y-6 px-6 py-6">
-				@csrf
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/> 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script> 
+<script> 
+    document.addEventListener('DOMContentLoaded', function () {
+        var latInput = document.getElementById('latitude'); 
+        var lngInput = document.getElementById('longitude'); 
+        var initialLat = parseFloat(latInput.value) || -6.200000; 
+        var initialLng = parseFloat(lngInput.value) || 106.816666; 
+        
+        var map = L.map('map').setView([initialLat, initialLng], 12); 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, 
+            attribution: '© OpenStreetMap' 
+        }).addTo(map); 
+        
+        var marker = null; 
+        if (latInput.value && lngInput.value) {
+            marker = L.marker([initialLat, initialLng]).addTo(map); 
+        } 
+        
+        map.on('click', function (e) {
+            var lat = e.latlng.lat.toFixed(7); 
+            var lng = e.latlng.lng.toFixed(7); 
+            if (marker) { map.removeLayer(marker); } 
+            marker = L.marker([lat, lng]).addTo(map); 
+            latInput.value = lat; 
+            lngInput.value = lng; 
+        }); 
 
-				<div class="grid gap-6 md:grid-cols-2">
-					<div class="md:col-span-2">
-						<label for="company_name" class="mb-2 block text-sm font-medium text-slate-700">Nama Perusahaan</label>
-						<input
-							type="text"
-							name="company_name"
-							id="company_name"
-							value="{{ old('company_name', $profile?->company_name) }}"
-							class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-							placeholder="Contoh: PT Energi Hijau Nusantara"
-							required
-						>
-					</div>
-
-					<div>
-						<label for="company_email" class="mb-2 block text-sm font-medium text-slate-700">Email Perusahaan</label>
-						<input
-							type="email"
-							name="company_email"
-							id="company_email"
-							value="{{ old('company_email', $profile?->company_email) }}"
-							class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-							placeholder="vendor@perusahaan.com"
-						>
-					</div>
-
-					<div>
-						<label for="company_phone" class="mb-2 block text-sm font-medium text-slate-700">Nomor Telepon</label>
-						<input
-							type="tel"
-							inputmode="numeric"
-							pattern="\d{6,20}"
-							title="Hanya angka, 6-20 digit"
-							name="company_phone"
-							id="company_phone"
-							value="{{ old('company_phone', $profile?->company_phone) }}"
-							class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-							placeholder="08xxxxxxxxxx"
-						>
-					</div>
-
-					<div class="md:col-span-2">
-						<label for="company_address" class="mb-2 block text-sm font-medium text-slate-700">Alamat Perusahaan</label>
-						<textarea
-							name="company_address"
-							id="company_address"
-							rows="4"
-							class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-							placeholder="Masukkan alamat lengkap perusahaan"
-							required
-						>{{ old('company_address', $profile?->company_address) }}</textarea>
-					</div>
-
-					<div class="md:col-span-2">
-						<label class="mb-2 block text-sm font-medium text-slate-700">Lokasi (Map Picker)</label>
-						<div id="map" class="w-full h-64 rounded-2xl border border-slate-300"></div>
-						<p class="mt-2 text-sm text-slate-500">Klik pada peta untuk memilih lokasi perusahaan. Koordinat akan otomatis diisi.</p>
-						<input type="hidden" name="latitude" id="latitude" value="{{ old('latitude', $profile?->latitude) }}">
-						<input type="hidden" name="longitude" id="longitude" value="{{ old('longitude', $profile?->longitude) }}">
-					</div>
-
-					<div class="md:col-span-2">
-						<label for="company_description" class="mb-2 block text-sm font-medium text-slate-700">Deskripsi Perusahaan</label>
-						<textarea
-							name="company_description"
-							id="company_description"
-							rows="4"
-							class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-							placeholder="Jelaskan singkat bidang usaha atau layanan perusahaan"
-						>{{ old('company_description', $profile?->company_description) }}</textarea>
-					</div>
-				<div class="md:col-span-2 grid gap-4 md:grid-cols-2">
-					<div>
-						<label for="opens_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Buka</label>
-						<input type="time" name="opens_at" id="opens_at" value="{{ old('opens_at', $profile?->opens_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
-					</div>
-					<div>
-						<label for="closes_at" class="mb-2 block text-sm font-medium text-slate-700">Jam Tutup</label>
-						<input type="time" name="closes_at" id="closes_at" value="{{ old('closes_at', $profile?->closes_at) }}" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
-					</div>
-				</div>
-
-				</div>
-
-				<div class="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-					<p class="text-sm text-slate-500">Data ini akan menjadi profil dasar vendor baru.</p>
-					<div class="flex gap-3">
-						<a href="{{ url('/') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Batal</a>
-						<button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">{{ $profile ? 'Simpan Perbaikan Profil' : 'Simpan Profil' }}</button>
-					</div>
-				</div>
-			</form>
-		</div>
-		</div>
-	</div>
-<!-- Leaflet CSS & JS untuk Map Picker (lokal pada view ini) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-	var latInput = document.getElementById('latitude');
-	var lngInput = document.getElementById('longitude');
-	var initialLat = parseFloat(latInput.value) || -6.200000;
-	var initialLng = parseFloat(lngInput.value) || 106.816666;
-
-	var map = L.map('map').setView([initialLat, initialLng], 12);
-
-	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '© OpenStreetMap'
-	}).addTo(map);
-
-	var marker = null;
-	if (latInput.value && lngInput.value) {
-		marker = L.marker([initialLat, initialLng]).addTo(map);
-	}
-
-	map.on('click', function (e) {
-		var lat = e.latlng.lat.toFixed(7);
-		var lng = e.latlng.lng.toFixed(7);
-
-		if (marker) { map.removeLayer(marker); }
-		marker = L.marker([lat, lng]).addTo(map);
-
-		latInput.value = lat;
-		lngInput.value = lng;
-	});
-
-	// simple client-side phone validation on submit
-	var form = document.querySelector('form[action="{{ route('vendor.profile.store') }}"]');
-	if (form) {
-		form.addEventListener('submit', function (ev) {
-			var phone = document.getElementById('company_phone').value.trim();
-			var phoneRe = /^\d{6,20}$/;
-			if (phone && !phoneRe.test(phone)) {
-				ev.preventDefault();
-				alert('Nomor telepon harus berupa angka (6-20 digit).');
-				return false;
-			}
-		});
-	}
-});
-</script>
-
+        // simple client-side phone validation on submit 
+        var form = document.querySelector('form[action="{{ route('vendor.profile.store') }}"]'); 
+        if (form) {
+            form.addEventListener('submit', function (ev) {
+                var phone = document.getElementById('company_phone').value.trim(); 
+                var phoneRe = /^\d{6,20}$/; 
+                if (phone && !phoneRe.test(phone)) {
+                    ev.preventDefault(); 
+                    alert('Nomor telepon harus berupa angka (6-20 digit).'); 
+                    return false; 
+                } 
+            }); 
+        } 
+    }); 
+</script> 
 @endsection

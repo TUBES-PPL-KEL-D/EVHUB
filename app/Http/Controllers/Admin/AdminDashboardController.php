@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Ticket;
 use App\Models\VendorWarning;
-use App\Models\Spklu; 
+use App\Models\Spklu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB; 
-use Carbon\Carbon; 
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SpkluExport;
 
@@ -21,13 +21,14 @@ class AdminDashboardController extends Controller
         $selectedYear = $request->get('year', date('Y'));
 
         // Data Antrean & Laporan Masuk
-        $pendingVendors = Vendor::with('user')->where('status', 'Pending')->get();
+        // MENAMBAHKAN RELASI 'profile' AGAR NPWP BISA TERBACA
+        $pendingVendors = Vendor::with(['user', 'profile'])->where('status', 'Pending')->get();
         $recentTickets = Ticket::with('user')->where('status', 'pending')->latest()->take(5)->get();
 
         // Data Kelompok Vendor Berdasarkan Status
-        $approvedVendors = Vendor::with(['user', 'warnings'])->withCount('warnings')->where('status', 'Approved')->get();
-        $suspendedVendors = Vendor::with('user')->where('status', 'Suspended')->get();
-        $rejectedVendors = Vendor::with('user')->where('status', 'Rejected')->get();
+        $approvedVendors = Vendor::with(['user', 'warnings', 'profile'])->withCount('warnings')->where('status', 'Approved')->get();
+        $suspendedVendors = Vendor::with(['user', 'profile'])->where('status', 'Suspended')->get();
+        $rejectedVendors = Vendor::with(['user', 'profile'])->where('status', 'Rejected')->get();
 
         // Pemrosesan Kurva Analitik Pertumbuhan SPKLU
         $spkluGrowth = Spklu::select(
@@ -54,13 +55,13 @@ class AdminDashboardController extends Controller
         $chartData = array_values($chartData);
 
         return view('admin.dashboard', compact(
-            'pendingVendors', 
-            'recentTickets', 
-            'approvedVendors', 
-            'suspendedVendors', 
-            'rejectedVendors', 
-            'chartLabels', 
-            'chartData', 
+            'pendingVendors',
+            'recentTickets',
+            'approvedVendors',
+            'suspendedVendors',
+            'rejectedVendors',
+            'chartLabels',
+            'chartData',
             'selectedYear'
         ));
     }
@@ -83,14 +84,13 @@ class AdminDashboardController extends Controller
     {
         $request->validate(['message' => 'required|string|max:255']);
         $vendor = Vendor::findOrFail($id);
-
+        
         VendorWarning::create([
             'vendor_id' => $vendor->id,
             'message' => $request->message
         ]);
 
         $totalWarnings = $vendor->warnings()->count();
-
         if ($totalWarnings >= 3) {
             $vendor->update(['status' => 'Suspended']);
             return redirect()->route('admin.dashboard')->with('success', "Peringatan ke-3 dikirim. Sistem secara OTOMATIS membekukan akun {$vendor->company_name}.");
@@ -109,7 +109,7 @@ class AdminDashboardController extends Controller
     public function activate($id)
     {
         $vendor = Vendor::findOrFail($id);
-        $vendor->warnings()->delete(); 
+        $vendor->warnings()->delete();
         $vendor->update(['status' => 'Approved']);
         return redirect()->route('admin.dashboard')->with('success', "Akun vendor {$vendor->company_name} diaktifkan kembali.");
     }
@@ -138,11 +138,10 @@ class AdminDashboardController extends Controller
         return Excel::download(new SpkluExport, 'Rekap_Audit_SPKLU_EVHUB.xlsx');
     }
 
-    // Fungsi Baru Penanganan Resolusi Tiket Aduan
     public function resolveTicket($id)
     {
         $ticket = Ticket::findOrFail($id);
-        $ticket->update(['status' => 'resolved']); 
+        $ticket->update(['status' => 'resolved']);
         return redirect()->route('admin.dashboard')->with('success', "Tiket laporan dari {$ticket->user->name} berhasil diselesaikan.");
     }
 }

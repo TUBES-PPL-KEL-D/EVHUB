@@ -61,7 +61,6 @@ class VendorProfileController extends Controller
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'company_email' => ['nullable', 'email', 'max:255'],
-            // enforce numeric-only phone (6-20 digits) to match "nomor harus nomor"
             'company_phone' => ['nullable', 'regex:/^\d{6,20}$/'],
             'company_address' => ['required', 'string', 'max:1000'],
             'company_description' => ['nullable', 'string', 'max:2000'],
@@ -69,6 +68,11 @@ class VendorProfileController extends Controller
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'opens_at' => ['nullable', 'date_format:H:i'],
             'closes_at' => ['nullable', 'date_format:H:i'],
+            // Validasi data finansial baru yang diminta asprak
+            'npwp' => ['required', 'string', 'max:50'],
+            'bank_name' => ['required', 'string', 'max:100'],
+            'bank_account_number' => ['required', 'string', 'max:100'],
+            'bank_account_name' => ['required', 'string', 'max:150'],
         ]);
 
         $vendorProfile = VendorProfile::updateOrCreate(
@@ -82,15 +86,12 @@ class VendorProfileController extends Controller
             ]);
         }
 
-        $message = $hadProfile 
-            ? 'Profil vendor berhasil diperbarui.'
-            : 'Profil vendor berhasil disimpan. Silakan review dan lanjut upload dokumen legalitas.';
+        $message = $hadProfile ? 'Profil vendor berhasil diperbarui.' : 'Profil vendor berhasil disimpan. Silakan review dan lanjut upload dokumen legalitas.';
 
         return redirect()
             ->route('vendor.profile.show', $vendorProfile)
             ->with('success', $message);
     }
-
     public function updateHours(UpdateVendorHoursRequest $request, VendorProfile $vendorProfile)
     {
         $user = $this->resolveUser($request);
