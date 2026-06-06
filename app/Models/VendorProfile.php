@@ -20,8 +20,12 @@ class VendorProfile extends Model
         'longitude',
         'opens_at',
         'closes_at',
+        'npwp',
+        'bank_name',
+        'bank_account_number',
+        'bank_account_name',
     ];
-
+    
     public function user()
     {
         return $this->belongsTo(User::class);
