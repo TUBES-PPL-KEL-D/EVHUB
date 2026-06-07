@@ -207,10 +207,12 @@ class ChargerMachineController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $totalUsage = $transactions->sum('energy_consumed');
-        $totalRevenue = $transactions->where('status', 'success')->sum('total_price');
-        $totalTransactions = $transactions->count();
-        $successTransactions = $transactions->where('status', 'success')->count();
+            $successfulTransactions = $transactions->where('status', 'success');
+
+            $totalUsage = $successfulTransactions->sum('energy_consumed');
+            $totalRevenue = $successfulTransactions->sum('total_price');
+            $totalTransactions = $transactions->count();
+            $successTransactions = $successfulTransactions->count();
 
         return view('vendor.chargers.usage-history', compact(
             'transactions', 'totalUsage', 'totalRevenue', 'totalTransactions', 'successTransactions'
