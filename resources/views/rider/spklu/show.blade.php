@@ -136,20 +136,36 @@
                             </div>
 
                             @php
-                                $queueCount = \App\Models\ChargingQueue::where('charger_machine_id', $machine->id)->where('status', 'waiting')->count();
+                                $queueCount = \App\Models\ChargingQueue::where('charger_machine_id', $machine->id)
+                                    ->where('status', 'waiting')
+                                    ->count();
                             @endphp
-                            <div class="mt-auto pt-2">
-                                @if(strtolower($machine->status) === 'available')
-                                <a href="{{ route('rider.transactions.prepare', $machine->id) }}" class="block w-full text-center bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-3 rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10"> Mulai Mengisi </a>
-                                @elseif(strtolower($machine->status) === 'unavailable' || strtolower($machine->status) === 'dipakai')
-                                <form action="{{ route('rider.queues.store') }}" method="POST">
+
+                            @if(strtolower($machine->status) === 'available')
+                                <a href="{{ route('rider.transactions.prepare', $machine->id) }}"
+                                class="block w-full rounded-2xl bg-emerald-500 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-emerald-400">
+                                    Mulai Mengisi
+                                </a>
+                            @elseif(strtolower($machine->status) === 'unavailable' || strtolower($machine->status) === 'dipakai')
+                                <form action="{{ route('rider.queues.store') }}" method="POST" class="w-full">
                                     @csrf
                                     <input type="hidden" name="charger_machine_id" value="{{ $machine->id }}">
-                                    <button type="submit" class="w-full text-center bg-amber-500 hover:bg-amber-400 text-slate-900 font-black py-3 rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-amber-500/10"> Antre Sekarang ({{ $queueCount }} Org) </button>
+
+                                    <button type="submit"
+                                            class="block w-full rounded-2xl bg-amber-500 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-amber-400">
+                                        Masuk Antrean Digital
+                                        @if($queueCount > 0)
+                                            <span class="ml-1">({{ $queueCount }} antrean)</span>
+                                        @endif
+                                    </button>
                                 </form>
-                                @else
-                                <button disabled class="w-full text-center bg-slate-800 text-slate-500 border border-slate-700 font-black py-3 rounded-xl text-xs uppercase tracking-widest cursor-not-allowed"> Sedang Maintenance </button>
-                                @endif
+                            @else
+                                <button type="button"
+                                        disabled
+                                        class="block w-full cursor-not-allowed rounded-2xl bg-slate-700 px-4 py-3 text-center text-sm font-bold text-slate-400">
+                                    Sedang Maintenance
+                                </button>
+                            @endif
                             </div>
                         </div>
                     </div>
