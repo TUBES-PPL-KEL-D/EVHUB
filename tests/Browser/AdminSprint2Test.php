@@ -78,6 +78,40 @@ class AdminSprint2Test extends DuskTestCase
         });
     }
 
+
+    /**
+     * PBI 36: Admin mengekspor rekap data SPKLU ke Excel
+     */
+    public function test_admin_can_export_spklu_data()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->admin)
+                    ->visit('/admin/dashboard')
+                    
+                    // 1. Pindah ke tab Manajemen Vendor & Stasiun terlebih dahulu
+                    ->click('#tabBtn-manajemen')
+                    
+                    // 2. Tunggu sampai tombolnya benar-benar terlihat di layar
+                    ->waitForText('DOWNLOAD BERKAS EXCEL', 10)
+                    ->pause(1000); // Jeda transisi tab
+            
+            // 3. Eksekusi klik
+            $browser->script("
+                let elements = document.querySelectorAll('a, button');
+                for (let el of elements) {
+                    if (el.innerText.toUpperCase().includes('EXCEL')) {
+                        el.click();
+                        break;
+                    }
+                }
+            ");
+
+            // 4. Jeda 2 detik agar file terunduh, lalu pastikan tidak ada error
+            $browser->pause(2000)
+                    ->assertPathIs('/admin/dashboard'); 
+        });
+    }
+
     /**
      * PBI 37: Admin melihat grafik analitik pertumbuhan SPKLU
      */
