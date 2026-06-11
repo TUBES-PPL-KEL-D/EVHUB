@@ -44,7 +44,7 @@ class TransactionTest extends DuskTestCase
 
         $user = User::factory()->create();
 
-        Vehicle::create([
+        $vehicle = Vehicle::create([
             'user_id' => $user->id,
             'merk' => 'Hyundai',
             'model' => 'Ioniq 5',
@@ -54,7 +54,7 @@ class TransactionTest extends DuskTestCase
 
         User::find($user->id)->update(['balance' => 100000]);
 
-        $this->browse(function (Browser $browser) use ($user) {
+        $this->browse(function (Browser $browser) use ($user, $vehicle) {
             $browser->loginAs($user)
                     ->visit('/rider/peta')
                     ->waitFor('.leaflet-marker-icon', 15)
@@ -65,7 +65,7 @@ class TransactionTest extends DuskTestCase
                     ->clickLink('Mulai Mengisi')
                     ->assertSee('Konfigurasi Pengisian')
                     ->type('energy_target', '15')
-                    ->select('vehicle_id', '5')
+                    ->select('vehicle_id', (string) $vehicle->id)
                     ->press('Konfirmasi & Mulai Mengisi')
                     ->pause(2000)
                     ->assertSee('Riwayat Pengisian Daya')
@@ -78,7 +78,7 @@ class TransactionTest extends DuskTestCase
 
         $user = User::factory()->create();
 
-        Vehicle::create([
+        $vehicle = Vehicle::create([
             'user_id' => $user->id,
             'merk' => 'Hyundai',
             'model' => 'Ioniq 5',
@@ -88,7 +88,7 @@ class TransactionTest extends DuskTestCase
 
         User::find($user->id)->update(['balance' => 100000]);
 
-        $this->browse(function (Browser $browser) use ($user) {
+        $this->browse(function (Browser $browser) use ($user, $vehicle) {
             $browser->loginAs($user)
                     ->visit('/rider/peta')
                     ->waitFor('.leaflet-marker-icon', 15)
@@ -99,7 +99,7 @@ class TransactionTest extends DuskTestCase
                     ->clickLink('Mulai Mengisi')
                     ->assertSee('Konfigurasi Pengisian')
                     ->type('energy_target', '15')
-                    ->select('vehicle_id', '5')
+                    ->select('vehicle_id', (string) $vehicle->id)
                     ->press('Konfirmasi & Mulai Mengisi')
                     ->pause(2000)
                     ->assertSee('Riwayat Pengisian Daya')
@@ -114,7 +114,7 @@ class TransactionTest extends DuskTestCase
 
         $user = User::factory()->create();
 
-        Vehicle::create([
+        $vehicle = Vehicle::create([
             'user_id' => $user->id,
             'merk' => 'Hyundai',
             'model' => 'Ioniq 5',
@@ -124,7 +124,7 @@ class TransactionTest extends DuskTestCase
 
         User::find($user->id)->update(['balance' => 100000]);
 
-        $this->browse(function (Browser $browser) use ($user) {
+        $this->browse(function (Browser $browser) use ($user, $vehicle) {
             $browser->loginAs($user)
                     ->visit('/rider/peta')
                     ->waitFor('.leaflet-marker-icon', 15)
@@ -136,7 +136,7 @@ class TransactionTest extends DuskTestCase
                     ->clickLink('Mulai Mengisi')
                     ->assertSee('Konfigurasi Pengisian')
                     ->type('energy_target', '15')
-                    ->select('vehicle_id', '5')
+                    ->select('vehicle_id', (string) $vehicle->id)
                     ->press('Konfirmasi & Mulai Mengisi')
                     ->pause(2000)
                     ->assertSee('Riwayat Pengisian Daya')
