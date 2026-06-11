@@ -30,8 +30,8 @@ class UserTest extends DuskTestCase
                     ->type('password', 'password123')
                     ->type('password_confirmation', 'password123')
                     ->press('Registrasi')
-                    ->assertPathIs('/rider/vehicles')
-                    ->assertSee('Akun berhasil dibuat dan Anda telah login.');
+                    ->assertPathIs('/rider/peta')
+                    ->assertSee('Jaringan SPKLU');
         });
     }
 
