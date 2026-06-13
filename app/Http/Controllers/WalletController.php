@@ -11,10 +11,8 @@ class WalletController extends Controller
 {
     public function index()
     {
-        // Menggunakan auth bawaan, sesuaikan jika timmu menggunakan logic custom auth
         $user = Auth::user(); 
-        
-        // Ambil riwayat dompet terbaru
+
         $histories = WalletHistory::where('user_id', $user->id)
                                   ->orderBy('created_at', 'desc')
                                   ->get();
@@ -24,7 +22,7 @@ class WalletController extends Controller
 
     public function topUp(Request $request)
     {
-        // 1. Validasi input nominal top up
+
         $request->validate([
             'amount' => 'required|numeric|min:10000|max:10000000',
         ], [
@@ -37,17 +35,14 @@ class WalletController extends Controller
         $user = Auth::user();
         $amount = $request->amount;
 
-        // 2. Gunakan DB Transaction agar proses update saldo & pencatatan riwayat sinkron
         DB::beginTransaction();
         try {
-            // Update saldo user
             $user->balance += $amount;
             $user->save();
 
-            // Catat log ke tabel wallet_histories
             WalletHistory::create([
                 'user_id' => $user->id,
-                'reference_id' => null, // null karena ini top-up murni, bukan pembayaran
+                'reference_id' => null,
                 'type' => 'topup',
                 'amount' => $amount,
             ]);
