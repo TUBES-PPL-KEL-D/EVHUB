@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="space-y-6 animate-fade-in-up pb-10">
-
     @if(session('success'))
     <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-center space-x-3 shadow-sm">
         <div class="bg-emerald-500 p-1.5 rounded-full text-white">
@@ -52,11 +51,10 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        
         <div class="lg:col-span-1 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 backdrop-blur-xl shadow-xl">
             <h2 class="text-lg font-bold text-white mb-1">Ajukan Pencairan</h2>
             <p class="text-xs text-slate-400 mb-5">Batas penarikan dana minimum senilai Rp10.000.</p>
-
+            
             <form action="{{ route('vendor.withdrawals.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
@@ -64,26 +62,21 @@
                     <input type="number" name="amount" min="10000" max="{{ $availableBalance }}" placeholder="Contoh: 50000" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Bank</label>
-                    <input type="text" name="bank_name" placeholder="Contoh: BCA, Mandiri, BNI" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nama Pemilik Rekening</label>
-                    <input type="text" name="bank_account_name" placeholder="Nama sesuai pemilik rekening" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Nomor Rekening Bank</label>
-                    <input type="text" name="bank_account_number" placeholder="Masukkan nomor rekening" required class="w-full px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors">
+                <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pencairan otomatis ditujukan ke:</p>
+                    <p class="text-sm font-bold text-emerald-400 uppercase">{{ $vendor->profile->bank_name ?? 'BANK BELUM DIATUR' }} - {{ $vendor->profile->bank_account_number ?? '-' }}</p>
+                    <p class="text-xs text-slate-300">a/n {{ $vendor->profile->bank_account_name ?? '-' }}</p>
+                    
+                    <input type="hidden" name="bank_name" value="{{ $vendor->profile->bank_name ?? '' }}">
+                    <input type="hidden" name="bank_account_name" value="{{ $vendor->profile->bank_account_name ?? '' }}">
+                    <input type="hidden" name="bank_account_number" value="{{ $vendor->profile->bank_account_number ?? '' }}">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">Catatan (Opsional)</label>
                     <textarea name="notes" placeholder="Pesan atau catatan tambahan untuk admin..." class="w-full h-20 px-4 py-3 text-sm border border-slate-700 rounded-xl bg-slate-950 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors resize-none"></textarea>
                 </div>
-
+                
                 <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white py-4 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all duration-300 font-bold text-xl mt-4 hover:-translate-y-1">
                     Kirim Pengajuan
                 </button>
@@ -93,7 +86,7 @@
         <div class="lg:col-span-2 bg-slate-900/40 border border-slate-700/50 rounded-[2rem] p-6 md:p-8 backdrop-blur-xl shadow-xl">
             <h2 class="text-lg font-bold text-white mb-1">Riwayat Pengajuan</h2>
             <p class="text-xs text-slate-400 mb-5">Daftar rekam log pelacakan status pencairan dana Anda.</p>
-
+            
             <div class="space-y-4">
                 @forelse ($withdrawals as $wd)
                     @php
@@ -105,7 +98,6 @@
                         ];
                         $badgeClass = $badgeStyles[$wd->status] ?? 'bg-slate-800 text-slate-400';
                     @endphp
-
                     <div class="p-5 bg-slate-800/30 rounded-2xl border border-slate-700/40 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition-colors hover:border-slate-600">
                         <div class="space-y-2 flex-grow">
                             <div class="flex items-center gap-3">
@@ -114,12 +106,10 @@
                             </div>
                             <p class="text-lg font-black text-white">Rp{{ number_format($wd->amount, 0, ',', '.') }}</p>
                             <p class="text-[10px] text-slate-500 font-medium">Rekening: <span class="uppercase text-slate-400 font-bold">{{ $wd->bank_name }}</span> - {{ $wd->bank_account_number }} a/n {{ $wd->bank_account_name }}</p>
-                            
                             @if($wd->notes)
                                 <p class="text-[10px] text-slate-600 leading-relaxed bg-slate-950/40 p-2 rounded-lg mt-1 border border-slate-800">Catatan: "{{ $wd->notes }}"</p>
                             @endif
                         </div>
-
                         <div class="flex flex-col gap-2 shrink-0 sm:items-end">
                             <span class="text-[10px] font-mono text-slate-500">{{ $wd->created_at->format('d/m/Y H:i') }}</span>
                             
@@ -142,7 +132,6 @@
                 @endforelse
             </div>
         </div>
-
     </div>
 </div>
 @endsection

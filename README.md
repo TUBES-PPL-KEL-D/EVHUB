@@ -1,36 +1,96 @@
-# EV-HUB Project (Kelompok D)
+# EVHub - Ekosistem Infrastruktur SPKLU Terintegrasi
 
-## RULES NGERJAIN (Standar Kolaborasi Git & Jira)
+EVHub adalah platform berbasis web yang dirancang untuk menjembatani dan mengoptimalkan interaksi antara Pengendara Kendaraan Listrik (Rider), Penyedia Infrastruktur (Vendor), dan Pengelola Platform (Admin). Sistem ini menyediakan solusi *end-to-end* mulai dari pemetaan stasiun pengisian daya, manajemen antrean digital, pencocokan perangkat keras, hingga rekonsiliasi keuangan otomatis.
 
-**ATURAN WAJIB:** Tidak boleh ada yang melakukan `git push origin main` secara langsung. Semua pengerjaan harus menggunakan **Branch Perorangan** masing-masing dan disatukan ke `main` melalui mekanisme **Pull Request (PR)**.
+## Identitas Pengembang
+Kelompok D - Kelas SI-47-04, S1 Sistem Informasi
 
-### Langkah Pengerjaan Harian:
+**Anggota Kelompok:**
+1. Wisnu Cakra P. P.
+2. Fakhri M. Habibi
+3. Langgeng Yongi Surya
+4. Riehand Muhammad
+5. M. Byan Burika
+6. M. Azka As-Sidqi
+7. Aimee Clarissa A. S.
+
+---
+
+## Fitur Utama
+
+Sistem ini dibangun dengan mempertimbangkan tiga perspektif pengguna utama:
+
+### 1. Modul Rider (Pengendara)
+* **Smart Connector Matching:** Memvalidasi kecocokan tipe colokan stasiun pengisian dengan spesifikasi kendaraan di Garasi Digital milik pengendara secara otomatis.
+* **Queueing System:** Manajemen antrean digital secara *real-time* dengan estimasi durasi pengisian.
+* **EV-Pay & Transaksi Digital:** Sistem pembayaran terintegrasi yang mampu menerbitkan struk digital bersinkronisasi waktu nyata.
+
+### 2. Modul Vendor (Mitra SPKLU)
+* **Manajemen Stasiun & Mesin:** Kontrol penuh atas pengaturan jam operasional, penambahan mesin charger, dan penetapan tarif per kWh.
+* **Wallet & Automated Withdrawal:** Pencatatan otomatis pendapatan operasional (Wallet History) dan kemudahan penarikan dana usaha tanpa perlu mengisi ulang data rekening.
+* **Validasi Legalitas:** Keamanan pendaftaran dengan mandatori kelengkapan Nomor Rekening dan NPWP.
+
+### 3. Modul Admin (Pengelola Platform)
+* **Verifikasi Dokumen:** Otoritas untuk menyetujui atau menolak pendaftaran vendor baru berdasarkan kelengkapan legalitas.
+* **Sistem Pelaporan Terpusat:** Meninjau dan memberikan umpan balik langsung terhadap tiket laporan kendala dari pengguna.
+* **Audit Keuangan & Analitik:** Melakukan validasi pengajuan penarikan dana vendor serta memantau analitik tren operasional SPKLU.
+
+---
+
+## Panduan Instalasi & Menjalankan Aplikasi
+
+Pastikan Anda telah menginstal PHP, Composer, Node.js, dan MySQL di sistem Anda sebelum memulai. Ikuti langkah-langkah terstruktur berikut untuk menjalankan aplikasi di lingkungan lokal:
+
+**1. Clone Repositori**
+git clone https://github.com/TUBES-PPL-KEL-D/EVHUB.git
+cd evhub
 
 
+**2. Instalasi Dependensi Backend (PHP/Laravel)**
+composer install
 
-**1. Pindah/Buat Branch Perorangan**
-Gunakan branch dengan nama masing-masing. Jika branch belum ada, gunakan perintah ini:
-`git checkout -b NamaKamu_TubesPPL`
-*(Contoh: Langgeng_TubesPPL, Wisnu_TubesPPL)*
+**3. Instalasi Dependensi Frontend (Node/Vite)**
+npm install
 
-Jika branch sudah pernah dibuat sebelumnya, cukup ketik:
-`git checkout NamaKamu_TubesPPL`
+**4. Konfigurasi Environment**
+Salin file `.env.example` menjadi `.env`.
 
-**2. Sinkronisasi Kode Utama (Wajib Awal Pengerjaan)**
-Pastikan kode selalu *up-to-date* dengan pekerjaan teman-teman yang lain.
-`git pull origin main`
+cp .env.example .env
 
-**3. Kerjakan Kode (Laravel)**
-Kerjakan fitur (Controller, Model, View, Migration) sesuai dengan pembagian PBI di Jira.
+Buka file `.env` dan sesuaikan konfigurasi basis data Anda (pastikan Anda sudah membuat database kosong di MySQL terlebih dahulu):
 
-**4. Simpan dan Commit (WAJIB CANTUMKAN ID JIRA)**
-Meskipun pengerjaan disatukan dalam satu branch, **pesan commit harus tetap dipisah per pekerjaan** agar terdeteksi oleh Jira.
-`git add .`
-`git commit -m "[TPD-X] feat: membuat antarmuka dashboard admin"`
-*(Ganti TPD-X dengan ID tiket Jira yang sedang dikerjakan. Contoh: TPD-19)* Ini dicek di jira yah
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nama_database_evhub
+DB_USERNAME=root
+DB_PASSWORD=
 
-**5. Push ke Branch Sendiri**
-`git push origin NamaKamu_TubesPPL`
+**5. Generate Application Key**
+php artisan key:generate
 
-**6. Buat Pull Request (PR)**
-Jika progresmu udh kelar atau fitur sudah selesai, buka GitHub dan buat PR dari branch perorangan menuju `main`. Infokan ke grup untuk di-review oleh PM sblm di-Merge.
+**6. Migrasi dan Seeding Basis Data**
+Sistem membutuhkan *dummy data* awal untuk peran Admin, Vendor, Rider, serta master data mesin dan kendaraan.
+
+php artisan migrate:fresh --seed
+
+**7. Jalankan Kompilasi Aset Frontend (Terminal 1)**
+npm run dev
+
+**8. Jalankan Server Development Laravel (Terminal 2)**
+php artisan serve
+
+
+Aplikasi kini dapat diakses melalui browser di `http://127.0.0.1:8000`.
+
+## Catatan Khusus untuk Pengujian (Testing)
+
+Proyek ini dilengkapi dengan serangkaian *Test Case* fungsional. Karena sistem sangat bergantung pada ketersediaan data *seeder* yang spesifik untuk setiap alur transaksi, status antrean, dan saldo simulasi, terdapat aturan wajib yang harus diikuti saat menjalankan pengujian:
+
+**PENTING:** Anda diwajibkan untuk menjalankan perintah migrasi ulang beserta *seeder* **sebelum menjalankan setiap pengujian individual (per test case)**.
+
+Gunakan perintah ini setiap kali sebelum mengetes fitur baru:
+
+php artisan migrate:fresh --seed
+
+Tindakan ini mencegah terjadinya *error* akibat data *seeder* yang habis atau status data yang sudah berubah karena pengujian pada skenario sebelumnya.
