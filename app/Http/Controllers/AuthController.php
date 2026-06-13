@@ -61,18 +61,20 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi ketat: Hanya mengizinkan pilihan input 'rider' atau 'vendor' dari luar
+        // Validasi ketat: Tambahkan phone ke dalam validasi
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|max:20', // <-- TAMBAHAN BARU
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:rider,vendor' 
         ]);
 
-        // Pembuatan entitas user baru ke database
+        // Pembuatan entitas user baru ke database (Tambahkan phone)
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone, // <-- TAMBAHAN BARU
             'password' => Hash::make($request->password),
             'role' => $request->role, 
         ]);
