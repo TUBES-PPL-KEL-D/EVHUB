@@ -14,7 +14,6 @@ class ChargerMachineSeeder extends Seeder
     public function run(): void
     {
         $machines = [
-            // === SPKLU ID: 1 ===
             [
                 'vendor_id' => 1,
                 'spklu_id' => 1,
@@ -60,7 +59,6 @@ class ChargerMachineSeeder extends Seeder
                 'status' => 'maintenance',
             ],
 
-            // === SPKLU ID: 2 ===
             [
                 'vendor_id' => 1,
                 'spklu_id' => 2,
@@ -106,7 +104,6 @@ class ChargerMachineSeeder extends Seeder
                 'status' => 'available',
             ],
 
-            // === SPKLU ID: 3 ===
             [
                 'vendor_id' => 1,
                 'spklu_id' => 3,
