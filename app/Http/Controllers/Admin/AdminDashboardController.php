@@ -138,10 +138,21 @@ class AdminDashboardController extends Controller
         return Excel::download(new SpkluExport, 'Rekap_Audit_SPKLU_EVHUB.xlsx');
     }
 
-    public function resolveTicket($id)
+
+    public function resolveTicket(Request $request, $id)
     {
+
+        $request->validate([
+            'feedback' => 'required|string'
+        ]);
+
         $ticket = Ticket::findOrFail($id);
-        $ticket->update(['status' => 'resolved']);
-        return redirect()->route('admin.dashboard')->with('success', "Tiket laporan dari {$ticket->user->name} berhasil diselesaikan.");
+        
+        $ticket->update([
+            'status' => 'resolved',
+            'admin_response' => $request->feedback
+        ]);
+        
+        return redirect()->route('admin.dashboard')->with('success', "Tiket laporan dari {$ticket->user->name} berhasil diselesaikan dan tanggapan telah dikirim.");
     }
 }
