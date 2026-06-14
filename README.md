@@ -38,6 +38,20 @@ Sistem ini dibangun dengan mempertimbangkan tiga perspektif pengguna utama:
 ---
 
 ## Panduan Instalasi & Menjalankan Aplikasi
+*ps: Semua Foto Di Vendor saat pertama login/daftar merupakan seeder, makanya tidak muncul, untuk memunculkan gambar yang sesuai silahkan mencoba login sebagai Vendor baru dan mencoba menambahkan foto di Layanan Mesin Charger
+
+Data Seeder:
+Admin:
+Usn: admin@evhub.com
+Pw: admin123
+
+Vendor:
+Usn: vendor@evhub.com
+Pw: vendor123
+
+Rider:
+Usn: rider@evhub.com
+Pw: rider123
 
 Pastikan Anda telah menginstal PHP, Composer, Node.js, dan MySQL di sistem Anda sebelum memulai. Ikuti langkah-langkah terstruktur berikut untuk menjalankan aplikasi di lingkungan lokal:
 
