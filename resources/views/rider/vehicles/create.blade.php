@@ -579,14 +579,14 @@ function checkForm() {
     const connector = document.querySelector('input[name="connector_type"]:checked')?.value || '';
     const btn = document.getElementById('submit-btn');
 
-    // Show plate section if model is selected
+    
     if (merk && model) {
         if (!document.getElementById('plate-section').style.display || document.getElementById('plate-section').style.display === 'none') {
             document.getElementById('plate-section').style.display = 'block';
             if (connector) {
                 setStep(4);
             } else {
-                setStep(3); // Step 3 is connector, but we're allowing to skip
+                setStep(3); 
             }
             setTimeout(() => {
                 document.getElementById('plate-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -595,11 +595,11 @@ function checkForm() {
         }
     }
 
-    // Form valid jika: merk + model + plate. Connector optional!
+    
     if (merk && model && plate.length >= 4) {
         btn.disabled = false;
         
-        // Get connector display name
+       
         const connectorNames = {
             'CCS': 'CCS (Combined Charging System)',
             'CHAdeMO': 'CHAdeMO',

@@ -17,7 +17,7 @@ class GarasiDigitalTest extends DuskTestCase
 {
     use DatabaseMigrations;
 
-    // TC.Garasi.001 - Positive
+    // PBI 19 
     public function test_pengendara_can_add_new_ev_to_garage()
     {
         $user = User::factory()->create();
@@ -45,7 +45,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.002 - Negative
+    
     public function test_pengendara_cannot_submit_without_selecting_brand_and_model()
     {
         $user = User::factory()->create();
@@ -60,7 +60,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.003 - Positive
+    // PBI 20
     public function test_pengendara_can_view_their_ev_list()
     {
         $user = User::factory()->create();
@@ -83,7 +83,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.004 - Negative
+    
     public function test_pengendara_sees_empty_state_when_no_ev_registered()
     {
         $user = User::factory()->create();
@@ -96,7 +96,6 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.005 - Positive
     public function test_pengendara_can_update_ev_specification()
     {
         $user = User::factory()->create();
@@ -130,7 +129,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.006 - Negative
+    // PBI 21
     public function test_pengendara_cannot_update_ev_with_duplicate_license_plate()
     {
         $user = User::factory()->create();
@@ -168,7 +167,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.007 - Positive
+    
     public function test_pengendara_can_delete_ev_from_garage()
     {
         $user = User::factory()->create();
@@ -195,7 +194,7 @@ class GarasiDigitalTest extends DuskTestCase
         });
     }
 
-    // TC.Garasi.008 - Negative
+    // PBI 22
     public function test_pengendara_can_cancel_delete_ev_from_garage()
     {
         $user = User::factory()->create();
@@ -417,7 +416,7 @@ class GarasiDigitalTest extends DuskTestCase
         $this->assertSame(0, $matchingStatus['count']);
     }
 
-    // PBI 56 - 
+    // PBI 56 
     
     public function test_pengendara_melihat_notifikasi_servis_baterai_ketika_jadwal_servis_mendekat()
     {
@@ -620,12 +619,12 @@ class GarasiDigitalTest extends DuskTestCase
 
         $testImagePath = base_path('tests/resources/test-image.png');
         
-        // Ciptakan test image jika belum ada
+     
         if (!file_exists(dirname($testImagePath))) {
             mkdir(dirname($testImagePath), 0755, true);
         }
         if (!file_exists($testImagePath)) {
-            // Buat image placeholder 1x1 pixel PNG
+          
             $img = imagecreatetruecolor(1, 1);
             imagepng($img, $testImagePath);
             imagedestroy($img);
@@ -643,7 +642,7 @@ class GarasiDigitalTest extends DuskTestCase
                     ->assertSee('Data kendaraan EV berhasil diperbarui.');
         });
 
-        // Verifikasi foto tersimpan di database
+       
         $updatedVehicle = Vehicle::find($vehicle->id);
         $this->assertNotNull($updatedVehicle->vehicle_photo_path);
     }
@@ -653,7 +652,6 @@ class GarasiDigitalTest extends DuskTestCase
     {
         $user = User::factory()->create();
 
-        // Buat test image pertama
         $testImagePath = base_path('tests/resources/test-image.png');
         if (!file_exists(dirname($testImagePath))) {
             mkdir(dirname($testImagePath), 0755, true);
@@ -739,7 +737,7 @@ class GarasiDigitalTest extends DuskTestCase
             'license_plate' => 'L 8888 EV',
         ]);
 
-        // Buat file dengan format yang tidak didukung (svg)
+       
         $testFilePath = base_path('tests/resources/test-file.svg');
         if (!file_exists(dirname($testFilePath))) {
             mkdir(dirname($testFilePath), 0755, true);
