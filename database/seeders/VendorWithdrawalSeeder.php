@@ -10,7 +10,6 @@ class VendorWithdrawalSeeder extends Seeder
 {
     public function run(): void
     {
-        // Cari vendor yang sudah Approved (dari seeder bawaanmu)
         $vendor = Vendor::where('status', 'Approved')->first();
 
         if ($vendor) {

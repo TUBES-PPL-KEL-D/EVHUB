@@ -25,7 +25,6 @@ class ChargerMachine extends Model
 
     public function vendor(): BelongsTo
     {
-        // UBAH DARI User::class MENJADI Vendor::class
         return $this->belongsTo(Vendor::class, 'vendor_id');
     }
 

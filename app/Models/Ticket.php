@@ -11,7 +11,6 @@ class Ticket extends Model
 
     protected $guarded = ['id'];
 
-    // Relasi: Tiket ini dimiliki oleh satu pengguna (user)
     public function user()
     {
         return $this->belongsTo(User::class);

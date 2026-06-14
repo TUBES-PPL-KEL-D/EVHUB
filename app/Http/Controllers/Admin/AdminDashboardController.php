@@ -21,7 +21,6 @@ class AdminDashboardController extends Controller
         $selectedYear = $request->get('year', date('Y'));
 
         // Data Antrean & Laporan Masuk
-        // MENAMBAHKAN RELASI 'profile' AGAR NPWP BISA TERBACA
         $pendingVendors = Vendor::with(['user', 'profile'])->where('status', 'Pending')->get();
         $recentTickets = Ticket::with('user')->where('status', 'pending')->latest()->take(5)->get();
 

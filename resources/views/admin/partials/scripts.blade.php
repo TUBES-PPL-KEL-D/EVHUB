@@ -90,12 +90,10 @@
         const btnModalCloseNeutral = document.getElementById('btnModalCloseNeutral');
 
         if (status === 'Approved') {
-            // Sembunyikan tombol verifikasi, ganti dengan tombol tutup murni
             formApprove.classList.add('hidden');
             formReject.classList.add('hidden');
             btnModalCloseNeutral.classList.remove('hidden');
         } else {
-            // Munculkan kembali tombol aksi terima/tolak untuk berkas antrean baru
             formApprove.classList.remove('hidden');
             formReject.classList.remove('hidden');
             btnModalCloseNeutral.classList.add('hidden');

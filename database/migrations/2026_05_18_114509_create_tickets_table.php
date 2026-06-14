@@ -10,11 +10,10 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            // Relasi ke tabel users (pengendara yang melapor)
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('subject');
             $table->text('description');
-            // Status tiket laporan
+
             $table->enum('status', ['pending', 'processing', 'resolved'])->default('pending');
             $table->timestamps();
         });

@@ -45,10 +45,7 @@ class SpkluController extends Controller
         return response()->json($spklus);
     }
 
-    /**
-     * Mengambil data marker secara dinamis dari database untuk merespons Peta Leaflet Rider.
-     * [TELAH DIPERBAIKI: MENGHAPUS HARDCODED DUMMY, SEKARANG MEMBACA DATABASE RIIL VENDOR]
-     */
+    
     public function getDynamicMarkers(Request $request)
     {
         // 1. Tarik seluruh data SPKLU riil dari database beserta relasi mesin chargernya
@@ -112,9 +109,7 @@ class SpkluController extends Controller
         return response()->json($formattedData->values()->all());
     }
 
-    /**
-     * Endpoint tambahan untuk pencocokan tipe konektor kendaraan aktif milik pengendara.
-     */
+
     public function getMarkersWithVehicleMatching()
     {
         $userId = Auth::id();

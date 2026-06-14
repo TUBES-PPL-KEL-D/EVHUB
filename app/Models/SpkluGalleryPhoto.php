@@ -11,7 +11,7 @@ class SpkluGalleryPhoto extends Model
 
     protected $fillable = [
         'spklu_id',
-        'image_path', // Diubah kembali ke penamaan asli database
+        'image_path', 
         'caption',
         'sort_order',
     ];

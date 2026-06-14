@@ -9,10 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('charger_machines', function (Blueprint $table) {
-            // Hapus foreign key lama
             $table->dropForeign(['vendor_id']);
-            
-            // Buat foreign key baru yang strict ke tabel vendors
+
             $table->foreign('vendor_id')
                   ->references('id')->on('vendors')
                   ->onDelete('cascade');

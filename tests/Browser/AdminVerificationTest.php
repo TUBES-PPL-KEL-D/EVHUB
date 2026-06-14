@@ -18,18 +18,23 @@ class AdminVerificationTest extends DuskTestCase
      */
     public function test_admin_mengecek_daftar_vendor_baru()
     {
-        $user = User::factory()->create();
+        // 1. Buat akun Admin agar tidak ditendang middleware
+        $admin = User::factory()->create(['role' => 'admin']);
+        
+        // 2. Buat akun Vendor dummy
+        $vendorUser = User::factory()->create();
         Vendor::create([
-            'user_id' => $user->id,
+            'user_id' => $vendorUser->id,
             'company_name' => 'PT Antre Verifikasi',
-            'npwp' => '123456789012345',
-            'address' => 'Jl. Bojongsoang No. 1',
             'status' => 'Pending',
         ]);
 
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/admin/dashboard')
-                    ->assertSee('Antrean Dokumen')
+        $this->browse(function (Browser $browser) use ($admin) {
+            $browser->loginAs($admin)
+                    ->visit('/admin/dashboard')
+                    // 3. Harus masuk ke tab verifikasi dulu
+                    ->click('#tabBtn-verifikasi')
+                    ->waitForText('PT Antre Verifikasi', 10)
                     ->assertSee('PT Antre Verifikasi');
         });
     }
@@ -40,23 +45,29 @@ class AdminVerificationTest extends DuskTestCase
      */
     public function test_admin_menyetujui_izin_operasional_vendor()
     {
-        $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $vendorUser = User::factory()->create();
         Vendor::create([
-            'user_id' => $user->id, 
+            'user_id' => $vendorUser->id, 
             'company_name' => 'PT Lolos Verifikasi', 
-            'npwp' => '1', 
-            'address' => 'A', 
             'status' => 'Pending'
         ]);
 
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/admin/dashboard')
-                    ->assertSee('PT Lolos Verifikasi')
-                    ->press('TERIMA')
-                    ->pause(3000) 
-                    ->refresh()  
-                    ->waitForText('Semua Selesai!', 10)
-                    ->assertDontSee('PT Lolos Verifikasi');
+        $this->browse(function (Browser $browser) use ($admin) {
+            $browser->loginAs($admin)
+                    ->visit('/admin/dashboard')
+                    ->click('#tabBtn-verifikasi')
+                    ->waitForText('PT Lolos Verifikasi', 10)
+                    // Buka modal tinjauan
+                    ->script("document.querySelectorAll('button[onclick*=\"openReviewModal\"]')[0].click();");
+            
+            $browser->waitFor('#reviewModal')
+                    ->pause(1000)
+                    // Klik tombol setujui kemitraan di dalam modal
+                    ->click('#formApprove button[type="submit"]')
+                    // Menunggu notifikasi muncul dan memvalidasi teks di dalamnya
+                    ->waitForText('telah diaktifkan', 10)
+                    ->assertSee('PT Lolos Verifikasi'); 
         });
     }
 
@@ -66,18 +77,20 @@ class AdminVerificationTest extends DuskTestCase
      */
     public function test_admin_memantau_daftar_stasiun_spklu()
     {
-        $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $vendorUser = User::factory()->create();
         Vendor::create([
-            'user_id' => $user->id, 
+            'user_id' => $vendorUser->id, 
             'company_name' => 'PT Vendor Aktif', 
-            'npwp' => '2', 
-            'address' => 'B', 
             'status' => 'Approved'
         ]);
 
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/admin/stations')
-                    ->assertSee('Vendor Aktif')
+        $this->browse(function (Browser $browser) use ($admin) {
+            $browser->loginAs($admin)
+                    ->visit('/admin/dashboard')
+                    // Masuk ke tab manajemen (pengganti /admin/stations)
+                    ->click('#tabBtn-manajemen')
+                    ->waitForText('Daftar Vendor Aktif', 10)
                     ->assertSee('PT Vendor Aktif');
         });
     }
@@ -88,22 +101,23 @@ class AdminVerificationTest extends DuskTestCase
      */
     public function test_admin_membekukan_vendor_yang_melanggar()
     {
-        $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $vendorUser = User::factory()->create();
         Vendor::create([
-            'user_id' => $user->id, 
+            'user_id' => $vendorUser->id, 
             'company_name' => 'PT Bakal Suspend', 
-            'npwp' => '3', 
-            'address' => 'C', 
             'status' => 'Approved'
         ]);
 
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/admin/stations')
-                    ->script("window.confirm = function(){ return true; };"); 
-            
-            $browser->press('SUSPEND_ACC')
-                    ->pause(2000)
-                    ->waitForText('AKUN DITANGGUHKAN', 10);
+        $this->browse(function (Browser $browser) use ($admin) {
+            $browser->loginAs($admin)
+                    ->visit('/admin/dashboard')
+                    ->click('#tabBtn-manajemen')
+                    ->waitForText('PT Bakal Suspend', 10)
+                    ->click('form[action*="suspend"] button[type="submit"]')
+                    // Handle pop-up browser
+                    ->acceptDialog()
+                    ->waitForText('dibekukan sementara', 10);
         });
     }
 
@@ -113,22 +127,23 @@ class AdminVerificationTest extends DuskTestCase
      */
     public function test_admin_menghapus_data_vendor_sepenuhnya()
     {
-        $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $vendorUser = User::factory()->create();
         Vendor::create([
-            'user_id' => $user->id, 
+            'user_id' => $vendorUser->id, 
             'company_name' => 'PT Bakal Dihapus', 
-            'npwp' => '4', 
-            'address' => 'D', 
             'status' => 'Suspended'
         ]);
 
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/admin/stations')
-                    ->script("window.confirm = function(){ return true; };"); 
-            
-            $browser->press('HAPUS')
-                    ->pause(2000)
-                    ->waitForText('BELUM ADA VENDOR AKTIF', 10);
+        $this->browse(function (Browser $browser) use ($admin) {
+            $browser->loginAs($admin)
+                    ->visit('/admin/dashboard')
+                    ->click('#tabBtn-manajemen')
+                    ->waitForText('PT Bakal Dihapus', 10)
+                    // Cari tombol hapus pada form destroy
+                    ->click('form[action*="destroy"] button[type="submit"]')
+                    ->acceptDialog()
+                    ->waitForText('dihapus permanen', 10);
         });
     }
 }

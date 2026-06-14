@@ -48,17 +48,13 @@ class VendorWithdrawalController extends Controller
         return redirect()->route('admin.withdrawals.index')->with('success', 'Pengajuan withdrawal berhasil ditolak.');
     }
 
-    /**
-     * Menandai pengajuan withdrawal sebagai PAID dan menyimpan berkas bukti transfer riil.
-     * [TELAH DIPERBAIKI: MENANGKAP REQUEST FILE & UPDATE KOLOM receipt_path]
-     */
+
     public function markPaid(Request $request, VendorWithdrawal $withdrawal)
     {
         if ($withdrawal->status !== 'approved') {
             return redirect()->route('admin.withdrawals.index')->with('error', 'Hanya pengajuan berstatus approved yang bisa ditandai paid.');
         }
 
-        // Validasi file bukti transfer yang diunggah oleh Admin
         $request->validate([
             'receipt' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ], [
@@ -76,13 +72,11 @@ class VendorWithdrawalController extends Controller
                 'admin_notes' => 'Dana telah ditransfer ke rekening vendor.',
             ];
 
-            // Proses pemindahan file fisik ke dalam disk storage public
             if ($request->hasFile('receipt')) {
                 $path = $request->file('receipt')->store('vendor/receipts', 'public');
                 $updateData['receipt_path'] = $path;
             }
 
-            // Eksekusi pembaruan data baris transaksi ke database
             $withdrawal->update($updateData);
 
             DB::commit();

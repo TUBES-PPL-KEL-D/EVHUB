@@ -11,6 +11,7 @@ class WalletController extends Controller
 {
     public function index()
     {
+
         $user = Auth::user(); 
 
         $histories = WalletHistory::where('user_id', $user->id)
@@ -34,6 +35,7 @@ class WalletController extends Controller
 
         $user = Auth::user();
         $amount = $request->amount;
+
 
         DB::beginTransaction();
         try {

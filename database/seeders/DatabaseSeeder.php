@@ -32,7 +32,6 @@ class DatabaseSeeder extends Seeder
             'user_id' => $user1->id,
             'company_name' => 'PT Energi Nusantara Raya',
             'legality_document_path' => $dummyPdfPath,
-            // REVISI PENTING: Diubah jadi Approved agar bisa ditest Withdrawal-nya
             'status' => 'Approved', 
         ]);
 
@@ -102,9 +101,8 @@ class DatabaseSeeder extends Seeder
             'status' => 'pending'
         ]);
 
-        // --- 4. CALL OTHER SEEDERS (REVISI: Dijadikan satu agar tidak duplikat) ---
         $this->call([
-            UserSeeder::class, // Pastikan UserSeeder ini memiliki akun dengan role 'admin'
+            UserSeeder::class,
             VehicleSeeder::class,
             ChargerMachineSeeder::class,
             VendorWithdrawalSeeder::class, 
