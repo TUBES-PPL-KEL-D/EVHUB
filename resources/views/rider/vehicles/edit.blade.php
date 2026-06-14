@@ -393,7 +393,7 @@ const evModels = {
 let selectedBrand = '{{ $vehicle->merk }}';
 let selectedModel = '{{ $vehicle->model }}';
 
-// Auto-run on page load for Edit mode
+
 window.addEventListener('DOMContentLoaded', () => {
     if (selectedBrand) {
         document.getElementById('selected-brand-label').textContent = selectedBrand;
@@ -448,11 +448,11 @@ function checkForm() {
     const connector = document.querySelector('input[name="connector_type"]:checked')?.value || '';
     const btn = document.getElementById('submit-btn');
 
-    // Form valid jika: merk + model + plate. Connector optional!
+    
     if (merk && model && plate.length >= 4) {
         btn.disabled = false;
         
-        // Get connector display name
+        
         const connectorNames = {
             'CCS': 'CCS (Combined Charging System)',
             'CHAdeMO': 'CHAdeMO',

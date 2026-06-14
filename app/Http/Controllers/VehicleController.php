@@ -11,7 +11,7 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        // Mengambil ID User saat ini. Jika belum login, gunakan mode fallback ke user ID 1 (Admin pertama)
+        
         $userId = Auth::id() ?? 1;
         
         $vehicles = Vehicle::where('user_id', $userId)->latest()->get();
@@ -40,10 +40,10 @@ class VehicleController extends Controller
             'vehicle_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        // TESTER MODE BYPASS: Pastikan ada user ID 1
+        
         $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
         
-        // Buat user dummy jika ID 1 belum ada di database (Sangat berguna untuk Dusk Testing)
+        
         if (!\App\Models\User::find($userId)) {
             \App\Models\User::factory()->create(['id' => $userId]);
         }
@@ -61,7 +61,7 @@ class VehicleController extends Controller
 
     public function edit(Vehicle $vehicle)
     {
-        // Jika sedang tidak login, lewati pengecekan keamanan
+        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -71,7 +71,7 @@ class VehicleController extends Controller
 
     public function update(Request $request, Vehicle $vehicle)
     {
-        // Jika sedang tidak login, lewati pengecekan keamanan
+        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -101,7 +101,7 @@ class VehicleController extends Controller
 
     public function destroy(Vehicle $vehicle)
     {
-        // Jika sedang tidak login, lewati pengecekan keamanan
+        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
