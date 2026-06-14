@@ -105,6 +105,6 @@ Proyek ini dilengkapi dengan serangkaian *Test Case* fungsional. Karena sistem s
 
 Gunakan perintah ini setiap kali sebelum mengetes fitur baru:
 
-php artisan migrate:fresh --seed
+php artisan migrate:fresh --seed --env=dusk.local
 
 Tindakan ini mencegah terjadinya *error* akibat data *seeder* yang habis atau status data yang sudah berubah karena pengujian pada skenario sebelumnya.
