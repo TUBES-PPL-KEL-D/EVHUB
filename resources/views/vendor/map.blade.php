@@ -261,7 +261,6 @@
                 let listHTML = '';
                 listCountSpan.innerText = `${data.length} SPKLU`;
 
-                // Logika Sorting
                 if (currentUserLat && currentUserLng) {
                     data.forEach(spklu => {
                         spklu.distance = calculateDistance(currentUserLat, currentUserLng, spklu.latitude, spklu.longitude);

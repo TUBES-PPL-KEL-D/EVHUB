@@ -41,7 +41,6 @@ class MapSPKLUTest extends DuskTestCase
 
     public function test_complete_spklu_mapping_feature()
     {
-        // Start as unavailable
         $machine = $this->createSpkluWithMachine('SPKLU EV-HUB Bandung', -6.914744, 107.609810, 'unavailable');
         $rider = User::factory()->create(['role' => 'rider', 'status' => 'aktif']);
 
@@ -53,14 +52,10 @@ class MapSPKLUTest extends DuskTestCase
                     ->click('.leaflet-marker-icon')
                     ->waitForText('SPKLU EV-HUB Bandung', 5);
 
-            // Update status ke available di database
             $machine->update(['status' => 'available']);
 
-            // Tunggu sampai frontend mendeteksi perubahan (Polling)
-            // Kita pakai waitForText agar robot sabar menunggu sampai tulisan 'Tersedia' muncul
             $browser->waitForText('Tersedia', 10);
             
-            // Verifikasi akhir
             $browser->assertSee('Tersedia');
         });
     }

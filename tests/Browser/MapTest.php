@@ -14,7 +14,6 @@ class MapTest extends DuskTestCase
 {
     use DatabaseTruncation;
 
-    // Fungsi bantuan untuk membuat data dummy SPKLU dan mesin chargernya
     private function createSpkluWithMachine($name, $lat, $lng, $status = 'available')
     {
         $user = User::factory()->create(['role' => 'vendor', 'status' => 'aktif']);
@@ -47,7 +46,6 @@ class MapTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($rider) {
             $browser->loginAs($rider)->visit('/rider/peta')->waitFor('#map', 10);
             
-            // Bypass GPS Browser
             $browser->script("
                 navigator.geolocation.getCurrentPosition = function(success) {
                     success({ coords: { latitude: -6.920000, longitude: 107.600000 } });
@@ -109,7 +107,6 @@ class MapTest extends DuskTestCase
 
             $browser->click('#btn-locate-me')->pause(1000);
 
-            // Tembak spasi untuk memicu pemuatan ulang daftar
             $browser->type('#search-spklu', ' ')
                     ->waitForText('km', 15) 
                     ->assertSeeIn('#station-list', 'SPKLU UPI')
@@ -137,12 +134,10 @@ class MapTest extends DuskTestCase
         $this->browse(function (Browser $browser) use ($rider) {
             $browser->loginAs($rider)->visit('/rider/peta')->waitFor('#map', 10);
 
-            // Klik ubah ke Satelit
             $browser->click('#btn-toggle-layer')
                     ->pause(500)
                     ->assertPresent('#btn-toggle-layer.text-emerald-400'); 
 
-            // Klik kembali ke Street View
             $browser->click('#btn-toggle-layer')
                     ->pause(500)
                     ->assertMissing('#btn-toggle-layer.text-emerald-400');

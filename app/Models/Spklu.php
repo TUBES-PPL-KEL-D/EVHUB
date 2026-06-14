@@ -34,7 +34,6 @@ class Spklu extends Model
         return $this->hasMany(Review::class);
     }
 
-    // TAMBAHKAN FUNGSI INI
     public function galleryPhotos()
     {
         return $this->hasMany(SpkluGalleryPhoto::class);
