@@ -16,7 +16,7 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'company_name',
-        'legality_document_path', // Proteksi SUDAH DIBUKA agar tidak bernilai NULL lagi
+        'legality_document_path', 
         'status',
     ];
 

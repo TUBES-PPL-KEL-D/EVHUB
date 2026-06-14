@@ -68,7 +68,6 @@ class VendorProfileController extends Controller
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'opens_at' => ['nullable', 'date_format:H:i'],
             'closes_at' => ['nullable', 'date_format:H:i'],
-            // Validasi data finansial baru yang diminta asprak
             'npwp' => ['required', 'string', 'max:50'],
             'bank_name' => ['required', 'string', 'max:100'],
             'bank_account_number' => ['required', 'string', 'max:100'],

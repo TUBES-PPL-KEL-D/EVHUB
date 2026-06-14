@@ -11,7 +11,6 @@ class VendorWithdrawal extends Model
 
     /**
      * Kolom yang dapat diisi secara massal.
-     * [TELAH DIPERBAIKI: MENAMBAHKAN receipt_path KE DALAM FILLABLE]
      */
     protected $fillable = [
         'vendor_id',
@@ -24,7 +23,7 @@ class VendorWithdrawal extends Model
         'status',
         'processed_at',
         'admin_notes',
-        'receipt_path', // BARIS INI WAJIB ADA AGAR BERKAS TIDAK BERNILAI NULL
+        'receipt_path', 
     ];
 
     /**
