@@ -12,9 +12,7 @@ class SpkluController extends Controller
 {
     public function index()
     {
-        // Mengambil data koordinat dan info SPKLU dari database
         $spklus = Spklu::select('name', 'address', 'latitude', 'longitude')->get();
-        // Mengirimkan data $spklus ke file resources/views/vendor/map.blade.php
         return view('vendor.map', compact('spklus'));
     }
 
@@ -40,7 +38,6 @@ class SpkluController extends Controller
 
     public function getSpkluData()
     {
-        // Mengambil data SPKLU
         $spklus = Spklu::with('chargers')->get();
         return response()->json($spklus);
     }
@@ -48,28 +45,22 @@ class SpkluController extends Controller
     
     public function getDynamicMarkers(Request $request)
     {
-        // 1. Tarik seluruh data SPKLU riil dari database beserta relasi mesin chargernya
         $spkluRows = Spklu::with(['chargerMachines', 'reviews'])->get();
 
-        // 2. Transformasikan data database menjadi format JSON bento-box yang dibutuhkan Leaflet
         $formattedData = $spkluRows->map(function ($spklu) {
             $totalMachines = $spklu->chargerMachines->count();
             
-            // Hitung jumlah mesin yang statusnya 'available' (Tersedia)
             $availableMachines = $spklu->chargerMachines->filter(function ($machine) {
                 return strtolower($machine->status ?? '') === 'available';
             })->count();
 
-            // Hitung rata-rata rating ulasan dari pengendara
             $avgRating = $spklu->reviews->count() > 0 ? round($spklu->reviews->avg('rating'), 1) : 0;
 
-            // Tentukan status visual stasiun berdasarkan kondisi mesin charger
             $status = 'offline';
             if ($totalMachines > 0) {
                 $status = $availableMachines > 0 ? 'tersedia' : 'penuh';
             }
 
-            // Susun struktur array mesin di dalam stasiun terkait
             $machinesArray = $spklu->chargerMachines->map(function ($machine) {
                 return [
                     'connector_type' => $machine->connector_type ?? 'Unknown',
@@ -86,13 +77,12 @@ class SpkluController extends Controller
                 'status' => $status,
                 'available' => $availableMachines,
                 'total' => $totalMachines,
-                'avg_rating' => $avgRating ?: 5.0, // fallback visual rating jika belum ada ulasan
+                'avg_rating' => $avgRating ?: 5.0, 
                 'review_count' => $spklu->reviews->count(),
                 'charger_machines' => $machinesArray,
             ];
         });
 
-        // 3. Masukkan filter pencarian teks (Nama atau Alamat) jika pengendara mengetik di search bar
         if ($request->filled('search')) {
             $searchTerm = strtolower($request->search);
             $formattedData = $formattedData->filter(function ($item) use ($searchTerm) {
@@ -101,7 +91,6 @@ class SpkluController extends Controller
             });
         }
 
-        // 4. Masukkan filter dropdown berdasarkan Status ketersediaan mesin
         if ($request->filled('status') && $request->status !== 'semua') {
             $formattedData = $formattedData->where('status', $request->status);
         }
