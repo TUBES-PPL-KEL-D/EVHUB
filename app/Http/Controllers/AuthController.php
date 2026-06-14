@@ -35,17 +35,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // Ambil data peran user yang berhasil login
             $role = strtolower(Auth::user()->role ?? 'rider');
 
-            // Logika Otomatis Pengalihan Rute Berdasarkan Peran
             if ($role === 'admin') {
                 return redirect()->route('admin.dashboard')->with('success', 'Pusat kendali admin berhasil diakses.');
             } elseif ($role === 'vendor') {
                 return $this->redirectVendor(Auth::user());
             }
 
-            // Jalur default untuk pengendara umum (Rider)
             return redirect()->route('rider.map')->with('success', 'Sesi masuk berhasil dibuat.');
         }
 
@@ -61,28 +58,24 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi ketat: Tambahkan phone ke dalam validasi
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:20', // <-- TAMBAHAN BARU
+            'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:rider,vendor' 
         ]);
 
-        // Pembuatan entitas user baru ke database (Tambahkan phone)
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone, // <-- TAMBAHAN BARU
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'role' => $request->role, 
         ]);
 
-        // Otomatis login setelah pendaftaran sukses
         Auth::login($user);
 
-        // Jalur pengalihan instan pasca-registrasi
         if ($user->role === 'vendor') {
             return $this->redirectVendor($user);
         }

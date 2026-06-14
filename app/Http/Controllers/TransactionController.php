@@ -15,8 +15,7 @@ class TransactionController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        // Ambil transaksi yang terhubung dengan charger_machines
+
         $transactions = Transaction::with('chargerMachine')
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -55,25 +54,20 @@ class TransactionController extends Controller
         $vehicle = Vehicle::where('user_id', Auth::id())->findOrFail($request->vehicle_id);
         $user = Auth::user();
 
-        // VALIDASI 1: Cek kesesuaian tipe konektor
         if (strtolower($machine->connector_type) !== strtolower($vehicle->connector_type)) {
             return redirect()->back()->with('error', 'Tipe konektor mesin (' . $machine->connector_type . ') tidak cocok dengan kendaraan Anda (' . $vehicle->connector_type . ').');
         }
 
-        // Hitung estimasi harga berdasarkan target kWh inputan user
         $pricePerKwh = $machine->price_per_kwh ?? 2500;
         $estimatedPrice = $request->energy_target * $pricePerKwh;
 
-        // Hitung estimasi durasi berdasarkan daya mesin
         $estimatedDurationHours = $request->energy_target / $machine->capacity_kw;
         $estimatedDurationMinutes = ceil($estimatedDurationHours * 60);
 
-        // VALIDASI 2: Cek kecukupan saldo awal sebelum charge dimulai
         if ($user->balance < $estimatedPrice) {
             return redirect()->back()->with('error', 'Saldo EV-Pay Anda tidak mencukupi. Estimasi biaya: Rp ' . number_format($estimatedPrice, 0, ',', '.') . ' (Saldo Anda: Rp ' . number_format($user->balance, 0, ',', '.') . ').');
         }
 
-        // Proteksi ganda status mesin
         if (strtolower($machine->status) !== 'available') {
             return redirect()->back()->with('error', 'Maaf, mesin ini sedang digunakan oleh pengguna lain.');
         }

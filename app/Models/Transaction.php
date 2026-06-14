@@ -27,7 +27,6 @@ class Transaction extends Model
         'total_price' => 'decimal:2',
     ];
 
-    // Relasi balik ke User
     public function user()
     {
         return $this->belongsTo(User::class);
