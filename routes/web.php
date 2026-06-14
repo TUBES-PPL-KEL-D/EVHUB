@@ -16,6 +16,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ChargingQueueController;
 use App\Http\Controllers\TicketController;
+use App\Http\Middleware\IsAdmin;
 
 // 1. HALAMAN UTAMA (LANDING PAGE)
 Route::get('/', function () {
@@ -31,7 +32,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // ==========================================
-// ZONA INTERKONEKSI WAJIB LOGIN (MIDDLEWARE AUTH AKTIF)
+// ZONA WAJIB LOGIN YHH COY (MIDDLEWARE AUTH AKTIF)
 // ==========================================
 Route::middleware('auth')->group(function () {
     
@@ -90,7 +91,8 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 });
 
 // 5. AREA PANEL ADMIN & VERIFIKASI (Langgeng)
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(IsAdmin::class)->group(function () {
+
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/export-spklu', [AdminDashboardController::class, 'exportSpklu'])->name('export.spklu');
     Route::get('/withdrawals', [AdminVendorWithdrawalController::class, 'index'])->name('withdrawals.index');
@@ -104,8 +106,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('/vendors/{id}/activate', [AdminDashboardController::class, 'activate'])->name('vendors.activate');
     Route::delete('/vendors/{id}/destroy', [AdminDashboardController::class, 'destroy'])->name('vendors.destroy');
     Route::post('/vendors/{id}/warning', [AdminDashboardController::class, 'sendWarning'])->name('vendors.warning');
-    
-    // Rute Baru untuk Penyelesaian Laporan Kendala
     Route::patch('/tickets/{id}/resolve', [AdminDashboardController::class, 'resolveTicket'])->name('tickets.resolve');
 });
 

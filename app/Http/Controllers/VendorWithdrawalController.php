@@ -13,18 +13,12 @@ use Illuminate\Support\Str;
 
 class VendorWithdrawalController extends Controller
 {
-    /**
-     * Cek status vendor berdasarkan user yang sedang login.
-     * [TELAH DIPERBAIKI: MENGHAPUS HARDCODED VENDOR FIND 1]
-     */
     private function checkVendorStatus()
     {
         return Vendor::where('user_id', Auth::id())->first();
     }
 
-    /**
-     * Membangun ringkasan finansial riil milik vendor terkait.
-     */
+
     private function buildSummary(Vendor $vendor): array
     {
         $totalRevenue = 0;

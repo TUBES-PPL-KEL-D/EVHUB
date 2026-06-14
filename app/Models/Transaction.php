@@ -33,13 +33,11 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke Charger Machine (Mesin pengisi daya)
     public function chargerMachine()
     {
         return $this->belongsTo(ChargerMachine::class);
     }
 
-    // Relasi ke Wallet History (Jika transaksi ini memicu mutasi dompet)
     public function walletHistory()
     {
         return $this->hasOne(WalletHistory::class, 'reference_id');

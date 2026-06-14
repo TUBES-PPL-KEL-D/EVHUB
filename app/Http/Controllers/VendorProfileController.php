@@ -119,7 +119,6 @@ class VendorProfileController extends Controller
         }
 
         if ($vendorProfile->user_id !== $user->id) {
-            // Avoid redirect loops by always rendering the active user's own profile.
             $vendorProfile = $currentUserProfile;
         }
 

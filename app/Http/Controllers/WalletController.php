@@ -11,10 +11,9 @@ class WalletController extends Controller
 {
     public function index()
     {
-        // Menggunakan auth bawaan, sesuaikan jika timmu menggunakan logic custom auth
+
         $user = Auth::user(); 
-        
-        // Ambil riwayat dompet terbaru
+
         $histories = WalletHistory::where('user_id', $user->id)
                                   ->orderBy('created_at', 'desc')
                                   ->get();
@@ -37,7 +36,7 @@ class WalletController extends Controller
         $user = Auth::user();
         $amount = $request->amount;
 
-        // 2. Gunakan DB Transaction agar proses update saldo & pencatatan riwayat sinkron
+
         DB::beginTransaction();
         try {
             // Update saldo user

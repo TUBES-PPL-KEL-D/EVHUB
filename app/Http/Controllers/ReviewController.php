@@ -8,7 +8,6 @@ class ReviewController extends Controller
 {
     public function store(Request $request, $spkluId)
     {
-        // PERBAIKAN POIN 3: Comment diubah menjadi required dan minimal 3 karakter
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|min:3|max:1000',
