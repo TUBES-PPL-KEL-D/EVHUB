@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // tambah ini
+use Illuminate\Database\Eloquent\Factories\HasFactory; 
 use Illuminate\Database\Eloquent\Model;
 
 class VendorProfile extends Model
 {
-    use HasFactory; // tambah ini
+    use HasFactory; 
 
     protected $fillable = [
         'user_id',
