@@ -12,17 +12,14 @@ class DummyChargerMachineSeeder extends Seeder
 {
     public function run()
     {
-        // Temukan vendor dummy (misal ID 999 yang user buat, atau yang pertama)
         $vendor = Vendor::first();
         if (!$vendor) return;
 
-        // Ambil semua SPKLU dari 1 sampai 8
+
         $spklus = Spklu::whereIn('id', [1, 2, 3, 4, 5, 6, 7, 8])->get();
 
         foreach ($spklus as $spklu) {
-            // Cek jika SPKLU ini belum punya mesin
             if ($spklu->chargerMachines()->count() == 0) {
-                // Buat 2 mesin untuk masing-masing SPKLU ini
                 ChargerMachine::create([
                     'vendor_id' => $vendor->id,
                     'spklu_id' => $spklu->id,

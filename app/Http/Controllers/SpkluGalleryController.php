@@ -46,8 +46,7 @@ class SpkluGalleryController extends Controller
         ]);
 
         $path = $request->file('photo')->store('spklu_galleries', 'public');
-
-        // PERBAIKAN: Menggunakan kolom image_path
+        
         SpkluGalleryPhoto::create([
             'spklu_id' => $spklu->id,
             'image_path' => $path,
@@ -61,8 +60,6 @@ class SpkluGalleryController extends Controller
         $vendor = $this->getVendor();
         if ($spklu->vendor_id !== $vendor->id) abort(403);
         if ($photo->spklu_id !== $spklu->id) abort(404);
-
-        // PERBAIKAN: Menggunakan kolom image_path
         if (Storage::disk('public')->exists($photo->image_path)) {
             Storage::disk('public')->delete($photo->image_path);
         }

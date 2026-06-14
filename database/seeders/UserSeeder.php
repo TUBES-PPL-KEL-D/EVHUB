@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Jalankan database seeds.
-     */
     public function run(): void
     {
         // 1. Akun Default Admin Utama (Tidak Bisa Daftar Lewat Web)

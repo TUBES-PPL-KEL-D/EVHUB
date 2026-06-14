@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('role')->default('rider'); // rider, vendor, admin
+            $table->string('role')->default('rider'); 
             $table->string('phone')->nullable();
             $table->string('status')->default('aktif');
             $table->decimal('balance', 12, 2)->default(0.00);

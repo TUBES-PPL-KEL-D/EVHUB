@@ -166,7 +166,6 @@
                                     Sedang Maintenance
                                 </button>
                             @endif
-                            </div>
                         </div>
                     </div>
                     @endforeach

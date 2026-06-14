@@ -13,10 +13,6 @@ use App\Models\Transaction;
 
 class ChargerMachineController extends Controller
 {
-    /**
-     * Cek status vendor.
-     * [TELAH DIPERBAIKI: HAPUS BYPASS, GUNAKAN AUTH ASLI]
-     */
     private function checkVendorStatus()
     {
         // Mengambil ID user yang sedang login dari sesi

@@ -22,7 +22,7 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
     private function createVendorUser(array $attributes = []): User
     {
         return User::factory()->create(array_merge([
-            'role' => 'vendor',
+            'role'   => 'vendor',
             'status' => 'aktif',
         ], $attributes));
     }
@@ -48,26 +48,26 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
         $user = $this->createVendorUser();
 
         $vendor = Vendor::factory()->create(array_merge([
-            'user_id' => $user->id,
-            'status' => 'Approved',
+            'user_id'      => $user->id,
+            'status'       => 'Approved',
             'company_name' => 'PT EVHUB Vendor Utama',
         ], $vendorAttributes));
 
         $profile = VendorProfile::create(array_merge([
-            'user_id' => $user->id,
-            'company_name' => $vendor->company_name,
-            'company_email' => 'vendor@evhub.test',
-            'company_phone' => '081234567890',
-            'company_address' => 'Jl. Test Vendor No. 1',
+            'user_id'             => $user->id,
+            'company_name'        => $vendor->company_name,
+            'company_email'       => 'vendor@evhub.test',
+            'company_phone'       => '081234567890',
+            'company_address'     => 'Jl. Test Vendor No. 1',
             'company_description' => 'Vendor test untuk Dusk.',
-            'latitude' => -6.9123456,
-            'longitude' => 107.6123456,
-            'opens_at' => '08:00',
-            'closes_at' => '17:00',
-            'npwp' => '123456789012345',
-            'bank_name' => 'BCA',
+            'latitude'            => -6.9123456,
+            'longitude'           => 107.6123456,
+            'opens_at'            => '08:00',
+            'closes_at'           => '17:00',
+            'npwp'                => '123456789012345',
+            'bank_name'           => 'BCA',
             'bank_account_number' => '1234567890',
-            'bank_account_name' => 'PT EVHUB Vendor Utama',
+            'bank_account_name'   => 'PT EVHUB Vendor Utama',
         ], $profileAttributes));
 
         return compact('user', 'vendor', 'profile');
@@ -87,74 +87,74 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
         ]);
 
         $vehicle = Vehicle::create([
-            'user_id' => $rider->id,
-            'merk' => 'Hyundai',
-            'model' => 'Ioniq 5',
+            'user_id'       => $rider->id,
+            'merk'          => 'Hyundai',
+            'model'         => 'Ioniq 5',
             'license_plate' => 'B 1234 EV',
         ]);
 
         $spklu = Spklu::create([
             'vendor_id' => $bundle['vendor']->id,
-            'name' => 'SPKLU Dusk Revenue',
-            'address' => 'Jl. Pendapatan 1',
-            'latitude' => -6.91,
+            'name'      => 'SPKLU Dusk Revenue',
+            'address'   => 'Jl. Pendapatan 1',
+            'latitude'  => -6.91,
             'longitude' => 107.61,
         ]);
 
         $charger = ChargerMachine::create([
-            'vendor_id' => $bundle['vendor']->id,
-            'spklu_id' => $spklu->id,
-            'name' => 'Mesin Revenue A',
-            'connector_type' => 'CCS2',
-            'capacity_kw' => 150,
-            'price_per_kwh' => 2500,
+            'vendor_id'         => $bundle['vendor']->id,
+            'spklu_id'          => $spklu->id,
+            'name'              => 'Mesin Revenue A',
+            'connector_type'    => 'CCS2',
+            'capacity_kw'       => 150,
+            'price_per_kwh'     => 2500,
             'operational_hours' => '08:00 - 17:00',
-            'photo_path' => 'chargers/dusk.jpg',
-            'status' => 'available',
+            'photo_path'        => 'chargers/dusk.jpg',
+            'status'            => 'available',
         ]);
 
         Transaction::create([
-            'user_id' => $rider->id,
+            'user_id'            => $rider->id,
             'charger_machine_id' => $charger->id,
-            'vehicle_id' => $vehicle->id,
-            'energy_consumed' => 3,
-            'total_price' => 7500,
-            'started_at' => now()->subHours(2),
-            'finished_at' => now()->subHour(),
-            'status' => 'success',
+            'vehicle_id'         => $vehicle->id,
+            'energy_consumed'    => 3,
+            'total_price'        => 7500,
+            'started_at'         => now()->subHours(2),
+            'finished_at'        => now()->subHour(),
+            'status'             => 'success',
         ]);
 
         Transaction::create([
-            'user_id' => $rider->id,
+            'user_id'            => $rider->id,
             'charger_machine_id' => $charger->id,
-            'vehicle_id' => $vehicle->id,
-            'energy_consumed' => 3,
-            'total_price' => 7500,
-            'started_at' => now()->subHours(4),
-            'finished_at' => now()->subHours(3),
-            'status' => 'success',
+            'vehicle_id'         => $vehicle->id,
+            'energy_consumed'    => 3,
+            'total_price'        => 7500,
+            'started_at'         => now()->subHours(4),
+            'finished_at'        => now()->subHours(3),
+            'status'             => 'success',
         ]);
 
         Transaction::create([
-            'user_id' => $rider->id,
+            'user_id'            => $rider->id,
             'charger_machine_id' => $charger->id,
-            'vehicle_id' => $vehicle->id,
-            'energy_consumed' => 0,
-            'total_price' => 0,
-            'started_at' => now()->subHours(6),
-            'finished_at' => now()->subHours(5),
-            'status' => 'failed',
+            'vehicle_id'         => $vehicle->id,
+            'energy_consumed'    => 0,
+            'total_price'        => 0,
+            'started_at'         => now()->subHours(6),
+            'finished_at'        => now()->subHours(5),
+            'status'             => 'failed',
         ]);
 
         Transaction::create([
-            'user_id' => $rider->id,
+            'user_id'            => $rider->id,
             'charger_machine_id' => $charger->id,
-            'vehicle_id' => $vehicle->id,
-            'energy_consumed' => 0,
-            'total_price' => 0,
-            'started_at' => now()->subHours(8),
-            'finished_at' => now()->subHours(7),
-            'status' => 'pending',
+            'vehicle_id'         => $vehicle->id,
+            'energy_consumed'    => 0,
+            'total_price'        => 0,
+            'started_at'         => now()->subHours(8),
+            'finished_at'        => now()->subHours(7),
+            'status'             => 'pending',
         ]);
 
         return array_merge($bundle, compact('rider', 'vehicle', 'spklu', 'charger'));
@@ -178,12 +178,12 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
                 ->type('bank_name', 'BCA')
                 ->type('bank_account_number', '9876543210')
                 ->type('bank_account_name', 'PT Geografis EVHUB');
-            
+
             $browser->script([
-                    "document.getElementById('latitude').value = '-6.914744';",
-                    "document.getElementById('longitude').value = '107.609810';",
-                ]);
-                
+                "document.getElementById('latitude').value = '-6.914744';",
+                "document.getElementById('longitude').value = '107.609810';",
+            ]);
+
             $browser->type('opens_at', '08:00')
                 ->type('closes_at', '17:00')
                 ->press('Simpan Profil')
@@ -199,12 +199,12 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
         });
 
         $this->assertDatabaseHas('vendor_profiles', [
-            'user_id' => $user->id,
+            'user_id'      => $user->id,
             'company_name' => 'PT Geografis EVHUB',
-            'latitude' => -6.914744,
-            'longitude' => 107.60981,
-            'opens_at' => '08:00:00',
-            'closes_at' => '17:00:00',
+            'latitude'     => -6.914744,
+            'longitude'    => 107.60981,
+            'opens_at'     => '08:00:00',
+            'closes_at'    => '17:00:00',
         ]);
     }
 
@@ -223,12 +223,12 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
                 ->type('bank_name', 'Mandiri')
                 ->type('bank_account_number', '1234567890')
                 ->type('bank_account_name', 'PT Koordinat Salah');
-            
+
             $browser->script([
-                    "document.getElementById('latitude').value = '91';",
-                    "document.getElementById('longitude').value = '181';",
-                ]);
-                
+                "document.getElementById('latitude').value = '91';",
+                "document.getElementById('longitude').value = '181';",
+            ]);
+
             $browser->press('Simpan Profil')
                 ->waitForText('Ada kesalahan pada form:', 10)
                 ->assertPathIs('/vendor/profile/create')
@@ -255,8 +255,8 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
         });
 
         $this->assertDatabaseHas('vendor_profiles', [
-            'user_id' => $bundle['user']->id,
-            'opens_at' => '07:30:00',
+            'user_id'   => $bundle['user']->id,
+            'opens_at'  => '07:30:00',
             'closes_at' => '21:30:00',
         ]);
     }
@@ -287,22 +287,22 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
 
         $spklu = Spklu::create([
             'vendor_id' => $bundle['vendor']->id,
-            'name' => 'SPKLU Galeri Dusk',
-            'address' => 'Jl. Galeri No. 5',
-            'latitude' => -6.91,
+            'name'      => 'SPKLU Galeri Dusk',
+            'address'   => 'Jl. Galeri No. 5',
+            'latitude'  => -6.91,
             'longitude' => 107.61,
         ]);
 
         ChargerMachine::create([
-            'vendor_id' => $bundle['vendor']->id,
-            'spklu_id' => $spklu->id,
-            'name' => 'Mesin Galeri A',
-            'connector_type' => 'CCS2',
-            'capacity_kw' => 100,
-            'price_per_kwh' => 2500,
+            'vendor_id'         => $bundle['vendor']->id,
+            'spklu_id'          => $spklu->id,
+            'name'              => 'Mesin Galeri A',
+            'connector_type'    => 'CCS2',
+            'capacity_kw'       => 100,
+            'price_per_kwh'     => 2500,
             'operational_hours' => '08:00 - 17:00',
-            'photo_path' => 'chargers/gallery.jpg',
-            'status' => 'available',
+            'photo_path'        => 'chargers/gallery.jpg',
+            'status'            => 'available',
         ]);
 
         $photoPath = $this->getValidJpgPath();
@@ -327,50 +327,50 @@ class VendorImprovementSprintAndFinanceTest extends DuskTestCase
     }
 
     // PBI 42
-    public function test_pbi_42_vendor_can_submit_withdrawal_and_see_status(): void
-    {
-        $bundle = $this->seedRevenueBundle();
+public function test_pbi_42_vendor_can_submit_withdrawal_and_see_status(): void
+{
+    $bundle = $this->seedRevenueBundle();
 
-        $this->browse(function (Browser $browser) use ($bundle) {
-            $browser->loginAs($bundle['user'])
-                ->visit('/vendor/withdrawals')
-                ->waitForText('Penarikan Dana Pendapatan', 10)
-                ->assertSee('Rp15.000')
-                ->type('amount', '10000')
-                ->type('bank_name', 'BCA')
-                ->type('bank_account_name', 'PT Pendapatan Dusk')
-                ->type('bank_account_number', '1234567890')
-                ->type('notes', 'Pengujian withdrawal Dusk')
-                ->press('Kirim Pengajuan')
-                ->waitForText('Pengajuan withdrawal berhasil dikirim.', 10)
-                ->waitForText('Rp10.000', 10);
-        });
+    $this->browse(function (Browser $browser) use ($bundle) {
+        $browser->loginAs($bundle['user'])
+            ->visit('/vendor/withdrawals')
+            ->waitForText('Penarikan Dana Pendapatan', 10)
+            ->assertSee('Rp15.000')
+            ->waitFor('input[name="amount"]', 10);
 
-        $this->assertDatabaseHas('vendor_withdrawals', [
-            'vendor_id' => $bundle['vendor']->id,
-            'amount' => 10000,
-            'bank_name' => 'BCA',
-            'status' => 'pending',
+        $browser->script("document.getElementsByName('amount')[0].value = '10000';");
+
+        $browser->type('notes', 'Pengujian withdrawal Dusk')
+            ->press('Kirim Pengajuan')
+            ->waitForText('Pengajuan withdrawal berhasil dikirim.', 10)
+            ->waitForText('Rp10.000', 10);
+    });
+
+    $this->assertDatabaseHas('vendor_withdrawals', [
+        'vendor_id' => $bundle['vendor']->id,
+        'amount'    => 10000,
+        'bank_name' => 'BCA',
+        'status'    => 'pending',
+    ]);
+}
+
+public function test_pbi_42_vendor_cannot_withdraw_more_than_available_balance(): void
+{
+    $bundle = $this->seedRevenueBundle();
+
+    $this->browse(function (Browser $browser) use ($bundle) {
+        $browser->loginAs($bundle['user'])
+            ->visit('/vendor/withdrawals')
+            ->waitForText('Penarikan Dana Pendapatan', 10)
+            ->waitFor('input[name="amount"]', 10);
+
+        $browser->script([
+            "document.getElementsByName('amount')[0].removeAttribute('max');",
+            "document.getElementsByName('amount')[0].value = '30000';",
         ]);
-    }
 
-    public function test_pbi_42_vendor_cannot_withdraw_more_than_available_balance(): void
-    {
-        $bundle = $this->seedRevenueBundle();
-
-        $this->browse(function (Browser $browser) use ($bundle) {
-            $browser->loginAs($bundle['user'])
-                ->visit('/vendor/withdrawals')
-                ->waitForText('Penarikan Dana Pendapatan', 10);
-                
-            $browser->script("document.getElementsByName('amount')[0].removeAttribute('max');");
-            
-            $browser->type('amount', '30000')
-                ->type('bank_name', 'BCA')
-                ->type('bank_account_name', 'PT Pendapatan Dusk')
-                ->type('bank_account_number', '1234567890')
-                ->press('Kirim Pengajuan')
-                ->waitForText('Nominal melebihi saldo yang tersedia untuk ditarik.', 10);
-        });
-    }
+        $browser->press('Kirim Pengajuan')
+            ->waitForText('Nominal melebihi saldo yang tersedia untuk ditarik.', 10);
+    });
+}
 }

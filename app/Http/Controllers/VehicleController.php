@@ -11,7 +11,6 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        
         $userId = Auth::id() ?? 1;
         
         $vehicles = Vehicle::where('user_id', $userId)->latest()->get();
@@ -40,9 +39,7 @@ class VehicleController extends Controller
             'vehicle_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        
         $userId = \Illuminate\Support\Facades\Auth::id() ?? 1;
-        
         
         if (!\App\Models\User::find($userId)) {
             \App\Models\User::factory()->create(['id' => $userId]);
@@ -61,7 +58,6 @@ class VehicleController extends Controller
 
     public function edit(Vehicle $vehicle)
     {
-        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -71,7 +67,6 @@ class VehicleController extends Controller
 
     public function update(Request $request, Vehicle $vehicle)
     {
-        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -101,7 +96,6 @@ class VehicleController extends Controller
 
     public function destroy(Vehicle $vehicle)
     {
-        
         if (Auth::check() && $vehicle->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
